@@ -1,0 +1,46 @@
+<div class="row">
+        <div *ngIf="isDeleteError">
+                <div class="row">
+                    <div class=" ecb-alertCreatePOEerrormsg col-xs-12 col-sm-6  col-md-6 col-lg-offset-4 col-lg-4 col-lg-offset-4  alert alert-danger " role="alert">
+                        <p l10nTranslate><strong>{{deleteErrorMessage}}</strong></p>
+                        <span class="ebNotification-close" (click)="clearErrorMessage()">
+                                  <em class="ebIcon ebIcon_close_red"></em>
+                        </span>
+                    </div>
+                </div>
+        </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <ecb-calendars-modal-dialog [inUsePIData]="propertiesList" *ngIf="openInUseDetailsWidget" (inUseCalendarModalDialogClose)="hideInUseCalendarModalDialog($event)"></ecb-calendars-modal-dialog>
+    <div class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+        <div class="ebNotification-content ecb-infotext">
+            <span class="ebNotification-label">
+                <span l10nTranslate>{{"TEXT_EDIT_TO"}} </span> {{ propertiesList?.name }}
+                        <span l10nTranslate>{{"TEXT_CHANGE_IT_IN"}}</span>
+                <a  *ngIf="propertiesList?.usageCount > 0" (click)="openInUseDetails()"> {{propertiesList?.usageCount}}
+                <span l10nTranslate>{{ "TEXT_PI"}}</span>
+                </a>
+                <span *ngIf="propertiesList?.usageCount <= 0" l10nTranslate> {{propertiesList?.usageCount}}  {{"TEXT_PI"}}</span>
+            </span>
+        </div>
+    </div>
+    <div class="row ecb-rowContainer">
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+            <ecb-loader *ngIf="showCalPropSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>    
+            <ecb-calendar-properties (isCalendarFormDirty)="dataEdited($event)" (isGetWidgetType)="getWidgetType($event)" [properties]="propertiesList" [productOfferId]="calenderID" [errorMessage]="errorMessage"></ecb-calendar-properties>
+                            
+        </div>
+    </div>
+    <div class="row ecb-rowContainer">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+            <ecb-loader *ngIf="showCalStdSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+            <ecb-calendar-standardday (isEdited)="dataEdited($event)" (isGetWidgetType)="getWidgetType($event)" [selectedCalendarId]="calenderID"></ecb-calendar-standardday>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+                <ecb-loader *ngIf="showCalHolSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                <ecb-calendar-holiday (isEdited)="dataEdited($event)" (isGetWidgetType)="getWidgetType($event)"  [selectedCalendarId]="calenderID"></ecb-calendar-holiday>
+        </div>
+    </div>
+    </div>
+</div>
+

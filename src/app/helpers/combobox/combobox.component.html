@@ -1,0 +1,21 @@
+<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <label for="datetime-input" class="ebLabel">{{label}}</label>
+    <div *ngIf="ReadonlyMode" class="ecb-inputReadOnly">
+        <span>{{selectedOption}}</span>
+    </div>
+    <div *ngIf="!ReadonlyMode">
+        <div class="input-group">
+            <input id="initFocus" type="text" class="form-control ebInput" maxlength= {{MaximumLength}} [(ngModel)]="selectedOption" aria-label="..." (keyup)="showFilteredOptions($event.target.value)" (ngModelChange)="setSelectedOption()" tabindex="1" autofocus>
+            <div class="input-group-btn" [ngClass]="{'open': showOptions}">
+                <button #chevron type="button" class="btn btn-default ecb-btn">
+                    <span class="chevron down"></span>
+                </button>
+                <ul #comboboxOptions class="dropdown-menu dropdown-menu-right" [ngStyle]="{'height': 'auto', 'max-height':isHeightDefined ? setOptionsHeight : '200px', 'width':isWidthDefined ? setOptionsWidth : '160px', 'overflow': 'auto' }">
+                    <li *ngFor="let option of options">
+                        <a (click)="setOption(option)">{{option}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+<div class="panel panel-default">
+    <div class="panel-heading ecb-panelHeading">  
+		<div *ngIf="editExtPropCapability" class="ecb-panelHeaderLink">
+            <a title="{{editTooltip}}" [class.disable]="showAprrovalEditBtn" (click)="displayCoverHandler(extendedProps,true)" l10nTranslate>{{'TEXT_EDIT'}}</a>
+        </div>
+        <h2 class="ecb-priceableItemText" l10nTranslate *ngIf="!isProductOffer">{{'TEXT_EXTENEDED_PROPERTIES'}}</h2>
+        <h2 class="ecb-priceableItemText " l10nTranslate *ngIf="isProductOffer">{{'TEXT_EXTENEDED_PROPERTIES'}}</h2>                  
+    </div>
+    <div class="panel-body">
+      <form>
+          <div class="form-group" *ngFor="let extProperty of extendedProperty;  let i = index">
+              <div *ngIf="extProperty?.type?.value == 'string'" class="input-group col-xs-12 col-sm-12 input-paddingTop">
+                  <label for="simple-input" class="ebLabel" l10nTranslate>{{extProperty.displayName}}</label>
+                    <div class="ecb-inputReadOnly">
+                        <div class="ecb-wordbreak" [ngClass]="{'ecb-wordBreakAll': isNoBreakString(extProperty.value)}">{{extProperty.value}}</div>
+                    </div>
+              </div>
+              <div class="ebCheckbox" *ngIf="extProperty?.type?.value == 'boolean'">
+                  <label>
+                      <input type="checkbox" [ngClass]="{'readonly-checkbox' :(extProperty.value == '1' || extProperty.value == 'Y')}" [checked]="(extProperty.value == '1' ||  extProperty.value == 'Y')" disabled>
+                      <div class="text" [ngClass]="{'readonly' :(extProperty.value == '1' || extProperty.value == 'Y')}"><em *ngIf="(extProperty.value == '1' ||  extProperty.value == 'Y')" class="fa fa-check" aria-hidden="true"></em>
+                          {{extProperty.displayName}}
+                      </div>
+                  </label>
+              </div>
+          </div>
+      </form>
+      <ngx-aside #extendedProps [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false" class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <div class="panel panel-default">
+                    <div class="panel-heading ecb-panelHeading">
+                        <div class="row">
+                            <h2 class="col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_EXTPROPERTIES'}}</h2>
+                            <div class="col-xs-6 ecb-editOverlayLink">
+                                <button class="ebBtn ecbBtn-margin" [disabled]="!isSaveEnabled" [ngClass]="{'ebBtn-primary': isSaveEnabled}" (click)="savePOExtProperties(extendedProps)" l10nTranslate>{{'TEXT_SAVE'}}</button>
+                                <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                            </div>
+                        </div>
+                    </div>
+                <div class="panel-body">
+                    <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+                      <button type="button" class="close" data-dismiss="alert">
+                          <span aria-hidden="true" (click)="showErrorMessage = false">×</span><span class="sr-only">Close</span>
+                      </button>
+                      <p>{{httpErrorMessage}}</p>
+                    </div>
+                    <div *ngIf="isPItemplate" class="ebNotification ebNotification_color_paleBlue ecb-marginbottom">
+                      <div class="ebNotification-content ecb-infotext">
+                        <span class="ebNotification-label" l10nTranslate>
+                          {{'TEXT_CHANGES_IMPACT'}}
+                            <a (click)="openInUseOfferings()"><span l10nTranslate>{{'TEXT_EXISTING_PI'}}</span></a>
+                            <span l10nTranslate>{{'TEXT_UNLESS_NOTED'}}</span>
+                        </span>
+                      </div>
+                    </div>
+                    <form [formGroup]="extendedPropertiesForm" form #extPropertiesForm="ngForm"  (keydown) = "onEnterSavePOExtProperties(extendedProps, $event)" novalidate>
+                        <div class="form-group" *ngFor="let extProperty of extendedProperty;  let i = index">
+                            <div *ngIf="extProperty?.type?.value == 'string'">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{extProperty.displayName}}</label>
+                                <input id="initFocus" #firstInput type="text" tabindex="{{i+1}}" class="ebInput" maxlength="{{extProperty.length}}" formControlName="{{extProperty.dn}}" [readonly]="isReadonlyElement(extProperty)">
+                            </div>
+                            <div class="ebCheckbox" *ngIf="extProperty?.type?.value == 'boolean'">
+                                <label>
+                                    <input #firstInput tabindex="{{i+1}}" type="checkbox" (click)="onCheckboxSelect($event, extProperty, i)" [checked]="checkAnySelected(extProperty)" formControlName="{{extProperty.dn}}">
+                                    <div class="text">
+                                        {{extProperty.displayName}}
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+    </ngx-aside>
+    <ecb-modal-dialog [closeOnEscape]="false"[open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+            <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+            <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+    </ecb-modal-dialog>
+    <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>
+    <ecb-inuse-offerings-modal-dialog *ngIf="showInUseOfferings" [offeringsData]="inUseOfferingsData" [offeringsLocation]="inUseOfferingsLocation" (inUseModalDialogClose)="hideInUseModalDialog($event)"></ecb-inuse-offerings-modal-dialog>
+    </div>
+</div>

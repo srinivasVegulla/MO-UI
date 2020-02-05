@@ -1,0 +1,51 @@
+export const cycleConfigurationData = {
+	'Interval': {
+		'MONTHLY': 'TEXT_MONTHLY',
+		'DAILY': 'TEXT_DAILY',
+		'WEEKLY': 'TEXT_WEEKLY',
+		'BI_WEEKLY': 'TEXT_BI_WEEKLY',
+		'SEMI_MONTHLY': 'TEXT_SEMI_MONTHLY',
+		'QUARTERLY': 'TEXT_QUARTERLY',
+		'ANNUALLY': 'TEXT_ANNUAL',
+		'SEMI_ANNUALLY': 'TEXT_SEMI_ANNUAL'
+	},
+	'DaysOfWeek': {
+		1: 'TEXT_SUNDAY',
+		2: 'TEXT_MONDAY',
+		3: 'TEXT_TUESDAY',
+		4: 'TEXT_WEDNESDAY',
+		5: 'TEXT_THURSDAY',
+		6: 'TEXT_FRIDAY',
+		7: 'TEXT_SATURDAY'
+	},
+	'MonthData': {
+		1: 'TEXT_JANUARY',
+		2: 'TEXT_FEBRUARY',
+		3: 'TEXT_MARCH',
+		4: 'TEXT_APRIL',
+		5: 'TEXT_MAY',
+		6: 'TEXT_JUNE',
+		7: 'TEXT_JULY',
+		8: 'TEXT_AUGUST',
+		9: 'TEXT_SEPTEMBER',
+		10: 'TEXT_OCTOBER',
+		11: 'TEXT_NOVEMBER',
+		12: 'TEXT_DECEMBER'
+  },
+  'QuarterMonth': {
+		1: 'TEXT_1ST_QURT_MONTH',
+		2: 'TEXT_2ND_QURT_MONTH',
+		3: 'TEXT_3RD_QURT_MONTH'
+  },
+  'UsageCycle': {
+    'MONTHLY': 1,
+    'ON-DEMAND': 2,
+		'DAILY': 3,
+		'WEEKLY': 4,
+		'BI_WEEKLY': 5,
+		'SEMI_MONTHLY': 6,
+		'QUARTERLY': 7,
+		'ANNUALLY': 8,
+		'SEMI_ANNUALLY': 9
+  }
+}

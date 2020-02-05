@@ -1,0 +1,40 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    url: jdbc:hsqldb:mem:dbtestsql;sql.syntax_mss=true
+    dataSourceClassName: org.hsqldb.jdbc.JDBCDataSource
+    username: sa
+    password: password
+    dataSourceProperties:
+      url: jdbc:hsqldb:mem:dbtestsql;sql.syntax_mss=true
+ecb:
+  jwt:
+    accessToken:
+      timeToLive: 300 # seconds
+    refreshToken:
+      timeToLive: 900 # seconds
+  jwe:
+    algorithm:
+      name: RS256
+  jws:
+    algorithm:
+      name: RS256
+  dbms: sqlserver
+  auth:
+    db:
+      config: config
+  rmp:
+    config:
+      resolver: config
+      path: src/test/resources/rmp
+liquibase:
+  enabled: false
+eureka:
+  client:
+    enabled: false
+hystrix:
+  stream:
+    queue:
+      enabled: false

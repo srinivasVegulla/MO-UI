@@ -1,0 +1,85 @@
+<div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-ngxasidepanel">
+        <div class="panel panel-default">
+            <div class="panel-heading ">
+                <div class="row">
+                        <h2 *ngIf="isCreateRateList" class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{"TEXT_CREATE_RATELIST"}}</h2>
+                        <h2 *ngIf="isCopyRates" class="col-lg-6 col-md-6 col-sm-6 col-xs-6  ecb-toggleFloat" l10nTranslate>{{'TEXT_COPY_RATELIST'}}</h2>
+                    <div class="col-lg-6 ecb-editOverlayLink">
+                        <button class="ebBtn ecbBtn-margin" (click)="checkNameAvailability(true)" [disabled]="!isSaveEnabled||!sharedPricelist.valid" [ngClass]="{'ebBtn-primary': !isSaveDisabled}"
+                            l10nTranslate>{{'TEXT_SAVE'}}</button>
+                        <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <p>{{httpErrorMessage}}</p>
+                </div>
+                <form class="ecb-propertiesFormMain" class="ecb-asideform" [formGroup]="sharedPricelist" (keydown)="onEnterSaveRates($event)" novalidate>
+                    <div class="row">
+                        <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+                            <div class="input-group col-xs-12" l10nTranslate>
+                                <input #defaultName id="initFocus" type="text" class="ebInput" autofocus maxlength="255" name="name" formControlName="name"
+                                    (blur)="checkNameAvailability(false)" (keydown)="disableSpace($event)" (focusout)="removeSpace()" [ngClass]="{'ecb-fieldEmptyValidator': (sharedPricelist.controls.name.hasError('required') && sharedPricelist.controls.name.touched)
+                                    || nameExist}"/>
+                                <span class="input-group-required"></span>
+                            </div>
+                            <!-- Input name error message -->
+                            <div *ngIf="sharedPricelist.controls.name.hasError('required') && sharedPricelist.controls.name.touched" class="ebInputError">
+                                <span class="statusError"></span>
+                                <span l10nTranslate>{{'TEXT_NAME_REQUIRED'}}</span>
+                            </div>
+                            <!-- Input name uniqueness error message -->
+                            <div *ngIf="nameExist && !sharedPricelist.controls.name.hasError('required')" class="ebInputError">
+                                <span class="statusError"></span>
+                                <span l10nTranslate>{{'TEXT_NAME_EXIST'}}</span>
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+                            <textarea class="form-control ecbTextArea" type="text" #textArea [ngClass]="autoGrow()" maxlength="4000" name="description" formControlName="description"></textarea>
+                        </div>
+                        <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <label for="email" class="ebLabel" [class.ebInputError]="sharedPricelist.controls.currency.hasError('required') && sharedPricelist.controls.currency.touched"
+                                l10nTranslate>{{'TEXT_CURRENCY'}}</label>
+                            <div class="input-group col-xs-12">
+                                <select class="ebInput ecb-sideSelect" id="test" name="currency" formControlName="currency" (click)="changeDropdown()">
+                                    <option *ngFor="let currency of spcurrencies" [value]="currency?.name" [selected]="currency?.name=='USD' ? 'selected' : null"
+                                        class="currency">{{currency.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <label class="ebLabel" l10nTranslate>{{'TEXT_PARTITION_ID'}}</label>
+                            <div class="input-group col-xs-12">
+                                <select class="ebInput ecb-sideSelect" value="{{selectedPartition?.accountId}}" name="Partition" formControlName="sppartitionid" (click)="changeDropdown()">
+                                    <option *ngFor="let partition of sppartitions" [value]="partition?.accountId" [selected]="partition?.accountId==selectedPartition?.accountId ? 'selected' : null">{{partition.login}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="input-group  ecb-sidebarFooter">
+                            <input type="text" class="ebInput" placeholder="" readonly>
+                            <span class="ecb-requriedIndicator" l10nTranslate> {{'TEXT_REQUIRED_FIELD'}}</span><span class="input-group-required"> </span>
+                        </div>                  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>
+</div>

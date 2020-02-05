@@ -1,0 +1,25 @@
+<div class="ecb-404Container">
+    <div class="errorHeader"></div>
+    <div class="errorBody">
+        <div class="row">
+                <div class="col-sm-1 col-xs-1 ecb-imgRtl">
+                <i class="fa fa-times-circle fa-5" aria-hidden="true"></i>
+            </div>
+                <div class="col-sm-9 col-xs-9 ecb-404Content">
+                <h2 class="errorHeading" l10nTranslate>{{"TEXT_PAGE_NOT_FOUND"}}</h2>
+                <p *ngIf="checkAuth" l10nTranslate class="ecb-paraPosition">{{"TEXT_UNABLE_TO_REACH_THE_PAGE"}}</p>
+                <p *ngIf="!checkAuth" l10nTranslate class="ecb-paraPosition"><strong>Description:</strong> {{"TEXT_UNABLE_TO_REACH_THE_PAGE_2"}}</p>
+                <div *ngIf="checkAuth" class="ecb-errPageList">
+                    <ul>
+                        <li><a l10nTranslate (click)="back()">{{"TEXT_RETURN_PREVIOUS_PAGE"}}</a></li>
+                        <li *ngFor="let child of childData">
+                            <a [routerLink]="[child.path]" (click)='updateBreadcrumbsList(child)' l10nTranslate> {{child.displayName}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="errorFooter"></div>
+</div>

@@ -1,0 +1,7 @@
+{
+    "categoryname": "boolean",
+    "name": "boolean sample1",
+    "description": "sample protractor testing1",
+    "propertytype": "16",
+    "defaultvalue": "1"
+}

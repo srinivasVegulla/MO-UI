@@ -1,0 +1,302 @@
+<div class='ecb-approvalPanel'>
+    <ngx-aside #ApprovalPanel [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false"
+        [showOverlay]="false" class="ecb-asideApprovalContent" [ngClass]="{'ecb-showEditDialog':showCover}">
+        <div class="panel panel-default ecb-approvalInfiniteScroll">
+            <div class="panel-heading ecb-panelHeading">
+                <div class="ecb-editOverlayLink">
+                    <button class="ebBtn ebBtn-primary" [disabled]="isSaveDisabled" (click)="saveApprovals()"
+                        l10nTranslate>{{'TEXT_SAVE'}}</button>
+                    <button class="ebBtn ebBtn-default" *ngIf="!isUpdateFailed" (click)="cancelCoverHandler()"
+                        l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                    <button class="ebBtn ebBtn-default" *ngIf="isUpdateFailed" (click)="cancelCoverHandler()"
+                        l10nTranslate>{{'TEXT_CLOSE'}}</button>
+                </div>
+                <h2 l10nTranslate>{{'TEXT_APPROVAL'}}</h2>
+            </div>
+            <div class="panel-body ecb-localizationaside ecb-positionRelative">
+                <!--error while fetching data -->
+                <div *ngIf="showErrorMessage">
+                    <div class="row">
+                        <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger"
+                            role="alert">
+                            <button  *ngIf="!loadError" type="button"  class="close"  data-dismiss="alert">
+                                <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <p *ngIf="approvalErrMsg != ''">{{approvalErrMsg}}</p>
+                            <div *ngIf="approvalErrMsg == ''">
+                                <div l10nTranslate>{{'TEXT_FAILURE_OCCURED_WHILE_APPLYING'}}
+                                    <span>:</span>
+                                </div>
+                                <table class="ecb-taleNoBorders">
+                                    <tbody>
+                                        <tr *ngFor="let item of objectKeys(approvalErrObj)">
+                                            <td><span l10nTranslate>{{'TEXT_MODIFIED_ITEM_ID'}}</span> {{item}}</td>
+                                            <td>-</td>
+                                            <td>{{approvalErrObj[item]}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3 l10nTranslate>{{'TEXT_CHANGES_LIST'}}
+                    <span>({{totalCount}})</span>
+                </h3>
+                <ecb-loader *ngIf="loading" mode="dot" fill="widget" backDropClassName="ecb-loaderPanelposition">
+                </ecb-loader>
+                <ecb-loader *ngIf="showSkeleton" mode="skeleton" fill="grid" type="grid"></ecb-loader>
+                <div *ngIf="loadGridData" id="approvalGrid"
+                    class=" eb-adjustPanelBodyMargin col-xs-12 col-sm-12 col-md-12 col-lg-12" ecb-infinite-scroller
+                    [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)">
+                    <p-dataTable #dt [value]="approvalList" scrollWidth="getDeviceWidth()" [lazy]="true"
+                        (onLazyLoad)="loadData($event)" sortField={{columnDef.defaultSortColumn}}
+                        [scrollable]="columnDef.scrollable" sortOrder={{convertedDefaultSortOrder}} [immutable]="false"
+                        [editable]="true">
+                        <p-column styleClass="ecb-SelectCol">
+                            <ng-template let-idx="rowIndex" let-data="rowData" pTemplate="body">
+                                <input type="radio" class="ebRadioBtn_noText" name="selectRowIndex"
+                                    [checked]="idx === rowIndex" (change)="selectedListItem(idx)">
+                            </ng-template>
+                            <ng-template pTemplate="filter" let-col>
+                                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                            </ng-template>
+                            <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                            </ng-template>
+                        </p-column>
+                        <p-column *ngFor="let col of cols" [style]="col.style" [filter]='col.filter'
+                            [editable]='col.editable' [field]="col.field" [sortable]="col.sortable"
+                            [header]="col.key | translate:lang">
+                            <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-idx="rowIndex"
+                                pTemplate="body">
+                                <span>
+                                    <span id="actionKeys-{{idx}}"
+                                        *ngIf="!isUserSubmittedRequest(approvalList[idx].submitterName)">
+                                        <a [title]="approveTooltip"
+                                            (click)="changeRequestStatus('APPROVED', idx, $event)">
+                                            <em class="fa fa-check-circle" tabindex="0" aria-hidden="true"></em>
+                                        </a>
+                                        <a [title]="denyTooltip" (click)="changeRequestStatus('DENIED', idx, $event)">
+                                            <em class="fa fa-times-circle" tabindex="0" aria-hidden="true"></em>
+                                        </a>
+                                    </span>
+                                    <span id="actionKeys-{{idx}}"
+                                        *ngIf="isUserSubmittedRequest(approvalList[idx].submitterName)">
+                                        <a [title]="dismissTooltip"
+                                            (click)="changeRequestStatus('DISMISSED', idx, $event)">
+                                            <em class="fa fa-minus-circle" tabindex="0" aria-hidden="true"></em>
+                                        </a>
+                                    </span>
+                                </span>
+                            </ng-template>
+                            <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                            </ng-template>
+                            <ng-template pTemplate="filter" let-col>
+                                <input type="text" *ngIf="(col.field !== 'actions' );else elseBlock"
+                                    placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}'
+                                    [(ngModel)]="filterFields[col.field]"
+                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])"
+                                    class="ecb-filterInput" pInputText class="ecb-filterInput" />
+                                <ng-template #elseBlock>
+                                    <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                                </ng-template>
+                                <div class="ecb-clearFilterMain">
+                                    <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)"
+                                        (click)="clearFilters(col.field)">
+                                        <i class="fa fa-times-circle fa-lg"></i>
+                                    </div>
+                                </div>
+                            </ng-template>
+
+                            <ng-template *ngIf="col.field == 'itemDisplayName'" let-col let-data="rowData"
+                                let-i="rowIndex" pTemplate="body">
+                                <span class="ecb-wordbreak">{{approvalList[i].itemDisplayName}}</span>
+                            </ng-template>
+                            <ng-template *ngIf="col.field == 'submitterName'" let-col let-data="rowData"
+                                let-i="rowIndex" pTemplate="body">
+                                <span class="ecb-wordbreak">{{approvalList[i].submitterName}}</span>
+                            </ng-template>
+                            <ng-template pTemplate="filter" let-col *ngIf="col.field === 'submittedDate'">
+                                <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)"
+                                    [filterKind]="'date'" [selectedColumnToFilter]="'submittedDate'"
+                                    [columnPlacement]="'middle'">
+                                </ecb-number-date-filter>
+                            </ng-template>
+                            <ng-template *ngIf="col.field == 'submittedDate'" let-col let-data="rowData"
+                                let-i="rowIndex" pTemplate="body">
+                                <span
+                                    class="ecb-wordbreak">{{approvalList[i].submittedDate | amDateFormat: calenderLocale.dateAndTimeFormat}}</span>
+                            </ng-template>
+                            <ng-template pTemplate="filter" let-col *ngIf="col.field === 'changeLastModifiedDate'">
+                                <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)"
+                                    [filterKind]="'date'" [selectedColumnToFilter]="'changeLastModifiedDate'"
+                                    [columnPlacement]="'middle'">
+                                </ecb-number-date-filter>
+                            </ng-template>
+                            <ng-template *ngIf="col.field == 'changeLastModifiedDate'" let-col let-data="rowData"
+                                let-i="rowIndex" pTemplate="body">
+                                <span
+                                    class="ecb-wordbreak">{{approvalList[i].changeLastModifiedDate | amDateFormat: calenderLocale.dateAndTimeFormat}}</span>
+                            </ng-template>
+                            <ng-template *ngIf="col.field == 'comment'" pTemplate="body" let-col let-data="rowData"
+                                let-i="rowIndex">
+                                {{approvalList[i].comment}}
+                            </ng-template>
+                            <ng-template *ngIf="col.field == 'comment'" pTemplate="editor" let-col let-data="rowData"
+                                let-i="rowIndex">
+                                <input type="text" maxlength="255" placeholder="" class="ecb-approvalComment"
+                                    id="{{disabledStatusList[i]}}" [attr.disabled]="disabledStatusList[i] ? '' : null "
+                                    [(ngModel)]="approvalList[i].comment" [ngModelOptions]="{standalone:true}">
+                            </ng-template>
+                            <ng-template *ngIf="col.field == 'currentState'" let-col let-data="rowData" let-i="rowIndex"
+                                pTemplate="body">
+                                <span class="ecb-wordbreak">
+                                    <em class="fa fa-exclamation-triangle" aria-hidden="true"
+                                        *ngIf="approvalList[i].currentState === 'FAILEDTOAPPLY'"></em>
+                                    <em *ngIf="approvalList[i].currentState !== 'FAILEDTOAPPLY'" class="fa fa-circle"
+                                        aria-hidden="true"
+                                        [ngClass]="updateStatusColor(approvalList[i].currentState)"></em>
+                                    {{approvalList[i].currentState | capitalizeFirst}}</span>
+                            </ng-template>
+                            <ng-template pTemplate="filter" let-col *ngIf="col.field === 'approvalId'">
+                                <ecb-number-date-filter (selectedUserFilter)="fetchNumberFilter($event)"
+                                    [filterKind]="'number'" [selectedColumnToFilter]="'approvalId'"
+                                    [columnPlacement]="'last'"></ecb-number-date-filter>
+                            </ng-template>
+                            <ng-template *ngIf="col.field == 'approvalId'" let-col let-data="rowData" let-i="rowIndex"
+                                pTemplate="body">
+                                <span class="ecb-numberColumn">{{approvalList[i].approvalId}}</span>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                    <div *ngIf="getErrorMessageType()">
+                        <div class="ecb-infoStyling">
+                            <div *ngIf="getErrorMessageType() === 1" class="alert alert-danger ecb-calInfoMessage"
+                                role="alert">
+                                <p>
+                                    {{filterErrorMessage}}
+                                </p>
+                            </div>
+                            <div *ngIf="getErrorMessageType() === 2"
+                                class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                <div class="ebNotification-content ecb-infotext">
+                                    <span class="ebNotification-label" l10nTranslate>
+                                        {{'TEXT_NO_LOCALISATION_ITEMS_RECORDS'}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div *ngIf="getErrorMessageType() === 3"
+                                class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                <div class="ebNotification-content ecb-infotext">
+                                    <span class="ebNotification-label" l10nTranslate>
+                                        {{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+            </div>
+            <div class="panel panel-default ecb-changes" *ngIf="totalCount > 0">
+                <div class="panel-heading">
+                    <h3 l10nTranslate>{{'TEXT_CHANGE_ITEM_HISTORY'}}</h3>
+                </div>
+                <div class="panel-body ecb-localizationaside">
+                    <!--error while fetching data -->
+                    <div *ngIf="errorMessage">
+                        <div class="row">
+                            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger"
+                                role="alert">
+                                <button *ngIf="!loadError" type="button" class="close" data-dismiss="alert">
+                                    <span aria-hidden="true" (click)="errorMessage = false">×</span>
+                                    <span class="sr-only">Close</span>
+                                </button>
+                                <p>{{approvalErrMsg}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="pendingHistoryloading" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <ecb-loader *ngIf="pendingItemLoading" mode="dot" fill="widget"></ecb-loader>
+                        <p-dataTable [value]="itemHistoryChangesList" scrollWidth="getDeviceWidth()"
+                            [scrollable]="itemHistoryColumnDef.scrollable" [lazy]="itemHistoryColumnDef.lazy"
+                            sortField={{itemHistoryColumnDef.defaultSortColumn}}
+                            sortOrder={{convertedDefaultItemSortOrder}} [immutable]="false"
+                            (onSort)="sortFields($event)">
+                            <p-column *ngFor="let col of itemHistoryColumnDef.cols" [style]="col.style"
+                                [editable]="col.editable" [field]="col.field" [sortable]="col.sortable"
+                                [header]="col.key | translate:lang">
+                                <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                    <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'createDt'" let-col let-data="rowData" let-i="rowIndex"
+                                    pTemplate="body">
+                                    <span
+                                        class="ecb-wordbreak">{{itemHistoryChangesList[i]?.createDt | amDateFormat: calenderLocale.dateAndTimeFormat}}</span>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'loginName'" let-col let-data="rowData"
+                                    let-i="rowIndex" pTemplate="body">
+                                    <span class="ecb-wordbreak">{{itemHistoryChangesList[i]?.loginName}}</span>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'eventName'" let-col let-data="rowData"
+                                    let-i="rowIndex" pTemplate="body">
+                                    <span class="ecb-wordbreak">{{itemHistoryChangesList[i]?.eventName}}</span>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'details'" let-col let-data="rowData" let-i="rowIndex"
+                                    pTemplate="body">
+                                    <span class="ecb-wordbreak">{{itemHistoryChangesList[i]?.details}}</span>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                        <div *ngIf="getErrorMessageTypeList()">
+                            <div class="ecb-infoStyling">
+                                <div *ngIf="getErrorMessageTypeList() === 1"
+                                    class="alert alert-danger ecb-calInfoMessage" role="alert">
+                                    <p>
+                                        {{sortErrorMessage}}
+                                    </p>
+                                </div>
+                                <div *ngIf="getErrorMessageTypeList() === 2"
+                                    class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                    <div class="ebNotification-content ecb-infotext">
+                                        <span class="ebNotification-label" l10nTranslate>
+                                            {{'TEXT_NO_RECORDS'}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default ecb-changes" *ngIf="totalCount > 0">
+                <div class="panel-heading">
+                    <h3 l10nTranslate>{{'TEXT_CHANGE_DETAILS'}}</h3>
+                </div>
+                <div class="panel-body">
+                    <div *ngIf="showRateChanges">
+                        <span>{{pendingRecord.itemDisplayName}}:</span>
+                        <span class="ecb-userName" l10nTranslate>{{'TEXT_RATE_UPDATE'}}</span>
+                        <ecb-rate-changes (onClose)="onRateChangeClose($event)" [param]="rateMetaData"
+                            [showRateChangesOnApproval]="showRateChanges" [pendingRecord]="pendingRecord">
+                        </ecb-rate-changes>
+                    </div>
+                    <div *ngIf="showOfferChanges">
+                        <span>{{pendingRecord.itemDisplayName}}:</span>
+                        <span class="ecb-userName" l10nTranslate>{{'TEXT_OFFERING_UPDATE'}}</span>
+                        <ecb-offering-changes [pendingRecord]="pendingRecord"></ecb-offering-changes>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </ngx-aside>
+</div>
+<ecb-modal-dialog [open]="confirmDialog == 1" [closeOnEscape]="false" (onClose)="onModalDialogCloseCancel($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>

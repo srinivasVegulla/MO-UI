@@ -1,0 +1,270 @@
+<div *ngIf="billingDetails || PIServerError" class="panel panel-default">
+  <div class="panel-heading ecb-panelHeading">
+	<div *ngIf="isPItemplate" class="ecb-panelHeaderLink">
+        <a title="{{editTooltip}}" (click)="displayCoverHandler(pBillingEditPanel)" l10nTranslate>{{'TEXT_EDIT'}}</a>
+      </div>
+      <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_BILLING'}}</h2>    
+  </div>
+  <div class="panel-body">
+    <div *ngIf="billingDetails" class="billingDetails">
+      <form>
+        <div class="form-group">
+          <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_CHARGE_IN'}}</label>
+          <div class="ebRadioBtn">
+            <label>
+              <input type="radio" [ngClass]="{'readonly-radio':viewBillingForm['advance']}" name="chargeIn"
+                [checked]="viewBillingForm['advance']" [disabled]="!viewBillingForm['advance']">
+              <div class="readonly" l10nTranslate *ngIf="viewBillingForm['advance']">
+                <em class="fa fa-check-circle"></em>{{'TEXT_ADVANCED'}}
+              </div>
+              <div class="text" *ngIf="!viewBillingForm['advance']" l10nTranslate>{{'TEXT_ADVANCED'}}</div>
+            </label>
+            <label>
+              <input type="radio" [ngClass]="{'readonly-radio':!viewBillingForm['advance']}" name="chargeIn"
+                [checked]="!viewBillingForm['advance']" [disabled]="viewBillingForm['advance']">
+              <div class="readonly" l10nTranslate *ngIf="!viewBillingForm['advance']">
+                <em class="fa fa-check-circle"></em>{{'TEXT_ARREARS'}}
+              </div>
+              <div class="text" *ngIf="viewBillingForm['advance']" l10nTranslate>{{'TEXT_ARREARS'}}</div>
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="simple-input" class="ebLabel ecbLabel" l10nTranslate>{{'TEXT_PROTRATE_SUBSCRIPTION'}}</label>
+            <div class="ebCheckbox ecbCheckbox">
+              <label>
+                <input type="checkbox" [ngClass]="{'readonly-checkbox' : viewBillingForm['prorateOnActivate']}" name="proSubsc" [checked]="viewBillingForm['prorateOnActivate']" disabled>
+                <div class="text" [ngClass]="{'readonly' : viewBillingForm['prorateOnActivate']}" l10nTranslate><em *ngIf="viewBillingForm['prorateOnActivate']" class="fa fa-check" aria-hidden="true"></em>{{'TEXT_ACTIVATION'}}</div>
+              </label>
+              <label>
+                <input type="checkbox" [ngClass]="{'readonly-checkbox' : viewBillingForm['prorateOnDeactivate']}" name="proSubc"  [checked]="viewBillingForm['prorateOnDeactivate']" disabled>
+                <div class="text" [ngClass]="{'readonly' : viewBillingForm['prorateOnDeactivate']}" l10nTranslate><em *ngIf="viewBillingForm['prorateOnDeactivate']" class="fa fa-check" aria-hidden="true"></em>{{'TEXT_TERMINATION'}}</div>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" *ngIf="viewBillingForm.prorateOnActivate || viewBillingForm.prorateOnDeactivate">
+          <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_NOOF_PORTDAYS'}}</label>
+          <div class="ebRadioBtn">
+            <label>
+              <input type="radio" [ngClass]="{'readonly-radio':!viewBillingForm['fixedProrationLength']}" name="noOfProrateDays" [checked]="!viewBillingForm['fixedProrationLength']"
+                [disabled]="viewBillingForm['fixedProrationLength']">
+              <div class="readonly" l10nTranslate *ngIf="!viewBillingForm['fixedProrationLength']">
+                <em class="fa fa-check-circle"></em>{{'TEXT_ACTUAL'}}
+              </div>
+              <div class="text" *ngIf="viewBillingForm['fixedProrationLength']" l10nTranslate>{{'TEXT_ACTUAL'}}</div>
+            </label>
+            <label>
+              <input type="radio" [ngClass]="{'readonly-radio':viewBillingForm['fixedProrationLength']}" name="noOfProrateDays" [checked]="viewBillingForm['fixedProrationLength']"
+                [disabled]="!viewBillingForm['fixedProrationLength']">
+              <div class="readonly" l10nTranslate *ngIf="viewBillingForm['fixedProrationLength']">
+                <em class="fa fa-check-circle"></em>{{'TEXT_FIXED'}}
+              </div>
+              <div class="text" *ngIf="!viewBillingForm['fixedProrationLength']" l10nTranslate>{{'TEXT_FIXED'}}</div>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_GROUP_SUBSCRIPTION_ONE_CHARGE_PER'}}</label>
+          <div class="ebRadioBtn">
+            <label>
+              <input type="radio" [ngClass]="{'readonly-radio':viewBillingForm['chargePerParticipant']}" name="oneChargePer" [checked]="viewBillingForm['chargePerParticipant']"
+                [disabled]="!viewBillingForm['chargePerParticipant']">
+              <div class="readonly" l10nTranslate *ngIf="viewBillingForm['chargePerParticipant']">
+                <em class="fa fa-check-circle"></em>{{'TEXT_PARTICIPANT'}}
+              </div>
+              <div class="text" *ngIf="!viewBillingForm['chargePerParticipant']" l10nTranslate>{{'TEXT_PARTICIPANT'}}</div>
+            </label>
+            <label>
+              <input type="radio" [ngClass]="{'readonly-radio':!viewBillingForm['chargePerParticipant']}" name="oneChargePer" [checked]="!viewBillingForm['chargePerParticipant']"
+                [disabled]="viewBillingForm['chargePerParticipant']">
+              <div class="readonly" l10nTranslate *ngIf="!viewBillingForm['chargePerParticipant']">
+                <em class="fa fa-check-circle"></em>{{'TEXT_SUBSCRIPTION'}}
+              </div>
+              <div class="text" *ngIf="viewBillingForm['chargePerParticipant']" l10nTranslate>{{'TEXT_SUBSCRIPTION'}}</div>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="ebLabel" l10nTranslate>{{'TEXT_RC_PERIOD_IS'}}</label>
+          <div class="input-group col-xs-12 col-sm-12">
+            <div type="text" class="ebInput ecb-height100percent" readonly="readonly" l10nTranslate>{{viewBillingForm.recCycle['text']}}</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div *ngIf="isRchargePeriodSelected(this.viewBillingForm['recCycle'])">
+            <div *ngIf="getRechargePeriodChildCount(this.viewBillingForm['recCycle']) >= 1" class="form-group">
+              <label class="ebLabel" l10nTranslate>{{viewRecurringCycleOptions1.text}}</label>
+              <div class="input-group col-xs-12 col-sm-12">
+                <div *ngIf = "!isBiWeekly" type="text" class="ebInput" readonly="readonly" >
+                  <span *ngIf="isTranslateText(viewBillingForm['chargeFrequency1']['text'])" l10nTranslate>{{viewBillingForm['chargeFrequency1']['text']}}</span>
+                  <span *ngIf="!isTranslateText(viewBillingForm['chargeFrequency1']['text'])" >{{viewBillingForm['chargeFrequency1']['text']}}</span>
+                </div>
+                <div *ngIf = "isBiWeekly" type="text" class="ebInput" readonly="readonly" >
+                  <span *ngIf="isTranslateText(biWeeklyInterval)" l10nTranslate>{{biWeeklyInterval}}</span>
+                  <span *ngIf="!isTranslateText(biWeeklyInterval)">{{biWeeklyInterval}}</span>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="getRechargePeriodChildCount(this.viewBillingForm['recCycle']) >= 2" class="form-group">
+              <label class="ebLabel" l10nTranslate>{{viewRecurringCycleOptions2.text}}</label>
+              <div class="input-group col-xs-12 col-sm-12">
+                <div type="text" class="ebInput" readonly="readonly"><span *ngIf="isTranslateText(viewBillingForm.chargeFrequency2['text'])" l10nTranslate>{{viewBillingForm.chargeFrequency2['text']}}</span>
+                  <span *ngIf="!isTranslateText(viewBillingForm.chargeFrequency2['text'])" >{{viewBillingForm.chargeFrequency2['text']}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<ngx-aside #pBillingEditPanel [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false" class="ecb-asideContent" (keydown) = "onEnterSaveBillingData($event)" [ngClass]="{'ecb-showEditDialog':showCover}">  
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="panel panel-default">
+        <div class="panel-heading ecb-panelHeading">
+            <div class="row">
+                <h2 class="col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT'}} <span l10nTranslate>{{'TEXT_BILLING'}}</span></h2>
+                <div class="col-xs-6 ecb-editOverlayLink">
+                    <button class="ebBtn ecbBtn-margin" [disabled]="!isSaveEnabled" [ngClass]="{'ebBtn-primary': isSaveEnabled}"(click)="saveBillingData()" l10nTranslate>{{'TEXT_SAVE'}}</button>
+                    <button class="ebBtn ebBtn-default" (click)="cancelEditPanel()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+          <div *ngIf="showErrorMessage != undefined" class="alert alert-danger" role="alert" l10nTranslate>
+              <button type="button" class="close" data-dismiss="alert">
+                  <span aria-hidden="true" (click)="showErrorMessage = undefined">×</span><span class="sr-only">Close</span>
+              </button>
+              <p>{{showErrorMessage}}</p>
+          </div>
+          <div class="ebNotification ebNotification_color_paleBlue ecb-marginbottom">
+              <div class="ebNotification-content ecb-infotext">
+                <span class="ebNotification-label" l10nTranslate>
+                  {{'TEXT_CHANGES_IMPACT'}}
+                  <a (click)="openInUseOfferings()">
+                    <span l10nTranslate>{{'TEXT_EXISTING_PI'}}</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          <form class="pBillingForm">
+              <div class="form-group" >
+                  <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_CHARGE_IN'}}</label>
+                  <div class="ebRadioBtn">
+                    <label>
+                      <input id="initFocusBilling" type="radio" tabindex="1" name="chargeIn" (change)="onOptionSelection('advance', true)" [checked]="billingForm['advance']" autofocus>
+                      <div class="text" l10nTranslate>{{'TEXT_ADVANCED'}}</div>
+                    </label>
+                    <label>
+                      <input type="radio" tabindex="2" name="chargeIn" (change)="onOptionSelection('advance', false)" [checked]="!billingForm['advance']">
+                      <div class="text" l10nTranslate>{{'TEXT_ARREARS'}}</div>
+                    </label>
+                  </div>
+                </div>
+            <div class="form-group">
+                <label for="simple-input" class="ebLabel ecbLabel" l10nTranslate>{{'TEXT_PROTRATE_SUBSCRIPTION'}}</label>
+                <div class="ebCheckbox ecbCheckbox">
+                  <label>
+                    <input type="checkbox" tabindex="3" name="proSubsc" (change)="onOptionSelection('prorateOnActivate', $event.target.checked)" [checked]="billingForm['prorateOnActivate']" [disabled]="disableProrate">
+                    <div class="text" l10nTranslate>{{'TEXT_ACTIVATION'}}</div>
+                  </label>
+                  <label>
+                      <input type="checkbox" tabindex="4" name="proSubc"  (change)="onOptionSelection('prorateOnDeactivate', $event.target.checked)" [checked]="billingForm['prorateOnDeactivate']" [disabled]="disableProrate">
+                      <div class="text" l10nTranslate>{{'TEXT_TERMINATION'}}</div>
+                    </label>
+                </div>
+              </div>
+              <div class="form-group" *ngIf="billingForm.prorateOnActivate || billingForm.prorateOnDeactivate">
+                <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_NOOF_PORTDAYS'}}</label>
+                <div class="ebRadioBtn">
+                  <label>
+                    <input type="radio" tabindex="5" name="noOfProrateDays" (change)="onOptionSelection('fixedProrationLength', false)" [checked]="!billingForm['fixedProrationLength']" [disabled]="disableProrate">
+                    <div class="text" l10nTranslate>{{'TEXT_ACTUAL'}}</div>
+                  </label>
+                  <label>
+                    <input type="radio" tabindex="6" name="noOfProrateDays" (change)="onOptionSelection('fixedProrationLength', true)" [checked]="billingForm['fixedProrationLength']" [disabled]="disableProrate">
+                    <div class="text" l10nTranslate>{{'TEXT_FIXED'}}</div>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" >
+                <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_GROUP_SUBSCRIPTION_ONE_CHARGE_PER'}}</label>
+                <div class="ebRadioBtn">
+                  <label>
+                    <input type="radio" tabindex="7" name="oneChargePer" (change)="onOptionSelection('chargePerParticipant', true)" [checked]="billingForm['chargePerParticipant']">
+                    <div class="text" l10nTranslate>{{'TEXT_PARTICIPANT'}}</div>
+                  </label>
+                  <label>
+                    <input type="radio" tabindex="8" name="oneChargePer" (change)="onOptionSelection('chargePerParticipant', false)" [checked]="!billingForm['chargePerParticipant']">
+                    <div class="text" l10nTranslate>{{'TEXT_SUBSCRIPTION'}}</div>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 rate-padding">
+                <label class="ebLabel" l10nTranslate>{{'TEXT_RC_PERIOD_IS'}}</label>
+                <div class="dropdown">
+                    <button class="ebInput dropdown-toggle ecb-rtltextalignright ecb-RCPeriodDropdown" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" tabindex="9" aria-haspopup="true" aria-expanded="true" l10nTranslate>
+                    {{billingForm.recCycle['text']}}
+                    <span class="chevron down ecb-RtlLeftView"></span>
+                  </button>
+                    <ul class="dropdown-menu ecb-rtltextalignright" aria-labelledby="dropdownMenu1">
+                        <li *ngFor="let period of recurringCycles.periods | keys"
+                        (click)="selectOption(null, 'periods', period.value)"><a><span l10nTranslate> {{period.value.text}} </span></a></li>
+                        <span role="separator" class="ebComponentList-group-header"></span>
+                        <li *ngFor="let interval of recurringCycles.intervals | keys"
+                            (click)="selectOption(null, 'intervals', interval.value)"><a><span l10nTranslate> {{interval.value.text}} </span></a></li>
+                    </ul>
+                </div>
+              </div>
+              <div *ngIf="isRchargePeriodSelected(this.billingForm['recCycle'])">
+                <div *ngIf="getRechargePeriodChildCount(this.billingForm['recCycle']) >= 1" class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 rate-padding">
+                    <label class="ebLabel" l10nTranslate>{{recurringCycleOptions1.text}}</label>
+                    <div class="dropdown">
+                        <button class="ebInput dropdown-toggle ecb-rtltextalignright" type="button" id="dropdownMenu1"
+                            data-toggle="dropdown" tabindex="10" aria-haspopup="true" aria-expanded="true" >
+                            <span *ngIf="isTranslateText(billingForm['chargeFrequency1']['text'])" l10nTranslate>{{billingForm['chargeFrequency1']['text']}}</span>
+                            <span *ngIf="!isTranslateText(billingForm['chargeFrequency1']['text'])" >{{billingForm['chargeFrequency1']['text']}}</span>
+                        <span class="chevron down ecb-RtlLeftView"></span>
+                      </button>
+                        <ul class="dropdown-menu ecb-rtltextalignright" aria-labelledby="dropdownMenu1">
+                            <li *ngFor="let interval of recurringCycleOptions1.value | keys"
+                                (click)="selectOption(recurringCycleOptions1, 'chargeFrequency1', interval.value)"><a><span *ngIf="isTranslateText(interval.value.text)" l10nTranslate> {{interval.value.text}} </span>
+                                <span *ngIf="!isTranslateText(interval.value.text)"> {{interval.value.text}} </span>
+                                </a></li>
+                        </ul>
+                    </div>
+                  </div>
+                  <div *ngIf="getRechargePeriodChildCount(this.billingForm['recCycle']) >= 2" class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 rate-padding">
+                      <label class="ebLabel" l10nTranslate>{{recurringCycleOptions2.text}}</label>
+                      <div class="dropdown">
+                          <button [ngClass]="{'ecb-fieldEmptyValidator': isFormValidationError}" class="ebInput dropdown-toggle ecb-rtltextalignright" type="button" id="dropdownMenu1"
+                              data-toggle="dropdown" tabindex="11" aria-haspopup="true" aria-expanded="true" >
+                          <span *ngIf="isTranslateText(billingForm.chargeFrequency2['text'])" l10nTranslate>{{billingForm.chargeFrequency2['text']}}</span>
+                          <span *ngIf="!isTranslateText(billingForm.chargeFrequency2['text'])" >{{billingForm.chargeFrequency2['text']}}</span>
+                          <span class="chevron down ecb-RtlLeftView"></span>
+                        </button>
+                          <ul class="dropdown-menu ecb-rtltextalignright" aria-labelledby="dropdownMenu1">
+                              <li *ngFor="let interval of recurringCycleOptions2.value | keys"
+                                  (click)="selectOption(recurringCycleOptions2, 'chargeFrequency2', interval.value)"><a><span *ngIf="isTranslateText(interval.value.text)" l10nTranslate> {{interval.value.text}} </span>
+                                  <span *ngIf="!isTranslateText(interval.value.text)"> {{interval.value.text}} </span>
+                                  </a></li>
+                          </ul>
+                      </div>
+                      <div *ngIf="isFormValidationError" class="ebInputError">
+                          <span class="statusError"></span>
+                          <span l10nTranslate>{{'TEXT_2nd_DAY_GREATER_THAN_1st_DAY'}}</span>
+                      </div>
+                    </div>
+              </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</ngx-aside>
+<ecb-inuse-offerings-modal-dialog *ngIf="showInUseOfferings" [offeringsData]="inUseOfferingsData" [offeringsLocation]="inUseOfferingsLocation" (inUseModalDialogClose)="hideInUseModalDialog($event)"></ecb-inuse-offerings-modal-dialog>
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+</ecb-modal-dialog>

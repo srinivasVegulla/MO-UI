@@ -1,0 +1,276 @@
+<div class="panel panel-default">
+    <div class="panel-heading ecb-panelHeading">
+        <ecb-loader *ngIf="showDotLoader" mode="dot" fill="widget" ></ecb-loader>
+        <ecb-loader *ngIf="showSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+        <div class="ecb-panelHeaderLink">
+            <a *ngIf="kind !== 'USAGE' && editAdjustmentCapability" l10nTranslate (click)="openAdjustmentsSidePanel()">{{'TEXT_EDIT'}}</a>
+            <a *ngIf="kind === 'USAGE'" l10nTranslate (click)="openAdjustmentsSidePanel()">{{'TEXT_VIEW'}}</a>
+        </div>
+        <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_ADJUSTMENTS'}}</h2>
+    </div>
+
+    <div class="panel-body ecb-adjustmentPanel">
+        <div *ngIf="isDeleteAdjError">
+            <div class="row">
+                <div class="ecb-alertAdjErrormsg col-xs-12 col-sm-12 col-md-12 col-lg-10  alert alert-danger " role="alert">
+                    <p>
+                        <strong>{{deleteAdjError}}</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="noAdjustments" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+            <div class="ebNotification-content ecb-infotext">
+                <span class="ebNotification-label">
+                    <span l10nTranslate>{{'TEXT_NO_ADJUSTMENTS'}}</span>
+                </span>
+            </div>
+        </div>
+        <div class="form-group" *ngFor="let adjustment of newAdjustmentsDetailsList">
+            <div class="ecbNotClickableCard input-group col-xs-12 col-sm-12" *ngIf="removeAdjustmentID != adjustment.value && !isDeleteAdjError">
+                <div class="ecbNotClickableCard-heading">
+                    <div class="ecb-displayAdjName">{{adjustment.displayName}}</div>
+                </div>
+                <div class="ecbNotClickableCard-body">
+                    <div class="properties">
+                        <p>{{adjustment.reasonCount}}
+                            <span *ngIf="adjustment.reasonCount > 1" l10nTranslate>{{'TEXT_MORE_ADJUSTMENTS_REASONS'}}</span>
+                            <span *ngIf="adjustment.reasonCount <= 1" l10nTranslate>{{'TEXT_LESS_ADJUSTMENTS_REASONS'}}</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="ecbNotClickableCard-footer">
+                    <div *ngIf="kind !== 'USAGE' && !isPIInstance" class="actionIcons">
+                        <a (click)="openDeleteConfirmation(adjustment.value)">
+                            <em class="fa fa-times-circle" aria-hidden="true" title='{{"TEXT_DELETE"| translate:lang}}'></em>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ecbClickableCard ecb-deleteAdjCard deletePopUp " *ngIf="((removeAdjustmentID == adjustment.value) && (!removeAdjustmentfromUI) && !isDeleteAdjError)">
+                <div class="ecbClickableCard-heading">
+                    <h2 l10nTranslate>{{ 'TEXT_DELETE_ADJUSTMENT' }}</h2>
+                    <div class="ecb-displayName  removePIInstance">
+                        <div class="alert-warning alert-dismissible">
+                            <button type="button" class="ecb-removePoInBundleClose close ecb-toggleFloat" data-dismiss="alert" (click)="cancelAdjDeleteCard()">
+                                <span aria-hidden="true">x</span>
+                                <span class="sr-only ">Close</span>
+                            </button>
+                        </div>
+                        <span class="ecb-adjDeleteInfo" l10nTranslate>{{'TEXT_ADJUSTMENT_DELETE_INFO'}}</span> &#32;
+                        <span class="ecb-noProductOffers" l10nTranslate>{{ 'TEXT_DELETE'}}
+                            <label>{{adjustment.name}}?</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="ecb-removeAdjFooter ecbClickableCard-footer">
+                    <button class="ebBtn ebBtn-primary" (click)="deleteSelectedAdjustments(adjustment.value)" l10nTranslate>{{ 'TEXT_DELETE' }}</button>
+                    <button class="ebBtn" (click)="cancelAdjDeleteCard()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+        <dialog-header l10nTranslate>{{'TEXT_DELETE_ADJUSTMENT'}}</dialog-header>
+        <dialog-body l10nTranslate>
+            <p>
+                <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deletingAdjustment?.displayName}}&#32; &#63;</p>
+            <p>{{deletingAdjustment?.description}}</p>
+            <p l10nTranslate>{{'TEXT_ADJUSTMENT_DELETE_INFO'}}</p>
+        </dialog-body>
+        <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+        <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+    </ecb-modal-dialog>
+
+
+    <ngx-aside #adjustmentsResons [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+        class="ecb-maxAsidePanel ecb-adjAsidePanel" [ngClass]="{'ecb-showEditDialog':showCover}">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-editRateMain">
+            <div class="panel panel-default">
+                <div class="panel-heading ecb-panelHeading">
+                    <div class="row">
+                        <h2 class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_ADJUSTMENTS'}}</h2>
+                        <div class="col-lg-6 ecb-editOverlayLink">
+                            <button class="ebBtn" [ngClass]="{'ebBtn-primary': !isSaveEnabled}" l10nTranslate *ngIf="kind !== 'USAGE'" [disabled]="isSaveEnabled"
+                                (click)="saveChecks()">{{'TEXT_SAVE'}}</button>
+                            <button *ngIf="kind !== 'USAGE'" class="ebBtn ebBtn-default" (click)="cancelCoverHandler()">
+                                <span l10nTranslate>{{'TEXT_CANCEL'}} </span>
+                            </button>
+                            <button *ngIf="kind === 'USAGE'" class="ebBtn ebBtn-default" (click)="cancelCoverHandler()">
+                                <span l10nTranslate>{{'TEXT_CLOSE'}} </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div *ngIf="kind !== 'USAGE'" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                        <div class="ebNotification-content ecb-infotext">
+                            <span class="ebNotification-label">
+                                <span l10nTranslate>{{'TEXT_ADJUSTMENTS_MESSAGE'}}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div *ngIf="httpError">
+                        <div class="row">
+                            <div class="ecb-alertAdjErrormsg col-xs-12 col-sm-12 col-md-12 col-lg-10  alert alert-danger " role="alert">
+                                <p>
+                                    {{httpErrorMessage}}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div *ngIf="saveRulesError">
+        <div class="container-fluid">
+            <div class="row">
+                <div class=" col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+                    <p class="filterFetchingError" l10nTranslate><strong>{{saveRulesError}}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+                    <div class="ecb-rateTableInfo">
+                        <div class="ecbAdjustments col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3 class="ecb-toggleFloat">
+                                <span l10nTranslate>{{'TEXT_ADJUSTMENTS_LIST'}}</span>
+                            </h3>
+                        </div>
+                        <div class="ebTable_autoScroll ecb-adjustmentScroll col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-removePadding">
+                            <div class="ecb-adjust ecb-editabletableinput" id="ecb-adjustment">
+                                <!--loader -->
+                                <ecb-loader *ngIf="loading" mode="dot" fill="widget"></ecb-loader>
+                                <!--loader -->
+                                <p-dataTable #datatable *ngIf="!isDeleteAdjError && loadGridData" [value]="newAdjustment" [rowStyleClass]="getRowClass" [rowTrackBy]="identify"
+                                    (keydown)="onEnterSaveChecks($event)">
+                                    <p-column [style]="col.style" *ngFor="let col of cols" [field]="col.field" [header]="col.key | translate:lang" required="true">
+                                        <ng-template *ngIf="col.field == 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a [ngClass]="[(kind !== 'USAGE' && canAddNewAdjustment && !isPIInstance) ? 'ecb-actionicons' : 'ecb-disableactionicons']"
+                                                class="ecb-adjActions" [title]="addTooltip" (click)="addNewAdjustment()">
+                                                <em class="fa fa-plus" aria-hidden="true"> </em>
+                                            </a>
+                                            <a [ngClass]="[(kind !== 'USAGE' && !isPIInstance) ? 'ecb-actionicons' : 'ecb-disableactionicons']" class="ecb-adjActions ecb-ui-cell"
+                                                [title]="deleteTooltip" (click)="openAdjAsideDeleteConfirmation(newAdjustment[i],i)">
+                                                <em class="fa fa-times-circle" aria-hidden="true"> </em>
+                                            </a>
+                                        </ng-template>
+
+                                        <ng-template *ngIf="col.field == 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                            <div class="ebSelect" *ngIf="isAlreadyAddedAdj(newAdjustment[i],i) === true">
+                                                <textarea [autoSize]="i" maxlength="255" [elementNumber]="0" [ngStyle]="getlistHeight(i)" [disabled]="true" class="ecb-adjustmentDrop">{{newAdjustment[i].name}}</textarea>
+                                            </div>
+                                            <div class="ecb-adjustmentslist ecb-adjustmentsrowstyle" [ngStyle]="getlistHeight(i)" *ngIf="isAlreadyAddedAdj(newAdjustment[i],i) === false">
+                                                <p-dropdown [options]="adjustDropDownList" [(ngModel)]="adjustNames[i]" (onChange)="changeSelectedAdjustment(i)" appendTo="body"
+                                                    panelStyleClass="ecb-adjustTypeDd"></p-dropdown>
+                                            </div>
+                                        </ng-template>
+
+                                        <ng-template *ngIf="col.field == 'displayName'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                            <textarea [autoSize]="i" maxlength="255" [elementNumber]="1" *ngIf="kind !== 'USAGE'" class="ecb-adjustmentDrop" [ngStyle]="getlistHeight(i)"
+                                                [(ngModel)]="newAdjustment[i].displayName" (ngModelChange)="adjustmentEdited($event)"></textarea>
+                                            <textarea [autoSize]="i" maxlength="255" [elementNumber]="1" *ngIf="kind === 'USAGE'" [disabled]="true" class="ecb-adjustmentDrop"
+                                                [ngStyle]="getlistHeight(i)" [(ngModel)]="newAdjustment[i].displayName" (ngModelChange)="adjustmentEdited($event)"></textarea>
+                                        </ng-template>
+
+                                        <ng-template *ngIf="col.field == 'description'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                            <textarea [autoSize]="i" [elementNumber]="2" *ngIf="kind !== 'USAGE' && !isPIInstance" [ngStyle]="getlistHeight(i)" class="ecb-adjustmentDrop"
+                                                [(ngModel)]="newAdjustment[i].description" (ngModelChange)="adjustmentEdited($event)"></textarea>
+                                            <textarea [autoSize]="i" [elementNumber]="2" *ngIf="kind === 'USAGE' || isPIInstance" [disabled]="true" class="ecb-adjustmentDrop"
+                                                [ngStyle]="getlistHeight(i)" [(ngModel)]="newAdjustment[i].description" (ngModelChange)="adjustmentEdited($event)"></textarea>
+                                        </ng-template>
+
+                                        <ng-template class="ecb-adjustmentReasons" *ngIf="col.field == 'adjustmentsReasons'" let-col let-data="rowData" let-idx="index"
+                                            let-i="rowIndex" pTemplate="body">
+                                            <div *ngIf="kind === 'USAGE' || isPIInstance" class="ebComboMultiSelect ebComboMultiSelect_width_xLong ecb-multiselectbox">
+                                                <textarea [disabled]="true" [ngStyle]="getlistHeight(i)" class="ebComboMultiSelect-textarea ebTextArea ecb-droplisttextarea ecb-adjustmentsdroplistarea"
+                                                    autocomplete="off"></textarea>
+                                                <span [ngStyle]="getlistHeight(i)" class="ecb-adjManditory input-group-required"></span>
+                                                <span class="ecb-adjNamesDropdown ui-dropdown" #chevron>
+                                                    <div class="ecb-adjReasonDropdownIcon ui-dropdown-trigger ui-state-default ui-corner-right" (click)="showReasonsList(i)">
+                                                        <span class="fa fa-fw fa-caret-down ui-clickable"></span>
+                                                    </div>
+                                                </span>
+                                                <div class="ebComboMultiSelect-listHolder">
+                                                    <ul [autoSize]="i" [elementNumber]="3" class="ebComboMultiSelectList">
+                                                        <li class="ebComboMultiSelectList-item ebComboMultiSelectList-item_active" *ngFor="let reasonNames of newAdjustment[i].reasonCodes">
+                                                            <span *ngIf="newAdjustment[i].reasonCodes.length <= 4" class="ebComboMultiSelectList-itemTitle">{{reasonNames.displayName}}</span>
+                                                        </li>
+                                                    </ul>
+                                                    <li class="ecb-adjReasonsCount ebComboMultiSelectList-item ebComboMultiSelectList-item_active">
+                                                        <span *ngIf="newAdjustment[i].reasonCodes.length >= 5" class="ebComboMultiSelectList-itemTitle">{{newAdjustment[i].reasonCodes.length}} Adjustment Reasons Selected</span>
+                                                    </li>
+                                                </div>
+                                                <div class="ebComboMultiSelect-body" *ngIf="showOptions && i == reasonsDropdownIndex">
+                                                    <ul class="ebAdjComponentList eb_scrollbar">
+                                                        <li class="ecb-reasonsListItem" *ngFor="let reasons of adjustmentsReasonsList">
+                                                            <input class="ecbReasonCheck ebCheckbox" [ngClass]="{'readonly-checkbox' : reasonSelected(i, reasons?.propId)}" type="checkbox"
+                                                                [disabled]="true" (click)="selectReasons(reasons,$event,newAdjustment[i])"
+                                                                [checked]="reasonSelected(i, reasons?.propId)" />
+                                                            <label [ngClass]="{'readonly' : reasonSelected(i, reasons?.propId)}">{{reasons.displayName}}</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <div *ngIf="kind !== 'USAGE' && !isPIInstance" class="ebComboMultiSelect ebComboMultiSelect_width_xLong ecb-multiselectbox">
+                                                <textarea [ngStyle]="getlistHeight(i)" [disabled]="isAdjustmentReasonEnabled(newAdjustment[i]) ? true : false" class="ebComboMultiSelect-textarea ebTextArea ecb-droplisttextarea ecb-adjustmentsdroplistarea"
+                                                    autocomplete="off" (click)="showReasonsList(i)" readonly></textarea>
+                                                <span [ngStyle]="getlistHeight(i)" class="ecb-adjManditory input-group-required"></span>
+                                                <span *ngIf="!isAdjustmentReasonEnabled(newAdjustment[i])" class="ecb-adjNamesDropdown ui-dropdown" #chevron>
+                                                    <div class="ecb-adjReasonDropdownIcon ui-dropdown-trigger ui-state-default ui-corner-right" (click)="showReasonsList(i)">
+                                                        <span class="fa fa-fw fa-caret-down ui-clickable"></span>
+                                                    </div>
+                                                </span>
+                                                <div class="ebComboMultiSelect-listHolder">
+                                                    <ul [autoSize]="i" [elementNumber]="3" class="ebComboMultiSelectList">
+                                                        <li class="ebComboMultiSelectList-item ebComboMultiSelectList-item_active" *ngFor="let reasonNames of newAdjustment[i].reasonCodes">
+                                                            <span *ngIf="newAdjustment[i].reasonCodes.length <= 4" class="ebComboMultiSelectList-itemTitle">{{reasonNames.displayName}}</span>
+                                                        </li>
+                                                    </ul>
+                                                    <li class="ecb-adjReasonsCount ebComboMultiSelectList-item ebComboMultiSelectList-item_active">
+                                                        <span *ngIf="newAdjustment[i].reasonCodes.length >= 5" class="ebComboMultiSelectList-itemTitle">{{newAdjustment[i].reasonCodes.length}} Adjustment Reasons Selected</span>
+                                                    </li>
+                                                </div>
+                                                <div class="ebComboMultiSelect-body" *ngIf="showOptions && i == reasonsDropdownIndex">
+                                                    <ul class="ebAdjComponentList eb_scrollbar">
+                                                        <li class="ecb-reasonsListItem" *ngFor="let reasons of adjustmentsReasonsList">
+                                                            <input class="ecbReasonCheck ebCheckbox" type="checkbox" (click)="selectReasons(reasons,$event,newAdjustment[i])" [checked]="reasonSelected(i, reasons?.propId)"
+                                                            />
+                                                            <label>{{reasons.displayName}}</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <span *ngIf="newAdjustment[i].reasonCodes <= 0 && noReasonCodes">
+                                                <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="reasonErrorMessage" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                                            </span>
+                                        </ng-template>
+                                        <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                            <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+                        </div>
+                        <div *ngIf="isDeleteAdjError">
+                            <div class="row">
+                                <div class="ecb-alertAdjErrormsg col-xs-12 col-sm-12 col-md-12 col-lg-10  alert alert-danger " role="alert">
+                                    <p>
+                                        {{deleteAdjError}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ngx-aside>
+    <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>
+
+    <ecb-modal-dialog [closeOnEscape]="false" [open]="ifEditedConfirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+        <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+        <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+    </ecb-modal-dialog>
+</div>

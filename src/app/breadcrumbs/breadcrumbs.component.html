@@ -1,0 +1,113 @@
+<div  #breadcrumHeight  [ngClass]="{'ecb-DisableLastBreadCrumbChild':IsLatChildDisabled, 'ecb-breadcumbTicketLogin': isTicketLogin()}">
+  <ol class="breadcrumb ecb-rtlBreadcrumb" [ngClass]="{'hidden-sm': !isTicketLogin(), 'hidden-xs': !isTicketLogin()}">
+    <li *ngFor='let list of breadcrumb; let i = index'>
+      <span *ngIf="!isTranslateText(list.displayName)"  class="ecb-breadcrumblinkEllipsed" [routerLink]="[list.path]" (click)="breadcrumbHeaderClick(list,i)">{{list.displayName}}</span>
+      <span *ngIf="isTranslateText(list.displayName)"   class="ecb-breadcrumblinkEllipsed" [routerLink]="[list.path]" (click)="breadcrumbHeaderClick(list,i)" l10nTranslate>{{list.displayName}}</span>
+      <span id="breadcrumbExpDivs" [ngClass]="{ 'dropdown-link': (list.type === 'dropdown') }" (click)="selectedBreadcrumbDropdown(i)">
+      </span>
+        <div *ngIf="list.type === 'dropdown' && i === breadcrumbIndex" [ngClass]="{ 'open': dropdownOpen }" class="dropdown">
+            <ul class="ebComponentList ecb-ComponentList" [ngStyle]="calculateSideGridScrollHeight()">
+              <li class="ebComponentList-item ecb-componentListWidth" *ngFor="let child of list.children ; let j = index" [ngClass]="{ 'ebComponentList-item_selected ebComponentList-item_selectedRtl': (child.displayName == selectedOption), 'ecb-disableBreadcrumbLink': (child.path == '')}">
+                <a [routerLink]="[child.path]" [ngClass]="child.path ? '' : 'ecb-disableBreadcrumbLink'"  *ngIf="child.display && isTranslateText(child.displayName)" (click)='updateBreadcrumbsList(child)' l10nTranslate> {{child.displayName}} </a>
+                <a [routerLink]="[child.path]" [ngClass]="child.path ? '' : 'ecb-disableBreadcrumbLink'" *ngIf="child.display && !isTranslateText(child.displayName)" (click)='updateBreadcrumbsList(child)'> {{child.displayName}} </a>
+              </li>
+          </ul>
+        </div>
+        <div class="ecb-treePosition" *ngIf="list.type === 'dropdown' && i === breadcrumbIndex">
+        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget" backDropClassName="breadcrumbLoader"></ecb-loader>         
+          <p-tree [value]="selectedOfferingsChildren" styleClass="ui-treenode-content-selected" *ngIf="showTreeHierarchy" selectionMode="single" >
+              <ng-template let-node pTemplate="default">
+                     <img alt="Bundle" *ngIf="node.nodeType == 'BUNDLE'" class="ecb-treeHierarchyIcons" src="../../../assets/images/ericssonIcons/Icon_Bundle.svg" alt="Offer Icon">
+                  <img alt="Product Offer" *ngIf="node.nodeType == 'PO'" class="ecb-treeHierarchyIcons" src="../../../assets/images/ericssonIcons/Icon_ProductOffer.svg" alt="Offer Icon">
+                  <img alt="Priceable Item" *ngIf="node.nodeType == 'PI'" class="ecb-treeHierarchyIcons" src="../../../assets/images/ericssonIcons/Icon_PriceableItem.svg" alt="Offer Icon">
+                  <img alt="Child Priceable Item" *ngIf="node.nodeType == 'CHILD_PI'" class="ecb-treeHierarchyIcons" src="../../../assets/images/ericssonIcons/Icon_PriceableItem.svg" alt="Offer Icon">
+                  <span [ngClass]="{'ecb-selectedTreeNode':node.id == nodeId && node.displayName == pageTitle && node.nodeType == imageType}" type="text" (click)='nodeClickEventHandler(node)' *ngIf="isTranslateText(node.displayName)" l10nTranslate>{{node.displayName}}</span>
+                  <span [ngClass]="{'ecb-selectedTreeNode':node.id == nodeId && node.displayName == pageTitle && node.nodeType == imageType}" type="text" (click)='nodeClickEventHandler(node)'*ngIf="!isTranslateText(node.displayName)">{{node.displayName}}</span>
+              </ng-template>
+          </p-tree>
+        </div>
+    </li>
+  </ol>
+</div>
+<div class="visible-xs visible-sm ecb-mobileTreeMenu ecb-RtlTreePosition">
+  <div class="ecb-mobiledefaultMenuDiv">
+    <ul class="ebComponentList ecb-ComponentList" [ngStyle]="calculateExtraSmallScrollHeight()">
+        <li class="ebComponentList-item" *ngFor='let child of breadCrumbChildrens; let i = index' [ngClass]="{ 'ebComponentList-item_selected ebComponentList-item_selectedRtl': (child.displayName == selectedOption), 'ecb-disableBreadcrumbLink': (child.path == '')}" (click)="selectMobileDevDefaultOptions(child,i)">
+           <a *ngIf="child.display"  [ngClass]="child.path ? '' : 'ecb-disableBreadcrumbLink'" [routerLink]="[child.path]" l10nTranslate> {{child.displayName}}</a>
+        </li>
+        <hr class="ecb-mobilemenuSeperator">
+        <li class="ebComponentList-item" role="button">
+          <div class="ecb-mobileTreeNodesDiv">
+            <a>
+              <i class="fa fa-user"></i>
+              <span class="visible-xs-up">{{userName}}</span>
+            </a>
+          </div>
+        </li>
+        <li class="ebComponentList-item" role="button" (click)="logout()">
+          <div class="ecb-mobileTreeNodesDiv">
+            <a >
+              <i aria-hidden="true" class="fa fa-sign-out"></i>
+              <span class="visible-xs-up" l10nTranslate>{{'TEXT_LOGOUT'}}</span>
+            </a>
+          </div>
+        </li>
+    </ul>
+  </div>
+  <div class="ecb-mobileTreeStructureDiv">
+      <ul class="ebComponentList">
+        <li *ngIf="backNavigationName != undefined" class="ebComponentList-item ecb-componentListItem">
+           <div class="ecb-mobileTreeNodesDiv">
+            <em id="mobileExpandBackIcon" class="fa fa-chevron-left " (click)="previousAvailableNodes()"></em>       
+            <span (click)="backToPreviousPage()">
+              <span class="ecb-mobileBreadcrumblinkEllipsed" l10nTranslate>{{backNavigationName}}</span>
+            </span>
+          </div>
+        </li>
+        <hr class="ecb-mobilemenuSeperator">
+        <li class="ebComponentList-item" *ngFor="let obj of mobileTreeBreadCrumb; let i = index" >
+          <div class="ecb-mobileTreeNodesDiv" [ngClass]="{ 'ebComponentList-item_selected ebComponentList-item_selectedRtl': obj.displayName == currentPage && obj.nodeType == imageType}">
+            <a [ngClass]="{'ecb-selectedTreeNode ':obj.displayName == currentPage && obj.nodeType == imageType}"  class="ecb-mobileBreadcrumblinkEllipsed" (click)="mobileRedirectionEvent(obj,i)" [innerHtml]="formateName(obj)"></a>
+            <em id="mobileExpandForwardIcon" class="ecb-expandMoreIcon fa fa-chevron-right" [ngClass]="{ 'fa fa-chevron-right':(countAvailableNodes(obj))}" (click)="nextAvailableNodes(obj,i)">
+            </em>
+          </div>
+        </li>
+        <li class="ebComponentList-item visible-xs visible-sm" *ngIf="localizationLink">
+          <div class="ecb-mobileTreeNodesDiv">
+            <a (click)="loadLocalization()" l10nTranslate>{{"TEXT_LOCALIZATION"}}</a>
+          </div>
+        </li>
+        <li class="ebComponentList-item  visible-xs visible-sm" *ngIf="checkConfigLink">
+          <div class="ecb-mobileTreeNodesDiv">
+            <a (click)="loadCheckConfiguration()" l10nTranslate>{{'TEXT_CONFIGURATION'}}</a>
+          </div>
+        </li>
+        <hr class="ecb-mobilemenuSeperator">
+        <li class="ebComponentList-item" role="button">
+          <div class="ecb-mobileTreeNodesDiv">
+            <a>
+              <i class="fa fa-user"></i>
+              <span class="visible-xs-up ecb-userName">{{userName}}</span>
+            </a>
+          </div>
+        </li>
+        <li class="ebComponentList-item" role="button" (click)="logout()">
+          <div class="ecb-mobileTreeNodesDiv">
+            <a>
+              <i aria-hidden="true" class="fa fa-sign-out"></i>
+              <span class="visible-xs-up" l10nTranslate>{{'TEXT_LOGOUT'}}</span>
+            </a>
+          </div>
+        </li>
+      </ul>
+  </div>
+</div>
+<div class="col-lg-12 col-md-12 ebPageTitle-container ecb-rtlSubscribe" [ngClass]="{'hidden-xs' : !isTicketLogin(), 'hidden-sm': !isTicketLogin()}" #breadcrumTitle>
+  <h1>
+    <img alt="Bundle" *ngIf="imageType=='BUNDLE'" title='{{"TEXT_BUNDLE"| translate:lang}}' class="ecbPagetitle-icon" src="../../../assets/images/ericssonIcons/Icon_Bundle.svg">
+    <img alt="Product Offer" *ngIf="imageType=='PO'" title='{{"TEXT_PRODUCT_OFFER"| translate:lang}}' class="ecbPagetitle-icon" src="../../../assets/images/ericssonIcons/Icon_ProductOffer.svg">
+    <img alt="Priceable Item" *ngIf="imageType=='PI'" title='{{"TEXT_PRICEABLE_ITEM"| translate:lang}}' class="ecbPagetitle-icon" src="../../../assets/images/ericssonIcons/Icon_PriceableItem.svg">
+    <span *ngIf="!isTranslateText(pageTitle)" class= "text-right ecb-pageTitleElipsis">{{pageTitle}}</span>
+    <span *ngIf="isTranslateText(pageTitle)" class= "text-right ecb-pageTitleElipsis" l10nTranslate>{{pageTitle}}</span>
+  </h1>
+</div>

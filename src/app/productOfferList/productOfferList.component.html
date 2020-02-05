@@ -1,0 +1,290 @@
+<!--panel starts from here -->
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div #productOfferHead class="panel-heading">
+                <div class="ebButtonCommands-placement">
+                    <a *ngIf="isCapableOf('Download')"  (click)="exportToCSV()">
+                        <em class="fa fa-download" title='{{"TEXT_DOWNLOAD"| translate:lang}}' aria-hidden="true"></em>
+                    </a>
+                    <a>
+                        <em class="fa fa-refresh" title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+                    </a>
+                    <div class="ebLayout-HeadingCommands-separator"></div>
+                    <div class="form-group">
+                        <div class="btn-group">
+                            <button type="button" class="ebBtn ebBtn-default active" title='{{"TEXT_VISIBLE_LIST"| translate:lang}}' [ngClass]="{'active' : isVisiblePO }" (click)="showVisiblePOs()"
+                                [disabled]="isVisiblePO">
+                                <a [ngClass]="{'ebComponentList-item_disabled' : isVisiblePO }">
+                                    <em class="fa fa-eye" [ngClass]="{'ecb-activelink' : isVisiblePO }"></em>
+                                </a>
+                            </button>
+                            <button type="button" [ngClass]="{'active' : !isVisiblePO }" title='{{"TEXT_HIDDEN_LIST"| translate:lang}}' class="ebBtn ebBtn-default" (click)="getAllHiddenPo()" [disabled]="isHiddenListEmpty || !isVisiblePO">
+                                <a [class.disableAction]="isHiddenListEmpty" [ngClass]="{'ebComponentList-item_disabled' : isHiddenListEmpty|| !isVisiblePO}">
+                                    <em class="fa fa-eye-slash" [ngClass]="{'ecb-activelink' : !isVisiblePO }"></em>
+                                </a>
+                            </button>
+                        </div>
+                    </div>
+                    <span *ngIf="isCapableOf('Create')">
+                        <div class="ebLayout-HeadingCommands-separator"></div>
+                        <a class="ecb-createPOLink" (click)="openCreateOfferingPanel()" l10nTranslate>{{"TEXT_CREATE_OFFERING"}}</a>
+                    </span>
+                </div>
+                <h2 l10nTranslate>{{"TEXT_OFFERINGS_LIST"}}
+                    <span>({{totalCount}})</span>
+                </h2>
+            </div>
+            <!--panel header -->
+            <div class="ecb-positionRelative panel-body">
+                <div *ngIf="showErrorMsg">
+                    <div class="row">
+                        <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert"> 
+                        <button *ngIf="!loadError" type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true" (click)="showErrorMsg = false">×</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <p>{{offeringsGridErrMsg}}</p>
+                        </div>
+                        </div>
+                    </div>
+                
+                <!--error while fetching data -->
+
+                <ecb-properties *ngIf="showCreatePOPanel" [createOffering]="offeringType" [currencyAndPartitionList]="createPOData" [createPOConfig]="createPODataconfig"
+                    (hideCreatePOPanel)="hidePropertiesWidget($event)" [copyOfferings]="offeringData"></ecb-properties>
+                <div>
+                    <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"></ecb-loader>
+
+                    <div *ngIf="loadGridData" class=" eb-adjustPanelBodyPadding eb-adjustPanelBodyMargin ecb-tableOverflow" [ngStyle]="calculateGridScrollHeight()"
+                        [scrollerContext]="'self'" ecb-infinite-scroller (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()"
+                        (scrollGetLess)="getLessData()">
+                        <!--table strats from here -->
+
+                        <p-dataTable #datatable *ngIf="loadGridData" [value]="_productOffersList" [scrollable]="columnDef.scrollable"
+                            [lazy]="columnDef.lazy" (onLazyLoad)="loadData($event)" scrollWidth="getDeviceWidth()" sortOrder={{convertedDefaultSortOrder}}
+                            sortField={{columnDef.defaultSortColumn}} [rowStyleClass]="getRowClass" [immutable]=false>
+                            <p-column [style]="col.style" *ngFor="let col of cols" [field]="col.field" [header]="col.key | translate:lang" [sortable]="col.sortable"
+                                filter="col.filter" required="true">
+                                <ng-template pTemplate="filter" let-col *ngIf="col.field !== 'bundle' && col.field !== 'currency' && col.field !== 'poPartitionName'">
+                                    <div>
+                                        <input type="text" *ngIf="(col.field !== 'actions' && col.field !=='effStartDate' && col.field !=='effEndDate' && col.field !=='availStartDate' && col.field !=='availEndDate');else elseBlock"
+                                            placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]"
+                            pInputText (keyup)="filterDataKeys($event,col.field,filterFields[col.field])" class="ecb-filterInput" />
+                                        <ng-template #elseBlock>
+                                            <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                                        </ng-template>
+                                        <div class="ecb-clearFilterMain">
+                                            <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                <i class="fa fa-times-circle fa-lg"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                    <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a *ngIf="isCapableOf('copy_column_(un)hide')">
+                                        <em class="fa fa-clone" title='{{"TEXT_COPY"| translate:lang}}' aria-hidden="true" (click)="copyOfferingsHandler(_productOffersList[i])"></em>
+                                    </a>
+                                    <a *ngIf="isCapableOf('hide_column_(un)hide')">
+                                        <em class="fa fa-eye" title='{{"TEXT_SHOW_OFFERING"| translate:lang}}' *ngIf="!isVisiblePO" (click)="unHidePO(data,i)" aria-hidden="true">
+                                        </em>
+                                    </a>
+                                    <a *ngIf="isCapableOf('hide_column_(un)hide')">
+                                        <em class="fa fa-eye-slash" title='{{"TEXT_HIDE_OFFERING"| translate:lang}}' *ngIf="isVisiblePO" (click)="hidePO(data,i)" aria-hidden="true">
+                                        </em>
+                                    </a>
+                                    <a *ngIf="isCapableOf('Delete_Column_(un)hide')" [disabled]="data.delete" [class.disable]="(data.delete === false)" (click)="deletePO(data,i)">
+                                        <em class="fa fa-times-circle fa-lg" title='{{"TEXT_DELETE"| translate:lang}}' ></em>
+                                    </a>
+                                    <span *ngIf="errorTooltip && i == tooltipIndex">
+                                        <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="deletePoError" (onClose)="OnTooltipClose($event)"></ecb-errortooltip>
+                                    </span>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'bundle'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <img *ngIf="data['bundle']" class="ecb-subscribableItemType" src="../../../assets/images/ericssonIcons/Icon_Bundle.svg" alt="Offer Icon">
+                                        <img *ngIf="!data['bundle']" class="ecb-subscribableItemType" src="../../../assets/images/ericssonIcons/Icon_ProductOffer.svg"
+                                            alt="Offer Icon">
+                                        <div class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span *ngIf="data['bundle']" class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_BUNDLE"}}</span>
+                                                <span *ngIf="!data['bundle']" class="ecb-subscribePo" l10nTranslate>{{"TEXT_PRODUCT_OFFER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'bundle'" pTemplate="filter" let-col>
+                                    <ecb-dropdown [options]='offeringTypes' [primaryOption]='offeringFirstItem' [modelValue]='offeringFirstItem' (changeItem)="changeOfferingType($event)"></ecb-dropdown>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span>
+                                        <a class="ecb-ListActive" (click)="getOfferingDetails(_productOffersList[i])">{{_productOffersList[i]?.name}}</a>
+                                    </span>
+                                </ng-template>
+                                <ng-template *ngIf="col.field === 'effStartDate'" pTemplate="filter" let-col>
+                                    <div>
+                                        <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'startDate'"
+                                            [columnPlacement]="'middle'">
+                                        </ecb-number-date-filter>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'effStartDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span class="ecb-offeringsWordWrap">{{_productOffersList[i]?.effStartDate | amDateFormat:amLocaleDateFormat }}</span>
+                                </ng-template>
+
+                                <ng-template pTemplate="filter" let-col *ngIf="col.field === 'effEndDate'">
+                                    <div>
+                                        <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'endDate'"
+                                            [columnPlacement]="'middle'">
+                                        </ecb-number-date-filter>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'effEndDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span class="ecb-offeringsWordWrap">{{_productOffersList[i]?.effEndDate | amDateFormat:amLocaleDateFormat }}</span>
+                                </ng-template>
+
+                                <ng-template pTemplate="filter" let-col *ngIf="col.field === 'availStartDate'">
+                                    <div>
+                                        <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'availableStartDate'"
+                                            [columnPlacement]="'middle'">
+                                        </ecb-number-date-filter>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'availStartDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span class="ecb-offeringsWordWrap">{{_productOffersList[i]?.availStartDate | amDateFormat:amLocaleDateFormat }}</span>
+                                </ng-template>
+
+                                <ng-template pTemplate="filter" let-col *ngIf="col.field === 'availEndDate'">
+                                    <div>
+                                        <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'availableEndDate'"
+                                            [columnPlacement]="'last'">
+                                        </ecb-number-date-filter>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'availEndDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span class="ecb-offeringsWordWrap">{{_productOffersList[i]?.availEndDate | amDateFormat:amLocaleDateFormat }}</span>
+                                </ng-template>
+
+
+                                <ng-template *ngIf="col.field == 'currency'" pTemplate="filter" let-col>
+                                    <ecb-dropdown [options]='currencies' [primaryOption]='currencyFirstItem' [modelValue]='currencyFirstItem' (changeItem)="changeCurrencyItem($event)">
+                                    </ecb-dropdown>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'poPartitionName'" pTemplate="filter" let-col>
+                                    <ecb-dropdown [options]='partitions' [primaryOption]='partitionFirstItem' [modelValue]='partitionFirstItem' (changeItem)="changePartitionItem($event)">
+                                    </ecb-dropdown>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                        <!--table ends here -->
+                        
+
+                        <!--No productsoffer message here -->
+                        <div *ngIf="getErrorMessageType() !== 0">
+                            <div class="ecb-infoStyling">
+                                <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+                                    <p>{{errorMessage}}</p>
+                                </div>
+                                <div *ngIf="getErrorMessageType() === 2 && !isVisiblePO" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                    <div class="ebNotification-content ecb-infotext">
+                                        <span class="ebNotification-label">
+                                            <span l10nTranslate>{{'TEXT_NO_HIDDEN_OFFER_RECORDS'}} </span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div *ngIf="getErrorMessageType() === 2 && isVisiblePO" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                    <div class="ebNotification-content ecb-infotext">
+                                        <span class="ebNotification-label">
+                                            <span l10nTranslate>{{'TEXT_NO_SHOWN_OFFER_RECORDS'}} </span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                    <div class="ebNotification-content ecb-infotext">
+                                        <span class="ebNotification-label">
+                                            <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+
+                        <ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+                            <dialog-header *ngIf="!deleteHideUnhidePoData?.bundle" l10nTranslate>{{'TEXT_DELETE_POPUP'}}</dialog-header>
+                            <dialog-header *ngIf="deleteHideUnhidePoData?.bundle" l10nTranslate>{{'TEXT_DELETE_BUNDLE'}}</dialog-header>
+                            <dialog-body l10nTranslate>
+                                <p>
+                                    <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deleteHideUnhidePoData?.displayName}}&#32; &#63;</p>
+                                <p>{{deleteHideUnhidePoData?.description}}</p>
+                            </dialog-body>
+                            <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+                            <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+                        </ecb-modal-dialog>
+                        <ecb-modal-dialog [contentType]="'none'" [open]="confirmDialog == 2" (onClose)="onModalDialogCloseHide($event)" [defaultFooterButtons]="false"
+                            [primaryButtons]="[1]">
+                            <dialog-header *ngIf="deleteHideUnhidePoData?.bundle">
+                                <span l10nTranslate>{{'TEXT_HIDE'}}</span>&#32;
+                                <span l10nTranslate>{{'TEXT_BUNDLE'}}</span>
+                            </dialog-header>
+                            <dialog-header *ngIf="!deleteHideUnhidePoData?.bundle" l10nTranslate>{{'TEXT_HIDE_PRODUCT_OFFER'}}</dialog-header>
+                            <dialog-body l10nTranslate>
+                                <p>
+                                    <span l10nTranslate>{{'TEXT_HIDE'}}</span> &#32;{{deleteHideUnhidePoData?.name}}?</p>
+                                <p>{{deleteHideUnhidePoData?.description}}</p>
+                            </dialog-body>
+                            <dialog-button-1 l10nTranslate>{{'TEXT_HIDE'}}</dialog-button-1>
+                            <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+                        </ecb-modal-dialog>
+                        <ecb-modal-dialog [contentType]="'none'" [open]="confirmDialog == 3" (onClose)="onModalDialogCloseUnhide($event)" [defaultFooterButtons]="false"
+                            [primaryButtons]="[1]">
+                            <dialog-header *ngIf="deleteHideUnhidePoData?.bundle">
+                                <span l10nTranslate>{{'TEXT_UNHIDE'}}</span>&#32;
+                                <span l10nTranslate>{{'TEXT_BUNDLE'}}</span>
+                            </dialog-header>
+                            <dialog-header *ngIf="!deleteHideUnhidePoData?.bundle" l10nTranslate>{{'TEXT_UNHIDE_PRODUCT_OFFER'}}</dialog-header>
+                            <dialog-body l10nTranslate>
+                                <p>
+                                    <span l10nTranslate>{{'TEXT_UNHIDE'}}</span> &#32;{{deleteHideUnhidePoData?.name}}?</p>
+                                <p>{{deleteHideUnhidePoData?.description}}</p>
+                            </dialog-body>
+                            <dialog-button-1 l10nTranslate>{{'TEXT_UNHIDE'}}</dialog-button-1>
+                            <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+                        </ecb-modal-dialog>
+                        <ecb-modal-dialog [styleClass]="'ecb-createOfferingModal'" [open]="confirmDialog == 4" (onClose)="onModalDialogCloseCreatePO($event)"
+                            [header]="false" [body]="false" [footer]="false">
+                            <dialog-body-template>
+                                <div>
+                                    <h2 l10nTranslate>{{'TEXT_CREATE_OFFERING'}}</h2>
+                                    <ul>
+                                        <li>
+                                            <span class="bundleIcon" title ='{{"TEXT_BUNDLE"| translate:lang}}' ></span>
+                                            <a (keyup.enter)="triggerOffering('bundle')" (click)="triggerOffering('bundle')" tabindex="1" l10nTranslate>{{'TEXT_CREATE_BUNDLE'}}</a>
+                                        </li>
+                                        <li>
+                                            <span class="productOfferIcon" title ='{{"TEXT_PRODUCT_OFFER"| translate:lang}}'></span>
+                                            <a (keyup.enter)="triggerOffering('productOffer')" (click)="triggerOffering('productOffer')" tabindex="2" l10nTranslate>{{'TEXT_CREATE_PRODUCT'}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </dialog-body-template>
+                        </ecb-modal-dialog>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

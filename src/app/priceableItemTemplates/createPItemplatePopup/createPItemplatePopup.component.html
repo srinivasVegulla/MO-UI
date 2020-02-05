@@ -1,0 +1,95 @@
+<ecb-modal-dialog [styleClass]="'ecb-createPiTemplate'" [open]="confirmDialog == 1" (onClose)="onModalDialogClose($event)"
+  [heder]="false" [body]="false" [closeIcon]="false" [footer]="false" [drag]="false">
+  <dialog-body-template>
+    <div class="panel panel-default">
+      <div class="panel-heading ecb-panelHeading">
+        <div class="row">
+          <div class="col-xs-6 ecb-editOverlayLink">
+            <button class="ebBtn ecbBtn-margin" [disabled]="!isSaveEnabled" [ngClass]="{'ebBtn-primary': isSaveEnabled}" (click)="openCreateForm()"
+              l10nTranslate>{{'TEXT_SELECT'}}</button>
+            <button class="ebBtn ebBtn-default" (click)="closeCreateForm()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+          </div>
+          <h2 class="col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_SELECT_PI_TYPE'}}</h2> 
+        </div>
+      </div>
+      <div class="panel-body row">
+        <div class="panel-heading">
+          <h3 l10nTranslate>{{'TEXT_PI_T_LIST'}}
+            <span> ({{ availableChargeTypesCount }}) </span>
+          </h3>
+        </div>
+        <!--loader -->
+
+        <!--loader -->
+        <div class="panel-body ecb-inUseSharedRate ecb-gridInfiniteScroll">
+          <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"></ecb-loader>
+          <p-dataTable #datatable *ngIf="!availableChargeTypesErrorMessage && loadGridData" [value]="availableChargeTypes" [scrollable]="createPiColumnDef.scrollable"
+            [lazy]="createPiColumnDef.lazy" (onLazyLoad)="loadData($event)" scrollWidth="getDeviceWidth()" selectionMode="single"
+            [(selection)]="selectedType" sortField={{createPiColumnDef.defaultSortColumn}}>
+
+            <div class="offeringsSkeleton"></div>
+            <p-column [style]="cols.style" *ngFor="let cols of piTemplateColumns" [field]="cols.field" [header]="cols.key | translate:lang"
+              [sortable]="cols.sortable" filter="cols.filter" required="true">
+              <ng-template pTemplate="filter" let-col>
+                <div>
+                  <input type="text" *ngIf="(cols.field === 'name' || cols.field === 'description' || cols.field === 'displayName') else filterElseBlock"
+                    placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[cols.field]" pInputText
+                    (keyup)="filterDataKeys($event, cols.field, filterFields[cols.field])" class="ecb-filterInput ecb-inusesharedlistfilter" />
+                  <ng-template #filterElseBlock>
+                    <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                  </ng-template>
+                  <div class="ecb-clearFilterMain">
+                    <div class="ecb-clearFilter" *ngIf="isFilterText(cols.field)" (click)="clearFilters(cols.field)">
+                      <em class="fa fa-times-circle-o fa-lg"></em>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header" let-col let-rowData="rowData">
+                <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+              </ng-template>
+              <ng-template let-idx="rowIndex" *ngIf="(cols.field === 'choose')" let-idx="rowIndex" let-data="rowData" pTemplate="body">
+                <span>
+                  <input type="radio" class="ebRadioBtn_noText" (click)="setSelectedType(idx)" [checked]="idx === rowIndex">
+                </span>
+              </ng-template>
+              <ng-template *ngIf="cols.field == 'chargeType'" pTemplate="filter" let-col>
+                <ecb-dropdown [options]='usageTypes' [modelValue]='usageFirstName' [primaryOption]='usageFirstName' (changeItem)="changeUsageType($event)">
+                </ecb-dropdown>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+          <div *ngIf="getErrorMessageType() !== 0 && loadGridData">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert" *ngIf="getErrorMessageType() === 1">
+                  <button type="button" class="close" data-dismiss="alert">
+                    <span aria-hidden="true" (click)="showErrorMessage = false"><em class="ebIcon ebIcon_close_red "></em></span>
+                    <span class="sr-only">Close</span>
+                  </button>
+                  <p l10nTranslate>
+                    <strong>{{"TEXT_FILTERED_DATA_FETCHING_ERROR"}}</strong>
+                  </p>
+                </div>
+                <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations ">
+                  <div class="ebNotification-content ecb-infotext">
+                    <span class="ebNotification-label">
+                      <span l10nTranslate>{{'TEXT_NO_RECORDS'}} </span>
+                    </span>
+                  </div>
+                </div>
+                <div *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations ">
+                  <div class="ebNotification-content ecb-infotext">
+                    <span class="ebNotification-label">
+                      <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog-body-template>
+</ecb-modal-dialog>

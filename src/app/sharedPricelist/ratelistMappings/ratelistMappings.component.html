@@ -1,0 +1,62 @@
+<div class="panel panel-default" >
+  <ecb-loader *ngIf="sharedRateItemFetching" mode="dot" fill="widget" type="widget" backDropClassName="ecb-loaderMinHeight"></ecb-loader>  
+  <div *ngIf="!sharedRateItemFetching">
+    <div class="ecb-sharedRateInfo col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger"
+      role="alert" *ngIf="sharedItemError != null">
+      <p l10nTranslate>
+        {{sharedItemError}}
+      </p>
+    </div>
+    <div  *ngIf="sharedItemError == null && ratelistData.length == 0" class="ecb-sharedRateInfo ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+        <div class="ebNotification-content ecb-infotext">           
+            <span class="ebNotification-label">
+                <span l10nTranslate>{{'TEXT_NO_RATETABLE_MAPPED'}}</span>
+            </span>
+        </div>
+    </div>
+    <div *ngIf="sharedItemError == null && ratelistData.length > 0" class="panel-body ecbMarginLeft">
+      <div>
+        <div  [ngClass]="{'dropdown': isLowerResolution}">
+          <button class="btn btn-default dropdown-toggle" *ngIf="isLowerResolution" type="button" id="dropdownMenu22" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="true" l10nTranslate>
+            {{currentParameterTable?.displayName}}
+            <span class="chevron down"></span>
+          </button>
+          <ul class="ebComponentList ecbSPLzindex" [ngClass]="{'dropdown-menu ecbAbsolute': isLowerResolution}">
+            <li class="ebComponentList-group" *ngFor="let data of ratelistData">
+              <div class="ebComponentList-group-header">
+                <span class="pull-left ecbSplLeftPadding">{{data.displayName}} </span><span class="pull-left ecbSplLeftPadding"> ({{data.added}} {{"TEXT_OF" | translate: lang}} {{data.available}})</span>
+                <div class="ebComponentList-header-link ecbPointer pull-right" *ngIf="addRateTableCapability" (click)="showPIRatesTables(data)">
+                  <a l10nTranslate *ngIf="data.added != data.available && !isLowerResolution"> {{"TEXT_ADD_RATE_TABLE"}} </a>
+                </div>
+              </div>
+              <span *ngIf="data.children !== null && data.children.length > 0">
+                <ul class="ebComponentList-inner" *ngFor="let child of data.children">
+                  <li *ngIf="child?.nodeType =='PARAM_TABLE'" class="ebComponentList-item" [ngClass]="{'ebComponentList-item_selected ebComponentList-item_selectedRtl': (child?.selected)}">
+                    <a class="ebComponentList-link" (click)="showSchedules(child)">{{child.displayName}}</a>
+                  </li>
+                  <div class="ebComponentList-group" *ngIf="child?.nodeType =='CHILD_PI'">
+                    <div class="ebComponentList-group-subheader">
+                      <span class="pull-left ecbSplLeftPadding">{{child.displayName}} </span><span class="pull-left ecbSplLeftPadding"> ({{child.added}} {{"TEXT_OF" | translate: lang}} {{child.available}})&#x200E;</span>
+                      <div class="ebComponentList-header-link ecbPointer pull-right" *ngIf="addRateTableCapability" (click)="showPIRatesTables(child)">
+                        <a l10nTranslate *ngIf="child.added != child.available && !isLowerResolution"> {{"TEXT_ADD_RATE_TABLE"}} </a>
+                      </div>
+                    </div>
+                    <span *ngIf="child.children !== null && child.children.length > 0">
+                      <ul class="ebComponentList-inner" *ngFor="let grandChild of child.children">
+                        <li class="ebComponentList-subitem" [ngClass]="{'ebComponentList-item_selected ebComponentList-item_selectedRtl': (grandChild?.selected)}">
+                          <a class="ebComponentList-link" (click)="showSchedules(grandChild)">{{grandChild?.displayName}}</a>
+                        </li>
+                      </ul>
+                    </span>
+                  </div>
+                </ul>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>  
+  </div>
+</div>
+

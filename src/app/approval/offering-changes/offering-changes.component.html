@@ -1,0 +1,42 @@
+<div class="ecbRateTableHeader ecb-OfferingChanges col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <!--error while fetching data -->
+    <div *ngIf="showErrorMessage">
+        <div class="row">
+            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger"
+                role="alert">
+                <button  *ngIf="!loadError" type="button"  class="close"  data-dismiss="alert">
+                    <span aria-hidden="true" (click)="showErrorMessage=false">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <p>{{approvalErrMsg}}</p>
+            </div>
+        </div>
+    </div>
+    <ecb-loader *ngIf="loading" mode="dot" fill="widget"></ecb-loader>
+    <p-dataTable [value]="pendingOfferingChangesList" scrollWidth="getDeviceWidth()" [lazy]="true" sortField={{pendingOfferingColumnDef.defaultSortColumn}} sortOrder={{convertedDefaultSortOrder}}>
+        <p-column *ngFor="let col of pendingOfferingColumnDef.cols" [style]="col.style" [filter]='col.filter'
+            [editable]='col.editable' [field]="col.field" [sortable]="col.sortable" [header]="col.key | translate:lang">
+            <ng-template *ngIf="col.field == 'propertyName'" let-col let-data="rowData" let-i="rowIndex"
+                pTemplate="body">
+                <span class="ecb-wordbreak">{{pendingOfferingChangesList[i].propertyName}}</span>
+            </ng-template>
+            <ng-template *ngIf="col.field == 'previousValue'" let-col let-data="rowData" let-i="rowIndex"
+                pTemplate="body">
+                <span class="ecb-wordbreak">{{pendingOfferingChangesList[i].previousValue}}</span>
+            </ng-template>
+            <ng-template *ngIf="col.field == 'newValue'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                <span class="ecb-wordbreak">{{pendingOfferingChangesList[i].newValue}}</span>
+            </ng-template>
+        </p-column>
+    </p-dataTable>
+    <div class="ecb-infoStyling">
+        <div *ngIf="getErrorMessageType()" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+            <div class="ebNotification-content ecb-infotext">
+                <span class="ebNotification-label" l10nTranslate>
+                    {{'TEXT_NO_RECORDS'}}
+                </span>
+            </div>
+        </div>
+        <br />
+    </div>
+</div>

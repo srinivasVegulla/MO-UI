@@ -1,0 +1,198 @@
+<div class="panel panel panel-default">
+    <!--panel header -->
+    <div class="panel-heading">
+      <div class="ebCommands-placement ecbCommandsCenterAlign">
+          <span>
+            <em class="fa fa-refresh ecb-enableAlignIcon" title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+          </span>
+          <div class="ebLayout-HeadingCommands-separator"></div>
+        <a>
+          <span (click)="showCreateAdjustmentReason(false, adjName)" l10nTranslate>{{"TEXT_CREATE_ADJUSTEMNT_REASON"}}</span>
+        </a>
+      </div>
+      <h2 l10nTranslate>{{ "TEXT_MORE_ADJUSTMENTS_REASONS" }}
+        <span>({{ adjustmentReasonsLength }})</span>
+      </h2>
+    </div>
+  
+  <!--panel header -->
+
+  <!--error while fetching data -->
+  <div class="ecb-positionRelative panel-body">
+    <!-- error message when VPN is down -->
+      <div *ngIf="adjustmentErrorMsg">
+          <div class="row">
+              <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert"> 
+              <p>{{adjustmentErrorMsg}}</p>
+              </div>
+          </div>
+      </div>
+   <div *ngIf="loadGridData" class="ecb-tableOverflow" [ngStyle]="calculateGridScrollHeight()" [scrollerContext]="'self'"
+    [ngClass]="{'eb-panelBodyTopBorder' : filterErrorMessage}" ecb-infinite-scroller (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+    <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"></ecb-loader>
+    <ecb-loader *ngIf="showAdjustmentReasonsPropSkeleton" mode="skeleton" fill="grid" type="grid"></ecb-loader>
+    <!--table strats from here -->
+    <p-dataTable #datatable [value]="_adjustmentReasonsList" [scrollable]="columnDef.scrollable" [lazy]="columnDef.lazy"
+    [rowStyleClass]="getRowClass" (onLazyLoad)="loadData($event)" scrollWidth="getDeviceWidth()" sortField={{columnDef.defaultSortColumn}} sortOrder={{convertedDefaultSortOrder}} [immutable]="false">
+      <p-column [style]="col.style" *ngFor="let col of cols" [field]="col.field" [header]="col.key | translate:lang" [sortable]="col.sortable"
+        filter="col.filter" required="true">
+        <ng-template pTemplate="header" let-col let-rowData="rowData">
+            <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+        </ng-template>
+        <ng-template pTemplate="filter" let-col>
+          <div>
+            <input type="text" *ngIf="(col.field !== 'actions');else elseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}'
+                  [(ngModel)]="filterFields[col.field]" pInputText (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+            <ng-template #elseBlock>
+              <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+            </ng-template>
+            <div class="ecb-clearFilterMain">
+              <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                <em class="fa fa-times-circle fa-lg"></em>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+         <ng-template *ngIf="col.field == 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <a (click)="showCreateAdjustmentReason(false, adjName)">
+            <em class="fa fa-plus" title='{{"TEXT_ADD"| translate:lang}}' aria-hidden="true"> </em>
+          </a>
+          <a (click)="showCreateAdjustmentReason(true, _adjustmentReasonsList[i])">
+            <em class="fa fa-pencil" title='{{"TEXT_EDIT_VIEW"| translate:lang}}' aria-hidden="true"> </em>
+          </a>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;">{{_adjustmentReasonsList[i].name}}</span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'displayName'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;">{{_adjustmentReasonsList[i].displayName}}</span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'description'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;">{{_adjustmentReasonsList[i].description}}</span>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+
+    <div *ngIf="getErrorMessageType() !== 0">
+        <div class="ecb-infoStyling">
+                <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+                    <p>{{errorMessage}}</p>
+                </div>
+                <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                    <div class="ebNotification-content ecb-infotext">           
+                        <span class="ebNotification-label">
+                            <span l10nTranslate>{{'TEXT_NO_ADJUSTMENT_REASONS_RECORDS'}} </span>
+                        </span>
+                    </div>
+                  </div>
+                  <div  *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                    <div class="ebNotification-content ecb-infotext">           
+                        <span class="ebNotification-label">
+                            <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                        </span>
+                    </div>
+                  </div>
+        </div>
+    </div>
+    <!--table ends here -->
+  <br/>
+  
+  </div>
+  </div>
+</div>
+
+<div class="ecb-subscription-properties">
+    <ngx-aside #createAdjustmentReasonAside [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false" class="ecb-asideContent ecb-subscriptionproperties" [ngClass]="{'ecb-showEditDialog':showCover}">
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-ngxasidepanel ecb-subscriptionproperties">
+        <div class="panel panel-default">
+          <div class="panel-heading ecb-panelHeading">
+            <div class="row">
+              <h2 *ngIf="!showAdjEditMessage" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_CREATE_ADJUSTMENT_REASON'}}</h2>
+              <h2 *ngIf="showAdjEditMessage" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_ADJUSTMENT_REASON'}}</h2>
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ecb-editOverlayLink">
+                <button class="ebBtn ecbBtn-margin" [disabled]="isSaveDisabled" (click)="saveAdjustmentReason()" [ngClass]="{'ebBtn-primary': !isSaveDisabled}"  l10nTranslate>{{'TEXT_SAVE'}}</button>
+                <button class="ebBtn ebBtn-default" (click)="cancelAsidePanel()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body">
+          <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+              <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                <span class="sr-only">Close</span>
+              </button>
+              <p>{{httpErrorMessage}}</p>
+            </div>
+            <div *ngIf="showAdjEditMessage" class="ebNotification ebNotification_color_paleBlue">
+              <div class="ebNotification-content ">
+                <span class="ebNotification-label"><span class="ecb-notification-content" l10nTranslate>{{'TEXT_EDIT_ADJUSTMENT_REASON_MESSAGE'}}</span></span>
+              </div>
+            </div>
+            <form [formGroup]="adjustmentReasonForm" class="ecb-asideform" (keydown)="onEnterSaveAdjustmentReason($event)" novalidate>
+              <div class="row">
+                <!-- name -->
+                <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+                  <div class="input-group col-xs-12" l10nTranslate>
+                    <input id="initFocus" *ngIf="!showAdjEditMessage" #defaultName type="text" class="ebInput" maxlength="255" name="name" (blur)="checkNameAvailability()" (keydown)="disableSpace($event)" (focusout)="removeSpace()" formControlName="name" 
+                      [ngClass]="{'ecb-fieldEmptyValidator': (adjustmentReasonForm.controls.name.hasError('required') && adjustmentReasonForm.controls.name.touched)
+                    || nameExist}" tabindex="1" autofocus/>
+                    <input id="initFocus" *ngIf="showAdjEditMessage" type="text" class="ebInput" maxlength="255" name="name" formControlName="name" [readonly]="showAdjEditMessage" tabindex="1"/>
+                    <span *ngIf="!showAdjEditMessage" class="input-group-required"></span>
+                  </div>
+                  <div *ngIf="adjustmentReasonForm.controls.name.hasError('required') && adjustmentReasonForm.controls.name.touched"
+                    class="ebInputError">
+                    <span class="statusError"></span>
+                    <span l10nTranslate>{{'TEXT_NAME_REQUIRED'}}</span>
+                  </div>
+                  <div *ngIf="nameExist && !adjustmentReasonForm.controls.name.hasError('required')" class="ebInputError">
+                    <span class="statusError"></span>
+                    <span l10nTranslate>{{'TEXT_NAME_EXIST'}}</span>
+                  </div>
+                </div>
+                <!-- name -->
+                <!--Display Name -->
+                <div class=" form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DISPLAY_NAME'}}</label>
+                  <div class="input-group col-xs-12">
+                      <input id="initDisplayNameFocus" #displayNameField type="text" class="ebInput" maxlength="255" name="displayName" (keydown)="disableSpace($event)" (focusout)="removeSpace()"  formControlName="displayName" [ngClass]="{'ecb-fieldEmptyValidator': adjustmentReasonForm.controls.displayName.hasError('required') && adjustmentReasonForm.controls.displayName.touched}" tabindex="2">
+                      <span class="input-group-required"></span>
+                  </div>
+                      <div *ngIf="adjustmentReasonForm.controls.displayName.hasError('required') && adjustmentReasonForm.controls.displayName.touched" class="ebInputError">
+                      <span class="statusError"></span>
+                      <span l10nTranslate>{{'TEXT_DISPLAYNAME_REQUIRED'}}</span>
+                  </div>
+              </div>
+              <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+                  <textarea class="form-control ecbTextArea" type="text" #textArea [ngClass]="autoGrow()" maxlength="4000" name="description" formControlName="description" tabindex="3"></textarea>
+              </div>
+              </div>
+            </form>
+          </div>
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12">
+                  <div class="input-group ecb-sidebarFooter">
+                      <input type="text" class="ebInput" placeholder="" readonly>
+                      <span class="ecb-requriedIndicator" l10nTranslate> {{'TEXT_REQUIRED_FIELD'}} </span> <span class="input-group-required"> </span>
+                  </div>
+              </div>
+            </div>   
+          </div>
+        </div>
+      </div>
+    </ngx-aside>
+</div>
+      <ecb-modal-dialog [primaryButtons]="[2]" [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+        <dialog-header tabindex="1" l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+        <dialog-body tabindex="2" l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+      </ecb-modal-dialog>
+ 
+  <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>
+  

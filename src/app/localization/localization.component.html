@@ -1,0 +1,1140 @@
+<div class='ecb-removeAsidePanelScroll'>
+    <ngx-aside #localizationPanel [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+        class="ecb-asidelocalizationContent aside" [ngClass]="{'ecb-showEditDialog':showCover}">
+        <div class="panel panel-default">
+            <div #popupHeading class="panel-heading ecb-panelHeading">
+                <div class="ecb-editOverlayLink">
+                    <button class="ebBtn ebBtn-primary" [disabled]="!isDisabled" (click)="saveLocalizationData()" l10nTranslate>{{'TEXT_SAVE'}}</button>
+                    <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                </div>
+                <h2 l10nTranslate>{{'TEXT_LOCALIZATION'}}
+                    <span>&#58; {{displayName}}</span>
+                </h2>                
+            </div>
+            <div class="panel-body ecb-localizationaside">
+                    <div *ngIf="showErrorMessage">
+                            <div class="row">
+                                  <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert">
+                                          <button  *ngIf="!loadError" type="button" class="close" data-dismiss="alert">
+                                                  <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                                                  <span class="sr-only">Close</span>
+                                           </button>
+                                      <p>{{localizationErrMsg}}</p>
+                                  </div>
+                              </div>
+                       </div>
+                <div #selectLangHeader *ngIf="loadFlagData && !loadNetworkError" class="panel panel-default">
+                    <div class="panel-heading">
+
+                        <h2 class="ecb-selectLangAside" l10nTranslate>{{"TEXT_SELECT_LANGUAGES"}}</h2>
+                    </div>
+                    <div class="panel-body">  
+                        <div class="form-group ecb-checkbox">
+                            <div class="ebCheckbox ebCheckboxLoc" *ngFor="let entry of localeFlagData">
+                                <label>
+                                    <input class="ecb-localization" *ngIf="entry['langCode'] === cookieName" type="checkbox" [(ngModel)]="checkBoxFields[entry.description]"
+                                        (ngModelChange)="checkChange(entry.description, entry.langCode, $event)" [disabled]="false"
+                                        onclick="languageClick()">
+                                    <input *ngIf="entry['langCode'] !== cookieName" type="checkbox" class="ecb-localization" [(ngModel)]="checkBoxFields[entry.description]"
+                                        (ngModelChange)="checkChange(entry.description, entry.langCode, $event)" [disabled]="false">
+                                    <div class="text">{{entry.description}}</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>  
+
+                    </div>
+               
+                <div class="panel panel-default">
+                    <div *ngIf="!loadNetworkError" class="panel-heading">
+                        <div #selectGridCount class="eb-ProductOfferListHeadingAlignment ecb-localizationHeader">
+                            <h2 class="localizationList" l10nTranslate>{{"TEXT_LOCALIZATION_ITEMS_LIST"}}
+                                <span>({{totalCount}})</span>
+                            </h2>
+                            <div class="ebCommands-placement"> 
+                                <a>
+                                    <em class="fa fa-refresh  ecb-alignicon" title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!--error while fetching data -->
+                    <div class="panel-body  ecb-localizationPanel ecb-gridInfiniteScroll eb-adjustPanelBodyMargin ecb-viewList col-xs-12 col-sm-12 col-md-12 col-lg-12"
+                        [ngStyle]="calculateGridScrollHeight()" [ngClass]="{'eb-panelBodyTopBorder' : filterErrorMessage}" ecb-infinite-scroller
+                        *ngIf="loadGridData" [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)"
+                        [localizationPageSize]="totalPages" (scrollGetMore)="getMoreData()">
+                        <ecb-loader *ngIf="loading" mode="dot" fill="widget" backDropClassName="ecb-loaderLocPanelposition"></ecb-loader>
+                        <ecb-loader *ngIf="showlocalizationSkeleton" mode="skeleton" fill="widget" type="localization"></ecb-loader>
+                        <p-dataTable #dt [value]="localizationData" scrollWidth="getDeviceWidth()" [lazy]="true" [editable]="enableLocalizationEdit"
+                            (onLazyLoad)="loadData($event)" sortOrder={{convertedDefaultSortOrder}} sortField={{sortColumnName}}>
+                            <p-column *ngFor="let col of cols" [style]="col.style" [filter]='col.filter' [editable]='col.editable' [field]="col.field"
+                                [sortable]="col.sortable" [header]="col.key | translate:lang">
+                                <ng-template *ngIf="col.field == 'kindType'" pTemplate="filter" let-col>
+                                    <div>
+                                        <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                        (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                                        <div class="ecb-clearFilterMain">
+                                            <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                <i class="fa fa-times-circle fa-lg"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                    <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'property'" pTemplate="filter" let-col>
+                                    <div>
+                                        <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                        (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                                        <div class="ecb-clearFilterMain">
+                                            <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                <i class="fa fa-times-circle fa-lg"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'propName'" pTemplate="filter" let-col>
+                                    <div>
+                                        <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                                        <div class="ecb-clearFilterMain">
+                                            <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                <i class="fa fa-times-circle fa-lg"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'English(UK)'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'English(UK)'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].gb}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'English(UK)'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].gb" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'English(US)'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'English(US)'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].us}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'English(US)'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].us" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'French'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'French'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].fr}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'French'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].fr" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'German'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'German'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].de}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'German'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].de" [ngModelOptions]="{standalone:true}" (onChange)="onEditCell()"
+                                        (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'Spanish'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Spanish'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].es}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Spanish'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].es" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'Japanese'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Japanese'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].jp}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Japanese'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].jp" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'Portuguese_Brazil'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field === 'Portuguese_Brazil'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap']['pt-br']}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Portuguese_Brazil'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap']['pt-br']" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'Italian'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Italian'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].it}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Italian'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].it" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'Spanish_Mexican'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Spanish_Mexican'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap']['es-MX']}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Spanish_Mexican'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap']['es-MX']" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'Hebrew'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterRtl" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Hebrew'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].he}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Hebrew'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].he" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+
+                                <ng-template *ngIf="col.field == 'Danish'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Danish'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap'].da}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Danish'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap'].da" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Swedish'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                    (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field === 'Swedish'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap']['sv-se']}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Swedish'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap']['sv-se']" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Arabic'" pTemplate="filter" let-col>
+                                    <div class="tooltip ecb-rtlSubscribe">
+                                        <div>
+                                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                        (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                            <div class="ecb-clearFilterMain">
+                                                <div class="ecb-clearFilterRtl" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                                    <i class="fa fa-times-circle fa-lg"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                            <div class="ebInfoPopup-contentText">
+                                                <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                            </div>
+                                            <div class="ebInfoPopup-arrowShadow"></div>
+                                            <div class="ebInfoPopup-arrowBorder"></div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template *ngIf="col.field === 'Arabic'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                                    {{data['localizationMap']['ar-sa']}}
+                                </ng-template>
+                                <ng-template *ngIf="col.field == 'Arabic'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                                    <input type="text" [(ngModel)]="data['localizationMap']['ar-sa']" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                        <div *ngIf="getErrorMessageType()">
+                            <div class="ecb-infoStyling">
+                                <div *ngIf="getErrorMessageType() === 1" class="alert alert-danger ecb-calInfoMessage" role="alert">
+                                    <p>
+                                        {{filterErrorMessage}}
+                                    </p>
+                                </div>
+                                <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                        <div class="ebNotification-content ecb-infotext">
+                                            <span class="ebNotification-label">
+                                                <span l10nTranslate>{{'TEXT_NO_LOCALISATION_ITEMS_RECORDS'}} </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                        <div class="ebNotification-content ecb-infotext">
+                                            <span class="ebNotification-label">
+                                                <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                            </div>
+                        </div>
+                        <br/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ngx-aside>
+</div>
+<div *ngIf="isAllProductOfferPage">
+    <div *ngIf="!loadNetworkError" #selectLangHeader class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="ecb-selectLang" l10nTranslate>{{"TEXT_SELECT_LANGUAGES"}} </h2>
+        </div>
+        <div *ngIf="localeFlagData" class="panel-body panel-localizationBody">
+            <div class="form-group">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-checkBox">
+                    <div class="ebCheckbox ebCheckboxLoc" *ngFor="let entry of localeFlagData">
+                        <input class="ecb-localization" *ngIf="entry['langCode'] === cookieName" type="checkbox" [(ngModel)]="checkBoxFields[entry.description]"
+                            (ngModelChange)="checkChange(entry.description,entry.langCode, $event)" [disabled]="false" onclick="languageClick()">
+                        <input *ngIf="entry['langCode'] !== cookieName" type="checkbox" class="ecb-localization" [(ngModel)]="checkBoxFields[entry.description]"
+                            (ngModelChange)="checkChange(entry.description,entry.langCode, $event)" [disabled]="false">
+                        <div class="text">{{entry.description}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        
+        <!--error while fetching data -->
+        <div *ngIf="showErrorMessage">
+            <div class="row">
+                <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert">
+                        <button *ngIf="!loadError" type="button" class="close" data-dismiss="alert">
+                                <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                                <span class="sr-only">Close</span>
+                        </button>
+                    <p>{{localizationErrMsg}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!loadNetworkError" #selectGridCount class="panel-heading">
+            <div class="eb-ProductOfferListHeadingAlignment ecb-localizationHeader">
+                <h2 class="localizationList" l10nTranslate>{{"TEXT_LOCALIZATION_ITEMS_LIST"}}
+                    <span>({{totalCount}})</span>
+                </h2>
+                <div class="ebCommands-placement">
+                    <a>
+                        <em class="fa fa-refresh ecb-alignicon"  title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+                    </a>
+                    <a (click)="displayDownload()">
+                        <em class="fa fa-download" aria-hidden="true" title='{{"TEXT_DOWNLOAD"| translate:lang}}' ></em>
+                    </a>
+                    <span [ngClass]="(noTableData === false)?'ecb-enableAlignIcon':'ecb-disableAlignIcon'" class="ecb-fileUpload">
+                        <input #csvUploadElement type="file" accept=".csv" (change)="initiateUpload($event)">
+                        <a (click)="openUploadDialog()">
+                            <i class="fa fa-upload" aria-hidden="true" title='{{"TEXT_UPLOAD_FILE"| translate:lang}}'></i>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body ecb-positionRelative">
+            <div *ngIf="loadGridData" class="eb-adjustPanelBodyPadding ecb-localizationPanel eb-adjustPanelBodyMargin ecb-tableOverflow" [ngStyle]="calculateGridScrollHeight()"
+                [ngClass]="{'eb-panelBodyTopBorder' : filterErrorMessage}" ecb-infinite-scroller [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)" [localizationPageSize]="totalPages" (scrollGetMore)="getMoreData()">
+                <ecb-loader *ngIf="loading" mode="dot" fill="widget"></ecb-loader>
+                <ecb-loader *ngIf="showlocalizationSkeleton" mode="skeleton" fill="grid" type="grid"></ecb-loader>
+                <p-dataTable #dt (onLazyLoad)="loadData($event)" [value]="localizationData"  scrollWidth="getDeviceWidth()" [scrollable]="columnDef.scrollable"   
+                    [lazy]="true" [editable]="enableLocalizationEdit" sortOrder={{convertedDefaultSortOrder}} sortField={{columnDef.defaultSortColumn}}>
+                    <p-column *ngFor="let col of cols" [style]="col.style" [filter]='col.filter' [editable]='col.editable' [field]="col.field"
+                        [sortable]="col.sortable" [header]="col.key | translate:lang">
+                        <ng-template *ngIf="col.field == 'kindType'" pTemplate="filter" id="drop1" let-col>
+                            <div>
+                                <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                                <div class="ecb-clearFilterMain">
+                                    <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                        <i class="fa fa-times-circle fa-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'property'" pTemplate="filter" let-col>
+                            <div>
+                                <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                                <div class="ecb-clearFilterMain">
+                                    <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                        <i class="fa fa-times-circle fa-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'propName'" pTemplate="filter" let-col>
+                            <div>
+                                <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                                <div class="ecb-clearFilterMain">
+                                    <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                        <i class="fa fa-times-circle fa-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'English(UK)'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                       (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput"/>
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header" let-col let-rowData="rowData">
+                            <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'English(UK)'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].gb}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'English(UK)'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].gb" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'English(US)'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                        (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'English(US)'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].us}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'English(US)'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].us" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'French'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'French'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].fr}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'French'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].fr" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'German'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'German'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].de}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'German'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].de" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'Spanish'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Spanish'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].es}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Spanish'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].es" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'Japanese'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Japanese'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].jp}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Japanese'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].jp" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'Portuguese_Brazil'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field === 'Portuguese_Brazil'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap']['pt-br']}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Portuguese_Brazil'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap']['pt-br']" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'Italian'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Italian'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].it}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Italian'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].it" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'Spanish_Mexican'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Spanish_Mexican'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap']['es-MX']}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Spanish_Mexican'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap']['es-MX']" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'Hebrew'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterRtl" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Hebrew'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].he}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Hebrew'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].he" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+
+                        <ng-template *ngIf="col.field == 'Danish'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Danish'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap'].da}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Danish'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap'].da" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Swedish'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterLtr" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field === 'Swedish'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap']['sv-se']}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Swedish'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap']['sv-se']" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Arabic'" pTemplate="filter" let-col>
+                            <div class="tooltip ecb-rtlSubscribe">
+                                <div>
+                                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+                                                (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" (focus)="CaptureFocusedColumn(col.field)" class="ecb-filterInput" />
+                                    <div class="ecb-clearFilterMain">
+                                        <div class="ecb-clearFilterRtl" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                            <i class="fa fa-times-circle fa-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf= "showFilterForInfo(cols,col.field)" class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                    <div class="ebInfoPopup-contentText">
+                                        <span class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_CLEAR_UNFOCUSSED_FILTER"}}</span>
+                                    </div>
+                                    <div class="ebInfoPopup-arrowShadow"></div>
+                                    <div class="ebInfoPopup-arrowBorder"></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template *ngIf="col.field === 'Arabic'" pTemplate="body" let-data="rowData" let-i='rowIndex'>
+                            {{data['localizationMap']['ar-sa']}}
+                        </ng-template>
+                        <ng-template *ngIf="col.field == 'Arabic'" pTemplate="editor" let-data="rowData" let-i='rowIndex'>
+                            <input type="text" [(ngModel)]="data['localizationMap']['ar-sa']" [ngModelOptions]="{standalone:true}" (ngModelChange)="dataTableOnBlur(col, data, i, dt)">
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+                <div *ngIf="getErrorMessageType()">
+                    <div class="ecb-infoStyling">
+                        <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+                            <p>{{filterErrorMessage}}</p>
+                        </div>
+                        <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                            <div class="ebNotification-content ecb-infotext">
+                                <span class="ebNotification-label">
+                                    <span l10nTranslate>{{'TEXT_NO_LOCALISATION_ITEMS_RECORDS'}} </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                            <div class="ebNotification-content ecb-infotext">
+                                <span class="ebNotification-label">
+                                    <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+            </div>
+        </div>
+    </div>
+</div>
+<ecb-modal-dialog [open]="confirmDialog == 1" [closeOnEscape]="false" (onClose)="onModalDialogCloseCancelSave($event)" [defaultFooterButtons]="false"
+    [contentType]="'warning'">
+    <dialog-header l10nTranslate>{{'TEXT_DESELECTING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_DESELECTING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_DESELECT_WITHOUT_SAVING'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_RETURN'}}</dialog-button-2>
+</ecb-modal-dialog>
+
+<ecb-modal-dialog [open]="confirmDialog == 2" [closeOnEscape]="false" (onClose)="onModalDialogCloseCancel($event)" [contentType]="'warning'">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_CANCEL_WITHOUT_SAVING'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_RETURN'}}</dialog-button-2>
+</ecb-modal-dialog>
+
+<ecb-modal-dialog [open]="confirmDialog === 3" [closeOnEscape]="false" (onClose)="onModalDialogDownloadClose($event)" [defaultFooterButtons]="false"
+    [noOfFooterButton]="1" [closeIcon]="false" [primaryButtons]="[1]">
+    <dialog-header l10nTranslate>{{'TEXT_MAINTAIN_DOWNLOAD'}}</dialog-header>
+    <dialog-body l10nTranslate>
+        <span l10nTranslate>{{'TEXT_DOWNLOAD_MESSAGE'}}</span>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_CLOSE'}}</dialog-button-1>
+</ecb-modal-dialog>
+
+<ecb-modal-dialog [open]="confirmDialogDownload === 1" [closeOnEscape]="false" (onClose)="onModalDialogDownloadSaveClose($event)"
+    [defaultFooterButtons]="false" [closeIcon]="false">
+    <dialog-header l10nTranslate>{{'TEXT_DOWNLOAD_SAVE_HEADING'}}</dialog-header>
+    <dialog-body l10nTranslate>
+        <p l10nTranslate>{{'TEXT_DOWNLOAD_SAVE_MESSAGE'}}</p>
+        <span l10nTranslate>{{'TEXT_DOWNLOAD_SAVE_PROCEED'}}</span>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_DOWNLOAD_SAVE'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+<ecb-modal-dialog [open]="confirmDialog == 4" [closeOnEscape]="false" (onClose)="uploadWithoutSaving($event)" [defaultFooterButtons]="false"
+    [closeIcon]="false" [contentType]="'warning'">
+    <dialog-header l10nTranslate>{{'TEXT_UNSAVED_CHANGES'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_UPLOADING_DISCARD_YOUR_CHANGES'}}</dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_UPLOAD_WITHOUT_SAVING'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+<ecb-modal-dialog [open]="confirmDialog == 5" [closeOnEscape]="false" (onClose)="confirmUpload($event)" [defaultFooterButtons]="false"
+    [closeIcon]="false" [contentType]="'warning'">
+    <dialog-header l10nTranslate>{{'TEXT_UPLOAD_IS_IRREVERSIBLE'}}</dialog-header>
+    <dialog-body>
+        <div l10nTranslate>{{'TEXT_UPLOAD_COMPLETES_CANT_BE_REVERSED'}}</div>
+        <div l10nTranslate>{{'TEXT_BE_SURE'}}
+            <span>{{uploadedFileName}}</span>
+            <span l10nTranslate>{{'TEXT_IS_CORRECT_FILE'}}</span>
+        </div>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_UPLOAD'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+<ecb-modal-dialog [open]="confirmDialog == 6" [closeOnEscape]="false" (onClose)="onUploadComplete($event)" [defaultFooterButtons]="false"
+    [noOfFooterButton]=1 [primaryButtons]="[1]" [contentType]="'error'">
+    <dialog-header l10nTranslate>{{'TEXT_ERROR_UPLOADING_FILE'}}</dialog-header>
+    <dialog-body>
+        <div *ngIf="recordsUpdated === null">
+            <div l10nTranslate>{{'TEXT_FILE_EMPTY_NOT_UPLOAD_TO_DATABASE'}}</div>
+        </div>
+        <div *ngIf="recordsUpdated !== null">
+            <div l10nTranslate>{{'TEXT_FILE_CORRUPT_NOT_UPLOAD_TO_DATABASE'}}</div>
+            <div l10nTranslate>{{'TEXT_TRY_AGAIN_WITH_VALID_FILE'}}</div>
+        </div>
+        <div class="ecb-marginTop" *ngIf="isHeadersError && recordsUpdated !== null">
+            {{uploadError?.ErrorMessage}}
+            <div>{{uploadError?.ObjectNameHeader}}</div>
+            <div>{{uploadError?.ObjectTypeHeader}}</div>
+            <div>{{uploadError?.PropertyHeader}}</div>
+            <div>{{uploadError?.descIdHeader}}</div>
+        </div>
+        <div class="ecb-marginTop" *ngIf="!isHeadersError && recordsUpdated !== null">
+            <div l10nTranslate>{{'TEXT_UPLOAD_FAILED_ON_RECORD'}}
+                <span>:</span>
+                <span>{{this.uploadError?.errorJsonData?.RowNo}}</span>
+            </div>
+            <table class="ecb-taleNoBorders">
+                <tbody>
+                    <tr *ngFor="let item of Object.keys(uploadErrObj)">
+                        <td>{{item}}</td>
+                        <td>{{uploadErrObj[item]}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_CLOSE'}}</dialog-button-1>
+</ecb-modal-dialog>
+<ecb-modal-dialog [open]="confirmDialog == 7" [closeOnEscape]="false" (onClose)="onUploadComplete($event)" [defaultFooterButtons]="false"
+    [noOfFooterButton]=1 [primaryButtons]="[1]" [contentType]="'success'">
+    <dialog-header>
+        <div l10nTranslate>{{'TEXT_FILE'}}
+            <span>{{uploadedFileName}}</span>
+            <span l10nTranslate> {{'TEXT_UPLOADED_SUCCESSFULLY'}}</span>
+        </div>
+    </dialog-header>
+    <dialog-body>
+        <div l10nTranslate>{{'TEXT_TOTAL'}}
+            <span>{{recordsUpdated}} </span>
+            <span l10nTranslate>{{'TEXT_RECORDS_ARE_UPLOADED'}}</span>
+        </div>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_CLOSE'}}</dialog-button-1>
+</ecb-modal-dialog>
+<ecb-modal-dialog [open]="confirmDialog == 8" [closeOnEscape]="false" (onClose)="onUploadComplete($event)" [defaultFooterButtons]="false"
+    [noOfFooterButton]=1 [primaryButtons]="[1]" [contentType]="'error'">
+    <dialog-header l10nTranslate>{{'TEXT_ERROR_UPLOADING_FILE'}} <span> {{uploadError?.errorJsonData?.fileName}}</span></dialog-header>
+    <dialog-body>
+        <div *ngIf="uploadError?.errorType === 'DUPLICATE_ROW_ERROR'">
+            <div l10nTranslate>{{"TEXT_UPLOADING_DUPLICATE_RECORDS"}}
+                <span> {{uploadErrorCount}} </span>
+                <span l10nTranslate> {{"TEXT_DUPLICATE_DESCID"}} </span>
+            </div>
+            <div class="ecb-marginTop" *ngIf="uploadError?.errorJsonData">
+                <table class="ecb-taleNoBorders">
+                    <thead>
+                        <th l10nTranslate>{{"TEXT_DESC_ID"}}</th>
+                        <th l10nTranslate>{{"TEXT_NO_OF_DUPLICATES"}}</th>
+                    </thead>
+                    <tbody>
+                        <tr class="uploadErrorRow" *ngFor="let item of duplicateErrorObj | ObjectToArray">
+                            <td>{{item.key}}</td>
+                            <td>{{item.value}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div *ngIf="uploadError?.errorType === 'PARTIAL_UPLOAD_ERROR'">
+            <div l10nTranslate> {{"TEXT_UPLOADING_INVALID_RECORDS"}} </div>
+            <div class="ecb-marginTop" *ngIf="uploadError?.errorJsonData">
+                <table class="ecb-taleNoBorders">
+                    <thead>
+                        <th l10nTranslate>{{"TEXT_RECORDS"}}</th>
+                        <th l10nTranslate>{{"TEXT_DESC_ID"}}</th>
+                    </thead>
+                    <tbody>
+                        <tr class="uploadErrorRow" *ngFor="let item of partialErrorObj | ObjectToArray">
+                            <td>{{item.key}}</td>
+                            <td>{{item.value}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="ecb-marginTop">
+            <div l10nTranslate> {{"TEXT_UPLOAD_ERROR_STEPS"}}
+                <ol>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_1"}}</li>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_2"}}</li>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_3"}}</li>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_4"}}</li>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_5"}}</li>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_6"}}</li>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_7"}}</li>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_8"}}</li>
+                    <li l10nTranslate>{{"TEXT_UPLOAD_FIX_9"}}</li>
+                </ol>
+            </div>
+        </div>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_CLOSE'}}</dialog-button-1>
+</ecb-modal-dialog>
+
+
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>

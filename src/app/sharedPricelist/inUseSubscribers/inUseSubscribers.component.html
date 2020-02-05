@@ -1,0 +1,81 @@
+<ecb-modal-dialog [styleClass]="'ecb-inUsePricelistDialog'" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseDelete()"
+    [header]="false" [body]="false" [footer]="false" [closeOnEscape]="true">
+    <dialog-header-template>
+        <div class="panel-heading">
+            <div class="ecb-priceableTemplate">
+                <h2 l10nTranslate>{{"TEXT_IN_USE_ACCOUNTS"}}
+                    <span>: {{selectedSharedPricelist.name}}
+                    </span>
+                </h2>
+                <h2 class="ecb-title" l10nTranslate>{{"TEXT_Accounts"}}
+                    <span>({{totalCount}})
+                    </span>
+                </h2>
+            </div>
+        </div>
+    </dialog-header-template>
+    <dialog-body-template>
+ 
+        <div *ngIf="inUseSubscribersGridConfigError">
+            <div class="row">
+                <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert"> 
+                <p>{{inUseSubscribersGridConfigError}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="ecb-positionRelative">
+            <ecb-loader *ngIf="inUseSubscribersFetching" mode="dot" fill="widget"></ecb-loader>
+        <div  *ngIf="loadGridData" class="panel-body ecb-gridInfiniteScroll ecb-inUseSharedRate modal-body " [ngStyle]="calculateGridScrollHeight()" ecb-infinite-scroller [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+            <p-dataTable [value]="inUseSubscribers" [scrollable]="inUseSubscribersColumnDef.scrollable" [lazy]="inUseSubscribersColumnDef.lazy" (onLazyLoad)="loadData($event)"
+            sortField={{inUseSubscribersColumnDef.defaultSortColumn}} sortOrder="{{convertedInUseDefaultSortOrder}}" [immutable]="false">
+                <p-column [style]="col.style" *ngFor="let col of inUseSubscribersCols" [field]="col.field" [header]="col.key | translate:lang"
+                    [sortable]="col.sortable">
+                    <ng-template #filter pTemplate="filter" let-col>
+                        <div>
+                            <input type="text" *ngIf="(col.field == 'name' || col.field == 'accountType');else elseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]"
+                                pInputText (input)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                            <ng-template #elseBlock>
+                            <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText 
+                                (input)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" maxlength="9" (keypress)= "allowOnlyNumbers($event)"/>
+                            </ng-template>
+                            <div class="ecb-clearFilterMain">
+                                <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                    <em class="fa fa-times-circle-o fa-lg"></em>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template pTemplate="header" let-col let-rowData="rowData">
+                            <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                        </ng-template>
+                        
+                    <ng-template pTemplate="filter" let-col *ngIf="col.field === 'accountId'">
+                        <div>
+                            <ecb-number-date-filter (selectedUserFilter)="fetchAccountId($event)" [filterKind]="'number'" [selectedColumnToFilter]="'accountId'" [columnPlacement]="'middle'">
+                            </ecb-number-date-filter>
+                        </div>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+            <div *ngIf="getErrorMessageType() !== 0">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="alert alert-danger ecb-calInfoMessage" role="alert"
+                            *ngIf="getErrorMessageType() === 1">
+                            <p>{{inUseSubscribersError}}</p>
+                        </div>
+                        <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                            <div class="ebNotification-content ecb-infotext">           
+                                <span class="ebNotification-label">
+                                    <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </dialog-body-template>
+</ecb-modal-dialog>

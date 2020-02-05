@@ -1,0 +1,114 @@
+<!--panel starts from here -->
+<div class="panel panel-default  ecb-primeNgTable">
+    <!--panel header -->
+    <div #calListHead class="panel-heading">
+        <div class="ebButtonCommands-placement ecbCommandsCenterAlign">
+            <a>
+                <em class="fa fa-refresh ecb-enableAlignIcon" title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+            </a>
+            <div class="ebLayout-HeadingCommands-separator"></div>
+            <a [title]="createTooltip">
+                <span (click)="openCreateCalendarPanel()" l10nTranslate>{{"TEXT_CREATE_CALENDAR"}}</span>
+            </a>
+        </div>
+        <h2 l10nTranslate>{{"TEXT_CALENDARS_LIST"}}
+            <span>({{totalCount}})</span>
+        </h2>
+    </div>
+    <ecb-calendar-properties *ngIf="showCreateCalendarPanel" [showPropertiesPanel]="propertiesPanel" [copyCalendar]="isCopyCalendar" [copyCalendardata]="calenderData" (isCalendarFormDirty)="isFormDirty($event)" (hideCreateCalendarPanel)="hidePropertiesWidget($event)"></ecb-calendar-properties>
+    <div class="ecb-positionRelative">
+        <div *ngIf="showErrorMsg">
+            <div class="row">
+                <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert"> 
+                    <p>{{calendarGridListError}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body eb-adjustPanelBodyMargin ecb-viewList ecb-tableOverflow" [ngStyle]="calculateGridScrollHeight()" [scrollerContext]="'self'" [ngClass]="{'eb-panelBodyTopBorder' : filterErrorMessage}" ecb-infinite-scroller (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+            <!--table strats from here -->
+            <ecb-loader *ngIf="calendarlistFetching" mode="dot" fill="widget"></ecb-loader>
+            <p-dataTable *ngIf="loadGridData" #calendarsDatatable [value]="calendarList" [scrollable]="calendarsColumnDef.scrollable" [lazy]="calendarsColumnDef.lazy" (onLazyLoad)="loadData($event)" sortField={{calendarsColumnDef.defaultSortColumn}} sortOrder={{convertedDefaultSortOrder}} scrollWidth="getDeviceWidth()" [immutable]="false">
+                <p-column [style]="col.style" *ngFor="let col of calendarlistCols" [field]="col.field" [header]="col.key | translate:lang" [sortable]="col.sortable" required="true">
+                        <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                            </ng-template>
+                    <ng-template pTemplate="filter" let-col>
+                        <div>
+                        <input type="text" *ngIf="(col.field === 'name' || col.field === 'description')else filterElseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText (keyup)="filterDataKeys($event,col.field,filterFields[col.field])" class="ecb-filterInput"
+                            />
+                            <ng-template #filterElseBlock>
+                                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                            </ng-template>
+                            <div class="ecb-clearFilterMain">
+                                <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                    <em class="fa fa-times-circle fa-lg"></em>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template pTemplate="filter" let-col *ngIf="col.field === 'usageCount'">
+                        <div>
+                            <ecb-number-date-filter (selectedUserFilter)="fetchUsageCount($event)" [filterKind]="'number'" [selectedColumnToFilter]="'usageCount'" [columnPlacement]="'last'">
+                            </ecb-number-date-filter>
+                        </div>
+                    </ng-template>
+
+                    <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <a>
+                            <em class="fa fa-clone" title='{{"TEXT_COPY"| translate:lang}}' (click)="copyCalendarsHandler(calendarList[i])" aria-hidden="true"></em>
+                        </a>
+                        <a>
+                            <em class="fa fa-times-circle" title='{{"TEXT_DELETE"| translate:lang}}' [class.disable]="!isDeleteCalendar(data)" (click)="deleteCalendar(data,i)" aria-hidden="true"></em>
+                        </a>
+                        <span class="ecb-poListTooltip" *ngIf="errorTooltip && i == tooltipIndex">
+                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="deleteCalendarError" (onClose)="OnTooltipClose($event)"></ecb-errortooltip>
+                        </span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field === 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="redirectToDetailPage(data)">{{data[col.field]}}</a>
+                    </ng-template>
+                    <ng-template *ngIf="col.field === 'usageCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <div *ngIf="data[col.field] > 0"  class="ecb-cursorPointer text-right" (click)="openInuseOfferings(data)">
+                            <a>{{data[col.field]}}</a>
+                        </div>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+            <div *ngIf="getErrorMessageType() !== 0">
+                <div class="ecb-infoStyling">
+                <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+                    <p>
+                        {{calendarListError}}
+                    </p>
+                </div>
+                <div  *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                    <div class="ebNotification-content ecb-infotext">           
+                        <span class="ebNotification-label">
+                            <span l10nTranslate>{{'TEXT_NO_CALENDAR_RECORD'}} </span>
+                        </span>
+                    </div>
+                </div>
+                <div  *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                    <div class="ebNotification-content ecb-infotext">           
+                        <span class="ebNotification-label">
+                            <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}}</span>
+                        </span>
+                        </div>
+                </div>
+                </div>
+            </div>
+            <ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+                <dialog-header l10nTranslate>{{'TEXT_DELETE_CALENDAR'}}</dialog-header>
+                <dialog-body l10nTranslate>
+                    <p>
+                        <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deleteCalendarData?.name}}&#32; &#63;</p>
+                </dialog-body>
+                <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+                <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+            </ecb-modal-dialog>
+        </div>
+    </div>
+    
+    <ecb-calendars-modal-dialog [inUsePIData]="this.inUsePiData" *ngIf="openInUseDetailsWidget" (inUseCalendarModalDialogClose)="hideInUseCalendarModalDialog($event)"></ecb-calendars-modal-dialog>
+</div>

@@ -1,0 +1,384 @@
+<div class="panel panel-default">
+  <div class="panel-heading ecb-panelHeading">
+      <div class="ecb-panelHeaderLink">
+        <a class="ecb-pointer" [ngClass]="{'disable': calDefaultLoading}" (click)="displayCoverHandler(editCalendarPanel)" [title]="editTooltip" l10nTranslate>{{'TEXT_EDIT'}}</a>
+      </div> 
+      <h2 class="ecb-priceableItemText"  *ngIf="widgetModel === 'hol'" l10nTranslate> {{'TEXT_HOLIDAYS'}} </h2>
+      <h2 class="ecb-priceableItemText" *ngIf="widgetModel === 'std'" l10nTranslate> {{'TEXT_STANDARD_DAYS'}} </h2>
+ 
+  </div>
+  <!--error while fetching data -->
+  <ecb-loader *ngIf="calDefaultLoading" mode="dot" fill="widget" type="widget"></ecb-loader>
+  <div class="panel-body">
+    <div *ngIf="calFetchError !== null" class="alert alert-danger" role="alert">
+        {{calFetchError}}
+    </div>
+      <div class="panel panel-default">
+      <div class="ecb-panelHeading">
+        <h3 l10nTranslate class="ecb-priceableItemText">
+          <span *ngIf="widgetModel === 'hol'" l10nTranslate>{{'TEXT_HOLIDAY_TYPE'}}</span>
+          <span *ngIf="widgetModel === 'std'" l10nTranslate>{{'TEXT_DEF_DAY_TYPE'}}</span>
+        </h3>
+      </div>
+      <div class="panel-body ecb-calStdHolContainer ecb-calStdHolDefaultView">
+        <p-dataTable [value]="calDefViewRecords" *ngIf="calFetchError === null && loadDefaultGridData" [rowStyleClass]="getRowClass">
+          <p-column styleClass="col-button ecb-primeNgColumn" *ngFor="let col of calDefaultColDef.cols" [field]="col.field" [header]='col.key | translate:lang'
+            [sortable]="col.sortable" [editable]="false" [style]="col.style">
+            <ng-template *ngIf="col.field === 'weekday'" let-col let-data="rowData" pTemplate="body">
+              <span class="ecb-calCellData">{{data.localizedWeekday |translate:lang}}</span>
+            </ng-template>
+            <ng-template pTemplate="header" let-col let-rowData="rowData">
+                <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <span>
+                <a [title]="addTooltip" (click)="addDefFromView(editCalendarPanel, data, i)">
+                  <em class="fa fa-plus" aria-hidden="true"></em>
+                </a>
+              </span>
+              <span>
+                <a [class.disable]="data.holidayId == null" [title]="deleteTooltip" (click)="deleteDefault(data, i)">
+                  <em class="fa fa-times-circle" aria-hidden="true"></em>
+                </a>
+              </span>
+              <span *ngIf="!showCover && calDefaultError != null && i == defaultTooltipIndex">
+                <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="calDefaultError" (onClose)="OnHolidayTooltipCloseView($event)"></ecb-errortooltip>
+              </span>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <span class="ecb-calCellData">{{data.name}}</span>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'date'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <span class="ecb-calCellData">{{data.holidayLocaleDate}}</span>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'type'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <div class="ecb-calCodeType">
+                <div class='ecb-calendarBar ecb-calendarBar2'></div>
+                <div class='ecb-calCodeTxt' l10nTranslate>{{'TEXT_HOLIDAYS'}}</div>
+              </div>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'stdType'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <div class="row ecb-calCodeType">
+                <div [ngClass]='getCalendarBar(data.code)'></div>
+                <div class='ecb-calCodeTxt'>{{calCodes[data['code']]}}</div>
+              </div>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+      </div>
+      </div>
+      <div class="panel panel-default" *ngIf="showOverrideTimePeriod()">
+      <div class="ecb-panelHeading">
+          <h3 *ngIf="widgetModel === 'hol'" class="ecb-priceableItemText" l10nTranslate>{{'TEXT_HOLIDAY_OVERRIDE_PERIOD'}}</h3>
+          <h3 *ngIf="widgetModel === 'std'" class="ecb-priceableItemText" l10nTranslate>{{'TEXT_DAY_OVERRIDE_PERIOD'}}</h3>      
+      </div>
+      <div class="panel-body ecb-calStdHolContainer ecb-calStdHolPeriodView">
+        <p-dataTable [value]="calPeriodViewRecords" *ngIf="calFetchError == null && loadPeriodGridData" [rowStyleClass]="getRowClass">
+          <p-column styleClass="col-button ecb-primeNgColumn" *ngFor="let col of calPeriodColDef.cols" [field]="col.field" [header]='col.key | translate:lang'
+            [sortable]="col.sortable" [editable]="false" [style]="col.style">
+            <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <span>
+                <a [title]="addTooltip" (click)="addPeriodFromView(editCalendarPanel, data, i)">
+                  <em class="fa fa-plus" aria-hidden="true"></em>
+                </a>
+              </span>
+              <span>
+                <a [class.disable]="data.periodId == null" [title]="deleteTooltip" (click)="deletePeriod(data, i)">
+                  <em class="fa fa-times-circle" aria-hidden="true"></em>
+                </a>
+              </span>
+              <span *ngIf="!showCover && calPeriodError != null && i == periodTooltipIndex">
+                <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="calPeriodError" (onClose)="OnPeriodTooltipCloseView($event)"></ecb-errortooltip>
+              </span>
+            </ng-template>
+            <ng-template pTemplate="header" let-col let-rowData="rowData">
+                <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <span class="ecb-calCellData">{{data.name}}</span>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'weekdays'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <div class="ecb-daysoftheweek ecb-calCellData">
+                <div *ngFor="let day of allDaysOfWeek; let i=index">
+                  <a [ngClass]="{'active':isDaySelected(data.weekdays, day)}">{{day | slice:0:1}}</a>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'code'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <div class="ecb-calCodeType">
+                <div [ngClass]='getCalendarBar(data.code)'></div>
+                <div class='ecb-calCodeTxt'>{{calCodes[data['code']]}}</div>
+              </div>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'startTime'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <div class="row ecb-periodTime">
+                <div>{{calPeriodViewRecords[i].startHr}}</div>
+                <div>{{calPeriodViewRecords[i].startMin}}</div>
+                <div>{{calPeriodViewRecords[i].startFormat}}</div>
+              </div>
+            </ng-template>
+            <ng-template *ngIf="col.field === 'endTime'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <div class="row ecb-periodTime">
+                <div>{{calPeriodViewRecords[i].endHr}}</div>
+                <div>{{calPeriodViewRecords[i].endMin}}</div>
+                <div>{{calPeriodViewRecords[i].endFormat}}</div>
+              </div>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+      </div>
+      </div>
+   
+
+</div>
+</div>
+<!-- EDIT WIDGET : START -->
+<ngx-aside #editCalendarPanel [showDefaultFooter]="false" [showDefaultHeader]="false" (keyup.enter) = "processSaveCalRecords()" [closeOnEscape]="false" [showOverlay]="false"
+  class="ecb-maxAsidePanel" [ngClass]="{'ecb-showEditDialog':showCover}">
+    <div class="panel panel-default">
+      <div class="panel-heading ecb-panelHeading">
+          <h2 class="col-xs-6 col-sm-6 ecb-priceableItemText " *ngIf="widgetModel === 'hol'" l10nTranslate>{{'TEXT_EDIT_HOLIDAY'}} </h2>
+          <h2 class="col-xs-6 col-sm-6 ecb-priceableItemText" *ngIf="widgetModel === 'std'" l10nTranslate>{{'TEXT_EDIT_STD_DAY'}}</h2>
+          <div class="col-xs-6 col-sm-6 ecb-editOverlayLink">
+            <button class="ebBtn" [ngClass]="saveEnableStatus() ? 'ebBtn-primary': 'disabled'" l10nTranslate
+              (click)="processSaveCalRecords()">{{'TEXT_SAVE'}}</button>
+            <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()">
+              <span l10nTranslate>{{'TEXT_CANCEL'}} </span>
+            </button>
+          </div>
+      </div>
+      <div class="panel-body">
+          <div *ngIf="showErrorMessage">
+              <div class="row">
+                <div class="col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+                  <button type="button" class="close" data-dismiss="alert">
+                      <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                      <span class="sr-only">Close</span>
+                  </button>
+                  <p class="filterFetchingError">
+                   {{saveCalendarError}}
+                  </p>
+                </div>
+            </div>
+          </div>
+          <ecb-loader *ngIf="calendarSaving" mode="dot" fill="widget" type="widget"></ecb-loader>
+         <div>         
+            <div class="panel panel-default">
+            <div class="panel-heading ecb-panelHeading">  
+                <h3 class="ecb-priceableItemText" *ngIf="widgetModel === 'hol'" l10nTranslate>{{'TEXT_HOLIDAY_TYPE'}}</h3>
+                <h3 class="ecb-priceableItemText" *ngIf="widgetModel === 'std'" l10nTranslate>{{'TEXT_DEF_DAY_TYPE'}}</h3>            
+            </div>
+            <div class="panel-body">
+            <div [ngClass]="{'ecb-defaultTableError': (calDefaultError != null && (calDefEditRecords.length - defaultTooltipIndex) <=3) }"
+              class="ecb-calStdHolContainer ecb-calStdHolDefEdit ecb-calStdHolEditContainer">
+              <p-dataTable [value]="calDefEditRecords" [rowStyleClass]="getRowClass" *ngIf="loadDefaultGridData">
+                <p-column styleClass="col-button ecb-primeNgColumn {{col.headerClass}}" *ngFor="let col of calDefaultColDef.cols" [field]="col.field" [header]='col.key | translate:lang'
+                  [sortable]="col.sortable" [editable]="true" [style]="col.style">
+                  <ng-template *ngIf="col.field === 'weekday'" let-col let-data="rowData" pTemplate="body">
+                    <span class="ecb-calCellData">{{data.localizedWeekday |translate:lang}}</span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <span>
+                      <a [title]="addTooltip" (click)="addHoliday(i)">
+                        <em class="fa fa-plus"  tabindex="0" aria-hidden="true"></em>
+                      </a>
+                    </span>
+                    <span>
+                      <a [class.disable]="calDefEditRecords.length == 1" [title]="deleteTooltip" (click)="deleteEditDefault(data, i)">
+                        <em class="fa fa-times-circle" tabindex="0" aria-hidden="true"></em>
+                      </a>
+                    </span>
+                  </ng-template>
+                  <ng-template pTemplate="header" let-col let-rowData="rowData">
+                      <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <input (keyup)="setHolidayNames()" id="name-{{i}}" (blur)="validateDefEditWidget('name')" type="text" maxlength="254" [(ngModel)]="data[col.field]" pInputText autofocus
+                    />
+                    <span *ngIf="calDefaultError != null && i == defaultTooltipIndex && calDefaultErrorCol == 'name'">
+                      <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="calDefaultError" (onClose)="OnDefaultTooltipCloseEdit($event)"></ecb-errortooltip>
+                    </span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'date'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <p-calendar #holidayDate [dateFormat]="calendarLocale.dateFormat" name="calendarDefDate" [placeholder]="" inputStyleClass="ebInput"
+                      [locale]="calendarLocale" [inputId]="i" appendTo="body" [monthNavigator]="true" styleClass="ecb-calendar" [(ngModel)]="data['holidayLocaleDate']"
+                      (onBlur)="validatePostAssignCalDate()" (onSelect)="assignLocaleDate(i)" (onFocus)="data.pauseErrorCheck = 1;"
+                      (onClose)="data.pauseErrorCheck = 0" [showIcon]="true">
+                    </p-calendar>
+                    <span *ngIf=" calDefaultError != null && i == defaultTooltipIndex && calDefaultErrorCol == 'holidayLocaleDate'">
+                      <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="calDefaultError" (onClose)="OnDefaultTooltipCloseEdit($event)"></ecb-errortooltip>
+                    </span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'type'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="ecb-calCodeType">
+                      <div class='ecb-calendarBar ecb-calendarBar2'></div>
+                      <div class='ecb-calCodeTxt' l10nTranslate>{{'TEXT_HOLIDAYS'}}</div>
+                    </div>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'stdType'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="ecb-caleditDrpDownMain">
+                      <div [ngClass]='getCalendarBar(data.code)'></div>
+                      <p-dropdown [options]="calCodesDropDown" [(ngModel)]="data['code']" appendTo='body'>
+                        <ng-template let-calCode pTemplate="item">
+                          <div class="ui-helper-clearfix ecb-editCalDropDown">
+                            <div class="ecb-calDLabel">{{calCode.label}}</div>
+                            <div [ngClass]='getCalendarBg(calCode.value)'></div>
+                          </div>
+                        </ng-template>
+                      </p-dropdown>
+                    </div>
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+            </div>
+            </div>
+              </div>
+              <div class="panel panel-default" *ngIf="showOverrideTimePeriod()">
+            <div class="panel-heading ecb-panelHeading">
+                <h3 *ngIf="widgetModel === 'hol'" l10nTranslate>{{'TEXT_HOLIDAY_OVERRIDE_PERIOD'}}</h3>
+                <h3 *ngIf="widgetModel === 'std'" l10nTranslate>{{'TEXT_DAY_OVERRIDE_PERIOD'}}</h3>
+            </div>
+            <div [ngClass]="{'ecb-periodTableError': (calPeriodError != null && (calPeriodEditRecords.length - periodTooltipIndex) <=3) }"
+              class="panel-body  ecb-calStdHolContainer ecb-calStdHolPeriodEdit ecb-calStdHolEditContainer">
+              <p-dataTable [value]="calPeriodEditRecords" *ngIf="loadPeriodGridData" [rowStyleClass]="getRowClass">
+                <p-column styleClass="col-button ecb-primeNgColumn {{col.headerClass}}" *ngFor="let col of calPeriodColDef.cols" [field]="col.field" [header]='col.key | translate:lang'
+                  [sortable]="col.sortable" [editable]="true" [style]="col.style">
+                  <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <span>
+                      <a [title]="addTooltip" (click)="addPeriod(i)">
+                        <em class="fa fa-plus"  tabindex="0" aria-hidden="true"></em>
+                      </a>
+                    </span>
+                    <span>
+                      <a [class.disable]="calPeriodEditRecords.length == 1" [title]="deleteTooltip" (click)="deletePeriod(data, i)">
+                        <em class="fa fa-times-circle" tabindex="0" aria-hidden="true"></em>
+                      </a>
+                    </span>
+                  </ng-template>
+                  <ng-template pTemplate="header" let-col let-rowData="rowData">
+                      <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'weekdays'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="ecb-daysoftheweek ecb-calCellData">
+                      <div *ngFor="let day of allDaysOfWeek; let i=index" (click)="addRemoveStdPeriods(data, day)"  id="period-{{i}}" tabindex="0">
+                        <a  [ngClass]="{'active':isDaySelected(data.weekdays, day)}">{{day | slice:0:1}}</a>
+                      </div>
+                    </div>
+                    <span *ngIf="calPeriodError != null && i == periodTooltipIndex && calPeriodErrorCol == 'weekdays'">
+                      <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="calPeriodError" (onClose)="OnPeriodTooltipCloseEdit($event)"></ecb-errortooltip>
+                    </span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <select class="ecb-select ecb-selectOption" [(ngModel)]="data[col.field]" (change)="processPeriodNameChange()"  id="period-{{i}}">
+                      <option  *ngFor="let option of holidayNames" [value]="option?.value">
+                        <span *ngIf="isTranslateText(option?.label)" l10nTranslate>{{option?.label}}</span>
+                        <span *ngIf="!isTranslateText(option?.label)">{{option?.label}}</span>
+                      </option>
+                    </select>
+                    <span *ngIf="calPeriodError != null && i == periodTooltipIndex && calPeriodErrorCol == 'name'">
+                      <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="calPeriodError" (onClose)="OnPeriodTooltipCloseEdit($event)"></ecb-errortooltip>
+                    </span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'startTime'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="row ecb-periodTimeEdit">
+                      <div>
+                        <input (blur)="fix2Digit(data, 'startHr', 'filledTime')" (keypress)="onlyNumber($event)" (keyup)="handleClockNumber(12, data, 'startHr')"
+                          type="text" maxlength="2" pInputText autofocus [(ngModel)]="data['startHr']" />
+                      </div>
+                      <div>
+                        <input (blur)="fix2Digit(data, 'startMin', 'filledTime')" (keypress)="onlyNumber($event)" (keyup)="handleClockNumber(59, data, 'startMin')"
+                          type="text" maxlength="2" pInputText autofocus [(ngModel)]="data['startMin']" />
+                      </div>
+                      <div>
+                        <select class="ecb-select ecb-selectOption" [(ngModel)]="data['startFormat']" (change)="validatePeriodEditWidget('filledTime')">
+                          <option l10nTranslate *ngFor="let option of timeFormat" [value]="option?.value">
+                            {{option?.label}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                    <span *ngIf="calPeriodError != null && i == periodTooltipIndex && calPeriodErrorCol == 'startTime'">
+                      <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="calPeriodError" (onClose)="OnPeriodTooltipCloseEdit($event)"></ecb-errortooltip>
+                    </span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'endTime'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="row ecb-periodTimeEdit">
+                      <div>
+                        <input (blur)="fix2Digit(data, 'endHr', 'filledTime')" (keypress)="onlyNumber($event)" (keyup)="handleClockNumber(12, data, 'endHr')"
+                          type="text" maxlength="2" pInputText autofocus [(ngModel)]="data['endHr']" />
+                      </div>
+                      <div>
+                        <input (blur)="fix2Digit(data, 'endMin', 'filledTime')" (keypress)="onlyNumber($event)" (keyup)="handleClockNumber(59, data, 'endMin')" type="text" maxlength="2"
+                          pInputText autofocus [(ngModel)]="data['endMin']" />
+                      </div>
+                      <div>
+                        <select class="ecb-select ecb-selectOption" [(ngModel)]="data['endFormat']" (change)="validatePeriodEditWidget('filledTime')">
+                          <option l10nTranslate *ngFor="let option of timeFormat" [value]="option?.value">
+                            {{option?.label}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                    <span *ngIf="calPeriodError != null && i == periodTooltipIndex && calPeriodErrorCol == 'endTime'">
+                      <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="calPeriodError" (onClose)="OnPeriodTooltipCloseEdit($event)"></ecb-errortooltip>
+                    </span>
+                  </ng-template>
+                  <ng-template *ngIf="col.field === 'code'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="ecb-caleditDrpDownMain">
+                      <div [ngClass]='getCalendarBar(data.code)'></div>
+                      <p-dropdown [options]="calCodesDropDown" [(ngModel)]="data['code']" appendTo='body'>
+                        <ng-template let-calCode pTemplate="item">
+                          <div class="ui-helper-clearfix ecb-editCalDropDown">
+                            <div class="ecb-calDLabel">{{calCode.label}}</div>
+                            <div [ngClass]='getCalendarBg(calCode.value)'></div>
+                          </div>
+                        </ng-template>
+                      </p-dropdown>
+                    </div>
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+            </div>
+              </div>
+           
+          </div>
+      </div>
+    </div>
+</ngx-aside>
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseDeleteDefault($event)" [defaultFooterButtons]="false">
+  <dialog-header>
+    <span l10nTranslate>{{'TEXT_DEL_HOLIDAY_TYPE'}}</span>
+  </dialog-header>
+  <dialog-body l10nTranslate>
+    <p>
+      <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{delSelectedDefaultRecord?.name}}&#32;
+      <span *ngIf="delSelectedDefaultRecord.periodCount !== null">
+        ( {{delSelectedDefaultRecord.periodCount}}
+        <span l10nTranslate> {{'override time period'}}</span> )
+      </span>
+      &#63;
+    </p>
+  </dialog-body>
+  <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+  <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 2" (onClose)="onModalDialogCloseDeletePeriod($event)" [defaultFooterButtons]="false">
+  <dialog-header>
+    <span *ngIf="widgetModel === 'hol'" l10nTranslate>{{'TEXT_DEL_HOLIDAY_OVERRIDE_PERIOD'}}</span>
+    <span *ngIf="widgetModel === 'std'" l10nTranslate>{{'TEXT_DEL_DAY_OVERRIDE_PERIOD'}}</span>
+  </dialog-header>
+  <dialog-body l10nTranslate>
+    <p>
+      <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{delSelectedPeriodRecord?.name}} override time period for {{delSelectedPeriodRecord?.startHr}}.{{delSelectedPeriodRecord?.startMin}}
+      {{delSelectedPeriodRecord?.startFormat | lowercase}} to {{delSelectedPeriodRecord?.endHr}}.{{delSelectedPeriodRecord?.endMin}}
+      {{delSelectedPeriodRecord?.endFormat | lowercase}} &#32; &#63;
+    </p>
+  </dialog-body>
+  <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+  <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 3" (onClose)="onModalDialogCloseCal($event)">
+  <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+  <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>

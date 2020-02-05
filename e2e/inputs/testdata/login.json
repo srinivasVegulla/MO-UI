@@ -1,0 +1,23 @@
+{
+	"url": {
+		"WRONGURL": "https://10.200.166.70:8074/index.htmls",
+		"404url": "https://10.200.166.70:8074/404",
+    "URL": "https://localhost:8074/index.html",
+		"CurrentUrl": "https://localhost:8074/login",
+    "DashBoardURL": "https://localhost:8074/ProductCatalog"
+	},
+    "user": {
+		 "username": "Admin",
+		 "passwordField": "Admin123"
+	},
+	  "Hebrew": {
+		
+			"logintext": "התחברות"
+
+		},
+	
+
+
+		"language": "Hebrew"
+	 
+  }

@@ -1,0 +1,36 @@
+<div>
+    <div class="panel panel-default">
+        <div class="panel-heading ecb-panelHeading">
+            <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_IN_USE'}}</h2>
+        </div>
+        <div class="panel-body">
+                <div *ngIf="errorMsg" class="alert alert-danger" role="alert" l10nTranslate>
+                        {{errorMsg}}
+                    </div>
+                <div *ngIf="!errorMsg" class="form-group">
+                    <div>
+                        <div class="form-group">
+                            <div class="input-group col-xs-12">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_SR_ACCOUNTS'}}</label>
+                                <div class="ecb-inputReadOnly">
+                                    <a (click)="openInuseSubscribers()" *ngIf="inUseSubscribers > 0">{{inUseSubscribers}}</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_SR_PO_OFFERS'}}</label>
+                            <div class="input-group col-xs-12 ecb-inputReadOnly"> 
+                            <a (click)="openInuseOfferings()" *ngIf="inUseProductOffers > 0">{{inUseProductOffers}}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="showInuseSubscribersInfo">
+                            <ecb-ratelist-inusesubscribers [priceListIdVal]="sharedPricelist" (onClose)="onSubscriberClosed()"></ecb-ratelist-inusesubscribers>
+                        </div>
+                         <div *ngIf="showInuseOfferingsInfo">                
+                            <ecb-inuse-offerings-modal-dialog [offeringsData]="sharedPricelist" [offeringsLocation]="inUseOfferingsLocation" (inUseModalDialogClose)="onOfferingsClosed($event)"></ecb-inuse-offerings-modal-dialog>
+                         </div>
+                </div>            
+        </div>
+    </div>
+</div>

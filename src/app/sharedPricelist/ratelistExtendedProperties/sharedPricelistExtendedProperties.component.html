@@ -1,0 +1,82 @@
+<div>
+    <ngx-aside #extendedProps [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+        class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}" (keyup.enter) = "saveExtProperties()">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-ngxasidepanel">
+            <div class="panel panel-default">
+                <div class="panel-heading ecb-panelHeading">     
+                        <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_EDIT_EXTPROPERTIES'}}</h2>
+                        <div class="ecb-editOverlayLink">
+                            <button class="ebBtn ecbBtn-margin" [disabled]="!isSaveEnabled" [ngClass]="{'ebBtn-primary': isSaveEnabled}" (click)="saveExtProperties()"
+                                l10nTranslate>{{'TEXT_SAVE'}}</button>
+                            <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                        </div>
+                </div>
+                <div class="panel-body">
+                    <div *ngIf="errorMsg" class="alert alert-danger" role="alert" l10nTranslate>
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true" (click)="errorMsg = false">×</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <p>{{httpErrorMessage}}</p>
+                    </div>
+                    <form [formGroup]="extendedPropertiesForm" form #extPropertiesForm="ngForm" novalidate (keydown) ="onEnterSaveExtProperties($event)">
+                        <div class="form-group" *ngFor="let extProperty of extendedProperty;  let i = index">
+                            <div *ngIf="extProperty.type == 'string'">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{extProperty.displayName}}</label>
+                                <input type="text" class="ebInput" maxlength="255" formControlName="{{extProperty.dn}}" [readonly]="extProperty?.overrideable == 'false'">
+                            </div>
+                            <div class="ebCheckbox" *ngIf="extProperty.type == 'boolean'">
+                                <label>
+                                    <input type="checkbox" (click)="onCheckboxSelect($event, extProperty, i)" [checked]="(extProperty.value == '1' || extProperty.value == 'Y')"
+                                        formControlName="{{extProperty.dn}}">
+                                    <div class="text">
+                                        {{extProperty.displayName}}
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+            <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+            <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+        </ecb-modal-dialog>
+    </ngx-aside>
+</div>
+    <div *ngIf="extendedProperty.length>0">
+        <div class="panel panel-default">
+            <div class="panel-heading ecb-panelHeading">
+                <div class="row"> 
+                    <h2 class="ecb-priceableItemText col-xs-11 col-sm-11" l10nTranslate *ngIf="!isProductOffer">{{'TEXT_EXTENEDED_PROPERTIES'}}</h2>
+                    <h2 class="ecb-priceableItemText col-xs-11 col-sm-11" l10nTranslate *ngIf="isProductOffer">{{'TEXT_EXTENEDED_PROPERTIES'}}</h2>
+                    <div class="ecb-panelHeaderLink col-xs-1 col-sm-1">
+                        <a (click)="displayCoverHandler(extendedProps,true)" l10nTranslate>{{'TEXT_EDIT'}}</a>
+                    </div> 
+                </div> 
+            </div>
+            <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+                {{'TEXT_SR_ERROR_MESSAGE'}}
+            </div>
+            <div *ngIf="!showErrorMessage" class="panel-body">
+                    <form>
+                        <div class="form-group" *ngFor="let extProperty of extendedProperty;  let i = index">
+                            <div *ngIf="extProperty.type == 'string'">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{extProperty.displayName}}</label>
+                                <div class="ecb-wordbreak" [ngClass]="{'ecb-wordBreakAll': isNoBreakString(extProperty?.value)}">{{extProperty?.value}}</div>
+                            </div>
+                            <div class="ebCheckbox" *ngIf="extProperty.type == 'boolean'">
+                                <label>
+                                    <input type="checkbox" [ngClass]="{'readonly-checkbox' :(extProperty.value == '1' || extProperty.value == 'Y')}" [checked]="(extProperty.value == '1' ||  extProperty.value == 'Y')" disabled>
+                                    <div class="text" [ngClass]="{'readonly' : (extProperty.value == '1' || extProperty.value == 'Y')}"><em *ngIf="(extProperty.value == '1' ||  extProperty.value == 'Y')" class="fa fa-check" aria-hidden="true"></em>
+                                        {{extProperty.displayName}}
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </form>  
+            </div>
+        </div>
+    </div>
+    <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>

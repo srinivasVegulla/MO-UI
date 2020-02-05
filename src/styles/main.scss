@@ -1,0 +1,126 @@
+@import "_variables.scss";
+
+html {
+	position: relative;
+	font-family: $font-family-base !important;
+	font-size: $font-size-base !important;
+	line-height: $font-size-base !important;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: auto;
+}
+
+body {
+	font-family: $font-family-base !important;
+	font-size: $font-size-paragraph;
+	line-height: $font-size-paragraph;
+	color: $ebColor_Text;
+	background-color: $ebColor_ApplicationL1;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+p {
+	font-size: $font-size-paragraph;
+	line-height: $line-height-computed;
+}
+
+//Links overriding _scaffolding.scss
+
+a {
+	
+	font-size: $font-size-paragraph;
+
+	&:hover {
+    outline: none;
+	color: $ebColor_LinkHover;
+	
+	}
+
+	&:active {
+		text-decoration: $link-hover-decoration;
+	}
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+	}
+	&:disabled {
+	
+	}
+}
+
+.fa {
+  font-size: 18px;
+  font-weight: lighter 100;
+}
+
+h1, .h1 {
+	line-height: $line-height-h1; 			
+	font-size: $font-size-h1;          	
+	font-weight: $font-weight-h1; 			
+	padding: $padding-h1; 				
+	margin: $margin-h1; 				
+	border-bottom: $border-bottom-h1;
+}
+
+h2, .h2 {
+	line-height: $line-height-h2; 			
+	font-size: $font-size-h2;          	
+	font-weight: $font-weight-h2; 			
+	padding: $padding-h2; 				
+	margin: $margin-h2; 				
+	border-bottom: $border-bottom-h2;
+}
+
+h3, .h3 {
+	line-height: $line-height-h3; 			
+	font-size: $font-size-h3;          	
+	font-weight: $font-weight-h3; 			
+	padding: $padding-h3; 				
+	margin: $margin-h3; 				
+	border-bottom: $border-bottom-h3;
+	color:	$color-h3;
+}
+
+h4, h5, h6, .h4, .h5, .h6 {
+	line-height: $line-height-h4; 			
+	font-size: $font-size-h4;          	
+	font-weight: $font-weight-h4;
+	padding: $padding-h4; 				
+	margin: $margin-h4; 				
+	border-bottom: $border-bottom-h4;
+	color:	$color-h4;
+}
+
+label {
+  font-weight: normal;
+}
+
+.collapse.in {
+	margin: 15px 0 15px 0;
+}
+
+textarea {
+	resize: none;
+}
+
+
+.note {
+	margin-top: 40px;
+}
+
+.noteImg {
+	height: 24px;
+}
+
+// Blocks of code
+pre {
+
+  // Account for some code outputs that place code tags in pre tags
+  code {
+    white-space: pre-line;
+  }
+}

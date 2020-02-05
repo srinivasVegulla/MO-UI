@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 10 20" style="enable-background:new 0 0 10 20;" xml:space="preserve">
+<style type="text/css">
+	.st0{opacity:0.3;}
+	.st1{fill:#333333;}
+	.st2{clip-path:url(#SVGID_1_);}
+	.st3{clip-path:url(#SVGID_3_);fill:#333333;}
+	.st4{clip-path:url(#SVGID_5_);}
+	.st5{clip-path:url(#SVGID_7_);}
+</style>
+<g>
+	<g id="sort_x5F_descend_3_" class="st0">
+		<g>
+			<g>
+				<polygon id="SVGID_32_" class="st1" points="5,4.6 8.6,8.2 9.4,7.5 5,3.1 0.6,7.5 1.4,8.2 				"/>
+			</g>
+			<g>
+				<g>
+					<polygon id="SVGID_30_" class="st1" points="5,4.6 8.6,8.2 9.4,7.5 5,3.1 0.6,7.5 1.4,8.2 					"/>
+				</g>
+				<g>
+					<defs>
+						<polygon id="SVGID_28_" points="5,4.6 8.6,8.2 9.4,7.5 5,3.1 0.6,7.5 1.4,8.2 						"/>
+					</defs>
+					<clipPath id="SVGID_1_">
+						<use xlink:href="#SVGID_28_"  style="overflow:visible;"/>
+					</clipPath>
+					<g class="st2">
+						<g>
+							<g>
+								<rect id="SVGID_26_" x="-3" y="1.9" class="st1" width="16" height="16"/>
+							</g>
+							<g>
+								<g>
+									<rect id="SVGID_16_" x="-3" y="1.9" class="st1" width="16" height="16"/>
+								</g>
+								<g>
+									<defs>
+										<rect id="SVGID_14_" x="-3" y="1.9" width="16" height="16"/>
+									</defs>
+									<clipPath id="SVGID_3_">
+										<use xlink:href="#SVGID_14_"  style="overflow:visible;"/>
+									</clipPath>
+									<rect x="-4.3" y="-1.9" class="st3" width="18.7" height="15.1"/>
+								</g>
+							</g>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+	<g id="sort_x5F_descend_2_">
+		<g>
+			<g>
+				<polygon id="SVGID_12_" points="5,17.4 1.4,13.8 0.6,14.5 5,18.9 9.4,14.5 8.6,13.8 				"/>
+			</g>
+			<g>
+				<g>
+					<polygon id="SVGID_10_" points="5,17.4 1.4,13.8 0.6,14.5 5,18.9 9.4,14.5 8.6,13.8 					"/>
+				</g>
+				<g>
+					<defs>
+						<polygon id="SVGID_8_" points="5,17.4 1.4,13.8 0.6,14.5 5,18.9 9.4,14.5 8.6,13.8 						"/>
+					</defs>
+					<use xlink:href="#SVGID_8_"  style="overflow:visible;"/>
+					<clipPath id="SVGID_5_">
+						<use xlink:href="#SVGID_8_"  style="overflow:visible;"/>
+					</clipPath>
+					<g class="st4">
+						<g>
+							<g>
+								<rect id="SVGID_6_" x="-3" y="4.1" width="16" height="16"/>
+							</g>
+							<g>
+								<g>
+									<rect id="SVGID_4_" x="-3" y="4.1" width="16" height="16"/>
+								</g>
+								<g>
+									<defs>
+										<rect id="SVGID_2_" x="-3" y="4.1" width="16" height="16"/>
+									</defs>
+									<use xlink:href="#SVGID_2_"  style="overflow:visible;"/>
+									<clipPath id="SVGID_7_">
+										<use xlink:href="#SVGID_2_"  style="overflow:visible;"/>
+									</clipPath>
+									<rect x="-4.4" y="8.8" class="st5" width="18.7" height="15.1"/>
+								</g>
+							</g>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

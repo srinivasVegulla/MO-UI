@@ -1,0 +1,347 @@
+<!-- VIEW WIDGET : START -->
+<div class="ecb-rateTableInfo panel panel-default">
+        <div class="ecb-rateHeader" *ngIf='rateTableDataList.length>0'>
+            <div>
+                    <span [ngClass]="conditions.length > 0 === true ? 'ecb-rateEdit' : 'ecb-noConditions'">
+                        <span *ngIf="conditions.length > 0">
+                            <button *ngIf="editRatesCapability" (click)="displayCopyRateSchedules()" type="button" class="ebBtn ebBtn-default ecb-copyRate" [disabled]="enableApprovalsEdit"
+                                l10nTranslate>
+                                {{'TEXT_COPY_RATES'}}
+                            </button>
+                            <span *ngIf="download_View  && upload_View" class="ebLayout-HeadingCommands-separator"></span>
+                            <a *ngIf="download_View"  (click)="exportToXML()">
+                                <em class="fa fa-download" title='{{"TEXT_DOWNLOAD"| translate:lang}}'></em>
+                            </a>
+                            <span *ngIf="upload_View" class="ecb-fileUpload" [class.disableAction]="enableApprovalsEdit">
+                                <input #btnUpload type="file" accept="text/xml" (change)="importToXML($event, rateTables)">
+                                <a (click)="openUploadDialog()"><i class="fa fa-upload" title='{{"TEXT_UPLOAD_FILE"| translate:lang}}' aria-hidden="true"></i></a>
+                            </span>
+                            <span *ngIf="editRatesCapability" class="ebLayout-HeadingCommands-separator"></span>
+                        </span>
+                        <span *ngIf="editRatesCapability" [class.disableAction]="disableEdit || enableApprovalsEdit" (click)="displayCoverHandler(rateTables)">
+                            <a class="ecb-pointer" [title]="editTooltip" l10nTranslate>{{'TEXT_EDIT'}}</a>
+                        </span>
+                    </span>             
+            </div>
+            <h3 class="ecb-priceableItemText">
+                <span l10nTranslate>{{'TEXT_RATE_TABLE' }} </span>
+                <span> {{selectedSchedule?.description}}: </span>
+                    <span>{{rateTitle}}</span>
+                    <span>
+                        ({{existingRuleCount}}
+                    <span l10nTranslate>{{'TEXT_RATES'}}</span>)&#x202E;
+                </span>
+            </h3>
+        </div>
+        <!--error while fetching data -->
+        <div *ngIf="showErrorMsg">
+            <div class=" ecb-alertCreatePOEerrormsg col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert">
+                <p>{{rateTableFetchError}}</p>
+            </div>      
+        </div>
+        <div class="row" *ngIf="showErrorMsgForDelete">
+            <div class="col-xs-12 col-sm-6  col-md-6 col-lg-offset-4 col-lg-4 col-lg-offset-4  alert alert-danger "
+              role="alert">
+              <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true" (click)="showErrorMsgForDelete = false">x</span>
+                <span class="sr-only">Close</span>
+            </button>
+            <p>{{rateTableFetchError}}</p>
+            </div>
+          </div>
+        <div class="ebTable_autoScroll ecb-removePadding" [ngClass]="{'ecb-loaderMinHeight': rateTableLoading}">
+                <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"  backDropClassName="ecb-ratesTableLoaderPosition"></ecb-loader>                     
+                <!-- warning displayed on approvals capability -->
+                <div *ngIf="isPendingApproval" class="alert ecb-Warning col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 ecb-WarningApproval" [ngClass]="warningStyle">
+                    <p>{{warningMessage}}
+                        <a *ngIf="isRatesUpdateApproval" class="ecb-pointer" (click)="displayApprovalPanel()"l10nTranslate>{{'TEXT_PENDING_APPROVALS' | translate:lang}}</a>
+                    </p>
+                </div>                
+                <div class="ecb-rateTable" *ngIf='rateTableDataList.length>0 && !showErrorMsg'>
+                    <ecb-loader *ngIf="rateTableLoading" mode="skeleton" fill="grid" type="grid"></ecb-loader>         
+                    <p-dataTable [value]="rateTableDataList" [rowStyleClass]="getRowClass">
+                    <p-column styleClass="col-button ecb-primeNgColumn" *ngFor="let col of rateTableCols" [field]="col.field" [header]='col.key | translate:lang'
+                        [sortable]="col.sortable" [editable]="false" [style]="col.style" (sortFunction)="rateTableSort($event,'view')">
+                        <ng-template *ngIf="isStaticColumn(col.field)" let-col pTemplate="header">
+                            <span title="{{col.header | translate:lang}}">{{col.field |translate:lang}}</span>
+                        </ng-template>
+                        <ng-template *ngIf="!isStaticColumn(col.field)" let-col pTemplate="header">
+                            <span [ngClass]="col.style.enum === null && (col.style.datatype === 'int'|| col.style.datatype === 'decimal') ?'integerValue':''" title="{{col.header | translate:lang}}">{{getTableHeaderName(col)}}</span>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == staticColumns.ACTIONS" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                            <span *ngIf="!data['default']" [class.disableActions]="disableEdit">
+                                <span *ngIf="editRatesCapability" [class.disableAction]="enableApprovalsEdit">
+                                    <a [title]="addTooltip" (click)="addClickFromView(rateTables, i)">
+                                        <em class="fa fa-plus" aria-hidden="true"></em>
+                                    </a>
+                                </span>
+                                <span *ngIf="deleteRatesCapability" [title]="deleteTooltip" [class.disableAction]="enableApprovalsEdit">
+                                    <a (click)="deleteRateFromView(data, i)"  [class.disable]="disableExistingDeleteIcon()">
+                                        <em class="fa fa-times-circle" aria-hidden="true"></em>
+                                    </a>
+                                </span>
+                            </span>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == staticColumns.IF" let-col pTemplate="body">
+                            <span>{{col.field |translate:lang}}</span>
+                        </ng-template>
+                        <ng-template *ngIf="col.field == staticColumns.THEN" let-col pTemplate="body">
+                            <span>{{col.field |translate:lang}}</span>
+                        </ng-template>
+                        <ng-template *ngIf="!isStaticColumn(col.field)" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                            <span *ngIf="data.default !== undefined && data.default">
+                                <div class="ecb-defaultErrorMain" *ngIf="conditionsList.length > 0 && col.field == conditionsList[0]; else ecRatebAction">
+                                    <span *ngIf="!isDefaultRateAllowed">
+                                        <span l10nTranslate>{{'TEXT_DEFAULT_RATE_NOT_ALLOWED'}}</span>
+                                    </span>
+                                    <span *ngIf="isDefaultRateAllowed">
+                                        <span l10nTranslate>{{'TEXT_DEFAULT_RATE_IS'}}</span>
+                                        <li>
+                                            <label>
+                                                <input type="radio" value="false" name="ecb-defaultRateType" [checked]="!hasDefaultRate" disabled="disabled" />
+                                                <div>
+                                                    <span l10nTranslate>{{'TEXT_DEFAULT_DISPLAY_ERROR'}}</span>
+                                                </div>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label>
+                                                <input type="radio" value="true" name="ecb-defaultRateType" [checked]="hasDefaultRate" disabled="disabled" />
+                                                <div>
+                                                    <span l10nTranslate>{{'TEXT_DEFAULT_SELECT_VALUE'}}</span>
+                                                </div>
+                                            </label>
+                                        </li>
+                                    </span>
+                                </div>
+                                <div *ngIf="col.field == actionsList[0] && !hasDefaultRate">
+                                    <span l10nTranslate>{{'TEXT_DEFAULT_MATCH'}}</span>
+                                </div>
+                                <div *ngIf="hasDefaultRate" [ngClass]="getTextFieldClass(col)">
+                                    {{data[col.field]}}
+                                </div>
+                            </span>
+                            <div *ngIf="!data['default']" [ngClass]="getTextFieldClass(col)">
+                                <span *ngIf="col.field === 'Calendar_ID' && data[col.field] === 0"></span>
+                                <span *ngIf="(col.field === 'Calendar_ID' && data[col.field] !== 0) || col.field !== 'Calendar_ID'">{{data[col.field]}}</span>
+                            </div>
+                        </ng-template>
+                    </p-column>
+                    </p-dataTable>
+                </div>
+            <!-- Data grid to show rate tables ends-->
+            <ecb-approval *ngIf="showApprovalPanel" [isLoadedFrom]="currentView" (closeApprovalAsidePanel)="hideApprovalWidget($event)" [schedId]="selectedSchedule" (reloadSource)="refreshRates($event)" [rateMetaData]="parameterTableMetaData"></ecb-approval>
+        </div>
+</div>
+    <!-- VIEW WIDGET : END -->
+    
+    <!-- EDIT WIDGET : START -->
+    <ngx-aside #rateTables [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+     class="ecb-maxAsidePanel" [ngClass]="{'ecb-showEditDialog':showCover}" (keyup.enter) = "saveRateTables()">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-editRateMain">
+        <div class="panel panel-default ecb-zeroHeight">
+            <div class="panel-heading ecb-panelHeading">
+                <div class="row">
+                    <h2 class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_RATES'}}</h2>
+                    <div class="col-lg-6 ecb-editOverlayLink">
+                        <button class="ebBtn ecbBtn-margin" [ngClass]="{'ebBtn-primary': isSaveEnabled}" l10nTranslate [disabled]="!isSaveEnabled" (click)="saveRateTables()">{{'TEXT_SAVE'}}</button>
+                        <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()">
+                            <span l10nTranslate>{{'TEXT_CANCEL'}} </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div *ngIf="saveRulesError != ''">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class=" col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert">
+                                            <span aria-hidden="true" (click)="showErrorMessage=false">×</span>
+                                            <span class="sr-only">Close</span>
+                                     </button>
+                                <p>{{saveRulesError}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ecb-rateTableInfo">
+                    <div class="ecbRates col-xs-12 col-sm-12 col-md-12 col-lg-12" *ngIf="!showErrorMessage">
+                        <h3>
+                            <span l10nTranslate>{{'TEXT_RATE_TABLE' }} </span>
+                            <span> {{selectedSchedule?.description}}: </span>
+                            <span>{{rateTitle}}</span>
+                            <span>
+                                ({{existingRuleCount}}
+                                <span l10nTranslate>{{'TEXT_RATES'}}</span>)&#x202E;
+                            </span>
+                        </h3>
+                    </div>
+                    <!--error while fetching data -->
+                    <div *ngIf="showErrorMessage">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class=" col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+                                    <p> {{errorMessage}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ebTable_autoScroll col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-removePadding">
+                        <div class="ecb-rateTable" id="ecb-rateTableEdit">
+                            <p-dataTable [value]="rateTableEditDataList" [rowStyleClass]="getRowClass" *ngIf="!rateTableLoading  && !showErrorMessage"
+                                [primeDragula]="bag" [dragulaModel]="rateTableEditDataList" [dragulaOptions]="{ childContainerSelector: '#ecb-rateTableEdit table tbody', initAfterView: true }">
+                                <p-column styleClass="col-button ecb-primeNgColumn" *ngFor="let col of rateTableEditCols" [field]="col.field" [header]='col.key | translate:lang' [sortable]="col.sortable" [editable]="col.editable" [style]="col.style" (sortFunction)="rateTableSort($event,'edit')">
+                                    <ng-template *ngIf="isStaticColumn(col.field)" let-col let-data="rowData" pTemplate="header">
+                                        <span *ngIf="col.field == 'MOVE'" title="{{col.header | translate:lang}}"></span>
+                                        <span *ngIf="col.field != 'MOVE'" title="{{col.header | translate:lang}}">{{col.field |translate:lang}}</span>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field == 'MOVE'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <span *ngIf="!data['default']">
+                                            <a [title]="moveTooltip" class="ecb-moveRule" [class.disableAction]="disableMoveIcon()">
+                                                <i class="fa fa-arrows" aria-hidden="true"> </i>
+                                            </a>
+                                        </span>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field == staticColumns.ACTIONS" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <span *ngIf="!data['default']">
+                                            <a  *ngIf="editRatesCapability" (click)="addRateRow(i, null, true)" [title]="addTooltip" >
+                                                <em class="fa fa-plus" tabindex="0" aria-hidden="true" id={{i}}></em>
+                                            </a>
+                                        </span>
+                                        <span *ngIf="!data['default']">
+                                            <a *ngIf="deleteRatesCapability"  [title]="deleteTooltip" (click)="deleteRateModel(data,i)"  [class.disable]="disableDeleteIcon()" >
+                                                <em hidden>{{data}}</em>
+                                                <em [tabindex]="deleteTabIndex" class="fa fa-times-circle" aria-hidden="true" id={{i}}></em>
+                                            </a>
+                                            <a *ngIf="!deleteRatesCapability  && rateTableEditDataList[i]['removeRateCapability']"  [title]="deleteTooltip" (click)="deleteRateModel(data,i)" [class.disable]="disableDeleteIcon(data['order'])" >
+                                                <em hidden>{{data}}</em>
+                                                <em [tabindex]="deleteTabIndex" class="fa fa-times-circle" aria-hidden="true" id={{i}}></em>
+                                            </a>
+                                        </span>
+                                        <span *ngIf="tableCellError !== null && i == rateTableToolTipIndex && rateTableErrorCol == col.field">
+                                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="tableCellError" (onClose)="onToolTipClose($event)" ></ecb-errortooltip>
+                                        </span>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field == staticColumns.IF" let-col pTemplate="body">
+                                        <span>{{col.field |translate:lang}}</span>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field == staticColumns.THEN" let-col pTemplate="body">
+                                        <span>{{col.field |translate:lang}}</span>
+                                    </ng-template>
+                                    <ng-template *ngIf="!isStaticColumn(col.field)" let-col pTemplate="header">
+                                    <span [ngClass]="col.style.enum === null && (col.style.datatype === 'int'|| col.style.datatype === 'decimal') ?'integerValue':''" title="{{col.header | translate:lang}}">{{getTableHeaderName(col)}}</span>
+                                            </ng-template>
+                                    <ng-template *ngIf="col.key == staticColumns.OPERATOR" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <span *ngIf="!data['default']">
+                                            <ecb-dropdown [options]='getOpForConditions(col.field)' [modelValue]='data[col.field]' (changeItem)="setValue($event, col, i)">
+                                            </ecb-dropdown>
+                                        </span>
+                                    </ng-template>
+                                    <!-- default is input field -->
+                                    <ng-template *ngIf="!isStaticColumn(col.field) && col.key != staticColumns.OPERATOR" let-col let-data="rowData" let-i="rowIndex"
+                                        pTemplate="body">
+                                        <span *ngIf="isVisibleForEditDefaultRate(i, col.field); else defaultRateOption">
+                                            <span *ngIf="hasEnumData(col.field)">
+                                                <select class="ecb-select ecb-selectOption ecb-rateTableMetaData" (change)="onEditCell()" [(ngModel)]="data[col.field]" [ngClass]="{'ecb-ratesManditoryCheck': col.style.required}">
+                                                    <option l10nTranslate *ngFor="let option of metaDataAsPerRuleName[col.field].enumData" [value]="option?.value">
+                                                        {{option.label}}
+                                                    </option>
+                                                </select>
+                                            </span>
+                                            <span *ngIf="!hasEnumData(col.field) && col.field == 'Calendar_ID'">
+                                                <select class="ecb-select ecb-selectOption ecb-rateTableMetaData" (change)="onEditCell()" [(ngModel)]="data[col.field]" [ngClass]="{'ecb-ratesManditoryCheck': col.style.required}">
+                                                    <option l10nTranslate *ngFor="let calendar of calendarOptions" [value]="calendar?.value">
+                                                        {{calendar.label}}
+                                                    </option>
+                                                </select>
+                                            </span>
+                                            <span *ngIf="!hasEnumData(col.field)  && col.field != 'Calendar_ID'">
+                                                <input type="text" maxlength="10" [(ngModel)]="data[col.field]" pInputText (keyup)="validateInputField($event, col, i)" [ngClass]="getTextFieldClass(col)" [class.ecb-ratesManditoryCheck]="col.style.required"/>         </span>
+                                        </span>
+                                        <span #defaultRateOption *ngIf="data['default']">
+                                            <div class="ecb-defaultErrorMain" *ngIf="conditionsList.length > 0 && col.field == conditionsList[0]">
+                                                <span *ngIf="!isDefaultRateAllowed">
+                                                    <span l10nTranslate>{{'TEXT_DEFAULT_RATE_NOT_ALLOWED'}}</span>
+                                                </span>
+                                                <span *ngIf="isDefaultRateAllowed">
+                                                    <span l10nTranslate>{{'TEXT_DEFAULT_RATE_IS'}}</span>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" value="false" name="ecb-defaultEditRateType" [checked]="!hasDefaultRateEdit" (click)="setHasDefaultRate(false)"
+                                                            />
+                                                            <div>
+                                                                <span l10nTranslate>{{'TEXT_DEFAULT_DISPLAY_ERROR'}}</span>
+                                                            </div>
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" value="true" name="ecb-defaultEditRateType" [checked]="hasDefaultRateEdit" (click)="setHasDefaultRate(true)"
+                                                            />
+                                                            <div>
+                                                                <span l10nTranslate>{{'TEXT_DEFAULT_SELECT_VALUE'}}</span>
+                                                            </div>
+                                                        </label>
+                                                    </li>
+                                                </span>
+                                            </div>
+                                            <div *ngIf="col.field == actionsList[0] && !hasDefaultRateEdit">
+                                                <span l10nTranslate>{{'TEXT_DEFAULT_MATCH'}}</span>
+                                            </div>
+                                        </span>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                             <!-- Data grid to show rate tables ends-->
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="input-group ecb-sidebarFooter">
+                            <input type="text" class="ebInput" placeholder="" readonly>
+                            <span class="ecb-requriedIndicator" l10nTranslate> {{'TEXT_REQUIRED_FIELD'}} </span><span class="input-group-required"> </span>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</ngx-aside>
+    
+    <ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+        <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    </ecb-modal-dialog>
+    
+    <ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 2" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+        <dialog-header l10nTranslate>{{'TEXT_DEL_RATE'}}</dialog-header>
+        <dialog-body>
+            <table>
+                <tbody>
+                    <ng-template ngFor let-item [ngForOf]="deleteRateObjectKeys()">
+                        <tr *ngIf="isMetaDataColumns(item)" class="noStyle">
+                            <td class="noStyle">{{item}}</td>
+                            <td class="noStyle">{{getRuleRecordDetail(item)}}</td>
+                        </tr>
+                    </ng-template>
+                </tbody>
+            </table>
+        </dialog-body>
+        <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+        <dialog-button-2 l10nTranslate>{{'TEXT_RETURN'}}</dialog-button-2>
+    </ecb-modal-dialog>
+    
+    <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>
+    <!-- EDIT WIDGET : END -->
+    
+    <div *ngIf="copyRateSchedules">
+        <ecb-copyRates [rateTableVal]="rateTableInfo" (val)="setCopyRateSchedules($event)"></ecb-copyRates>
+    </div>
+    
+    <!-- COPY RATES WIDGET : END -->
+    

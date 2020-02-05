@@ -1,0 +1,16 @@
+{
+	"url": {
+		"WRONGURL": "https://10.200.166.80:8074/index.htmls",
+		"404url": "https://10.200.166.80:8074/404",
+    "URL": "https://10.200.166.70:8074/index.html",
+		"CurrentUrl": "https://10.200.166.70:8074/login",
+    "DashBoardURL": "https://10.200.166.70:8074/ProductCatalog"
+	},
+    "user": {
+		 "username": "admin",
+		 "passwordField": "123"
+	},
+	 
+    "logout": "Logout",
+		"img": "https://10.200.166.70:8074/assets/extdata/default/localeConfig/he.png"  
+  }

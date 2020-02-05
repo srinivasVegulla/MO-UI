@@ -1,0 +1,264 @@
+
+<div>
+    <ngx-aside #properties [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false" class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading ecb-panelHeading">
+                <div class="row">
+                    <h2 *ngIf="!isCreateOffering" class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_PROPERTIES'}}</h2>
+                    <h2 *ngIf="isCreateOffering && createPO" class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_CREATE_PRODUCT_OFFER'}}</h2>
+                    <h2 *ngIf="isCreateOffering && createBundle" class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_CREATE_BUNDLE'}}</h2>
+                    <h2 *ngIf="isCreateOffering && isCopyPO" class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_COPY_PO'}}</h2>
+                    <h2 *ngIf="isCreateOffering && isCopyBundle" class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_COPY_BUNDLE'}}</h2>
+                    <div class="col-lg-6 ecb-editOverlayLink">
+                    <button class="ebBtn ecbBtn-margin" (click)="savePOProperties()" [disabled]="setSaveDisabled()" [ngClass]="{'ebBtn-primary': isSaveEnabled}"
+                        l10nTranslate>{{'TEXT_SAVE'}}</button>
+                        <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true" (click)="showErrorMessage = false">×</span><span class="sr-only">Close</span>
+                    </button>
+                    <p>{{httpErrorMessage}}</p>
+                </div>
+                <form class="ecb-propertiesFormMain" [formGroup]="POProperties" (keydown)="onEnterSavePOProperties($event)" novalidate>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="form-group">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+                            <span *ngIf="!isCreateOffering">
+                                <input #defaultName type="hidden" name="name" formControlName="name">
+                                <div>{{ POProperties.get('name').value }}</div>
+                            </span>
+                            <span *ngIf="isCreateOffering">
+                              <div class="input-group col-xs-12 col-sm-12" l10nTranslate>
+                                  <input #defaultName type="text" class="ebInput" maxlength="255" name="name" (keydown)="disableSpace($event)" (focusout)="removeSpace()" formControlName="name" (blur)="checkNameAvailability()" [ngClass]="{'ecb-fieldEmptyValidator': (POProperties.controls.name.hasError('required') && POProperties.controls.name.touched) || nameExist}" tabindex="1" >
+                                  <span class="input-group-required"></span>
+                              </div>
+                              <!-- Input name error message -->
+                              <div *ngIf="POProperties.controls.name.hasError('required') && POProperties.controls.name.touched" class="ebInputError">
+                                  <span class="statusError"></span><span l10nTranslate>{{'TEXT_NAME_REQUIRED'}}</span>
+                              </div>
+                              <!-- Input name uniqueness error message -->
+                              <div *ngIf="nameExist && !POProperties.controls.name.hasError('required')" class="ebInputError">
+                                  <span class="statusError"></span><span l10nTranslate>{{'TEXT_NAME_EXIST'}}</span>
+                              </div>
+                            </span>
+                            </div>
+                            <div class=" form-group">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DISPLAY_NAME'}}</label>
+                                <div class="input-group col-xs-12 col-sm-12">
+                                    <input *ngIf="isCreateOffering" type="text" class="ebInput" maxlength="255" name="displayName" formControlName="displayName" (keydown)="disableSpace($event)" (focusout)="removeSpace()" [ngClass]="{'ecb-fieldEmptyValidator': (POProperties.controls.displayName.hasError('required')|| displayNameExist) && (POProperties.controls.displayName.touched)}" tabindex="2">
+                                    <input id="initFocus" *ngIf="!isCreateOffering" type="text" class="ebInput" maxlength="255" name="displayName" formControlName="displayName" (keydown)="disableSpace($event)" (focusout)="removeSpace()" [ngClass]="{'ecb-fieldEmptyValidator': (POProperties.controls.displayName.hasError('required')|| displayNameExist) && (POProperties.controls.displayName.touched)}"
+                                      tabindex="2" autofocus>
+                                    <span class="input-group-required"></span>
+                                </div>
+                                <div *ngIf="POProperties.controls.displayName.hasError('required') && POProperties.controls.displayName.touched" class="ebInputError">
+                                    <span class="statusError"></span>
+                                    <span l10nTranslate>{{'TEXT_DISPLAYNAME_REQUIRED'}}</span>
+                                </div>
+                                <!-- Input name uniqueness error message -->
+                                <div *ngIf="displayNameExist && !POProperties.controls.displayName.hasError('required')" class="ebInputError">
+                                    <span class="statusError"></span><span l10nTranslate>{{'TEXT_DISPLAY_NAME_EXIST'}}</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+                                <!-- <input type="text" class="ebInput" maxlength="500" name="description" formControlName="description"> -->
+                                <textarea class="form-control ecbTextArea" type="text" #textArea [ngClass]="autoGrow()" maxlength="4000" name="description" formControlName="description" tabindex="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <!-- <input type="text" value="test" formControlName="curvalue"> -->
+                                <label for="email" class="ebLabel" [class.ebInputError]="POProperties.controls.currency.hasError('required') && POProperties.controls.currency.touched" l10nTranslate>{{'TEXT_CURRENCY'}}</label>
+                                <input *ngIf="!isCreateOffering" type="text" class="ebInput" value="{{selectedCurrency?.name}}" formControlName="currency" readonly>
+                                <div *ngIf="isCreateOffering" class="input-group col-xs-12 col-sm-12">
+                                    <select tabindex="4" class="ebInput ui-corner-all ecb-sideSelect" id="test" name="currency" formControlName="currency">
+                                        <option *ngFor="let currency of currencies" [value]="currency?.name" (click)="changeDropdown(currency)" [selected]="currency?.name==currencyDefault ? 'selected' : null" class="currency">{{currency.name}}</option>
+                                    </select>
+                                </div>
+                                <div *ngIf="POProperties.controls.currency?.hasError('required') && POProperties.controls.currency.touched" class="ebInputError">
+                                    <span class="statusError"></span>
+                                    <span l10nTranslate>{{'TEXT_CURRENCY_REQUIRED'}}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="!showFormFields" class="form-group">
+                                <label for="datetime-input" class="ebLabel" l10nTranslate>{{'TEXT_EFFECTIVE_START_DATE'}}</label>
+                                <p-calendar name="startDate" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput" [maxDate]="maxStartDate" formControlName="startDate" [placeholder]="calenderLocale.placeHolder" [locale]="calenderLocale" [tabindex]="5" [showIcon]="true" (onSelect)="onFormFieldChange('startDate')" (onBlur)="onFormFieldChange('startDate')">
+                                </p-calendar>
+                                <div [hidden]="!startDateError" class="ebInputError">
+                                    <span class="statusError"></span>
+                                    <span l10nTranslate>{{'TEXT_EFFSTRTDATE_MORE_THAN_EFFENDDATE'}}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="!showFormFields" class="form-group">
+                                <label for="datetime-input" class="ebLabel" l10nTranslate>{{'TEXT_EFFECTIVE_END_DATE'}}</label>
+                                <p-calendar name="endDate" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput" formControlName="endDate" [placeholder]="calenderLocale.placeHolder" [minDate]="minEndDate" [locale]="calenderLocale" [tabindex]="6" [showIcon]="true" (onSelect)="onFormFieldChange('endDate')" (onBlur)="onFormFieldChange('endDate')">
+                                </p-calendar>
+                                <div [hidden]="!endDateError" class="ebInputError">
+                                    <span class="statusError"></span>
+                                    <span l10nTranslate>{{'TEXT_EFFENDDATE_LESS_THAN_EFFSTRTDATE'}}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="!showFormFields" class="form-group">
+                                <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_VISIBILITY'}}</label>
+                                <div class="ebRadioBtn">
+                                    <label>
+                                    <input #visibilityShow type="radio" class="ebRadioBtn" name="hidden" id="optionsRadios1" [value]="false" checked="" formControlName="hidden" (click)="showProductOffer($event)" tabindex="7">
+                                    <span class="text" l10nTranslate>{{'TEXT_SHOWN'}}</span>
+                                    </label>
+                                    <label>
+                                    <input #visibilityHide type="radio" class="ebRadioBtn" name="hidden" id="optionsRadios2" [value]="true" formControlName="hidden" (click)="hideProductOffer($event)" tabindex="7">
+                                    <span class="text" l10nTranslate>{{'TEXT_HIDDEN'}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div *ngIf="!showFormFields" class="form-group">
+                                    <label class="ebLabel" l10nTranslate>{{'TEXT_PARTITION_ID'}}</label>
+                                    <input *ngIf="!isCreateOffering" type="text" class="ebInput" value="{{selectedPartition?.login}}" readonly>
+                                    <div *ngIf="isCreateOffering" class="input-group col-xs-12 col-sm-12">
+                                    <select tabindex="8" class="ebInput ui-corner-all ecb-sideSelect" value="{{selectedPartition?.accountId}}" name="Partition" formControlName="popartitionid">
+                                            <option *ngFor="let partition of partitions" [value]="partition?.accountId" (click)="changeDropdown
+                            (partition)" [selected]="partition?.accountId==selectedPartition?.accountId ? 'selected' : null">{{partition.login}}</option>
+                                        </select>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="panel-footer"> 
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="input-group ecb-sidebarFooter">
+                            <input type="text" class="ebInput" placeholder="" readonly>
+                            <span class="ecb-requriedIndicator" l10nTranslate> {{'TEXT_REQUIRED_FIELD'}} </span><span class="input-group-required"> </span>
+                        </div>
+                    </div>
+                </div>           
+            </div> 
+        </div>
+        
+        </div>
+    </ngx-aside>
+</div>
+<div class="panel panel-default" *ngIf="!isCreateOffering">
+        <div class="panel-heading ecb-panelHeading">    
+                       <div *ngIf="editPropertiesCapability" class="ecb-panelHeaderLink">
+                <a title="{{editTooltip}}" [class.disable]="showAprrovalEditBtn" (click)="displayCoverHandler(properties,true)" l10nTranslate>{{'TEXT_EDIT'}}</a>
+            </div>
+            <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_PROPERTIES'}}</h2>
+        </div>
+    <div class="panel-body">
+        <div *ngIf="POLoadError" class="alert alert-danger" role="alert" l10nTranslate>
+            {{'TEXT_ERROR_MESSAGE'}}
+        </div>
+        <div *ngIf="!POLoadError" class="form-group">
+            <form class="ecb-propertiesFormMain" class="ngForm" novalidate>
+                <div class="form-group">
+                    <div class="input-group col-xs-12 col-sm-12 input-paddingTop">
+                        <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+                        <div class="ecb-inputReadOnly">
+                        <div class="ecb-wordbreak" [ngClass]="{'ecb-wordBreakAll': isNoBreakString(viewGeneralPropertiesList?.name)}">{{viewGeneralPropertiesList?.name}}</div>
+                        </div>
+                    </div>  
+                </div>
+                <div class="form-group">
+                    <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DISPLAY_NAME'}}</label>
+                    <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                    <div class="ecb-wordbreak" [ngClass]="{'ecb-wordBreakAll': isNoBreakString(viewGeneralPropertiesList?.displayName)}">{{viewGeneralPropertiesList?.displayName}}</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+                    <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                    <div class="ecb-wordbreak" [ngClass]="{'ecb-wordBreakAll': isNoBreakString(viewGeneralPropertiesList?.description)}">{{viewGeneralPropertiesList?.description}}</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="ebLabel" l10nTranslate>{{'TEXT_CURRENCY'}}</label>
+                    <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                        <span>{{selectedCurrency?.name}}</span>
+                    </div>
+                </div>
+                <div *ngIf="!showFormFields" class="form-group">
+                    <label for="datetime-input" class="ebLabel" l10nTranslate>{{'TEXT_EFFECTIVE_START_DATE'}}</label>
+                    <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                        <span>{{viewGeneralPropertiesList?.effStartDate | amDateFormat:calenderLocale.amLocaleDateFormat}}</span>
+                    </div>
+                </div>
+                <div *ngIf="!showFormFields" class="form-group">
+                    <label for="datetime-input" class="ebLabel" l10nTranslate>{{'TEXT_EFFECTIVE_END_DATE'}}</label>
+                    <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                        <span>{{viewGeneralPropertiesList?.effEndDate | amDateFormat:calenderLocale.amLocaleDateFormat}}</span>
+                    </div>
+                </div>
+                <div *ngIf="!showFormFields" class="form-group">
+                    <label for="radio button" class="ebLabel" l10nTranslate>{{'TEXT_VISIBILITY'}}</label>
+                    <div class="ebRadioBtn">
+                        <label>
+                            <input type="radio" [ngClass]="{'readonly-radio':viewGeneralPropertiesList?.hidden == false}" name="hidden" id="optionsRadios1"
+                                [checked]="viewGeneralPropertiesList?.hidden == false" [disabled]="viewGeneralPropertiesList?.hidden == true">
+                            <div class="readonly" l10nTranslate *ngIf="viewGeneralPropertiesList?.hidden == false">
+                                <i class="fa fa-check-circle"></i>{{'TEXT_SHOWN'}}</div>
+                            <div class="text" *ngIf="viewGeneralPropertiesList?.hidden == true" l10nTranslate>{{'TEXT_SHOWN'}}</div>
+                        </label>
+                        <label>
+                            <input type="radio" [ngClass]="{'readonly-radio':viewGeneralPropertiesList?.hidden == true}" name="hidden" id="optionsRadios2"
+                                [checked]="viewGeneralPropertiesList?.hidden == true" [disabled]="viewGeneralPropertiesList?.hidden == false">
+                            <div class="readonly" l10nTranslate *ngIf="viewGeneralPropertiesList?.hidden == true">
+                                <i class="fa fa-check-circle"></i>{{'TEXT_HIDDEN'}}
+                            </div>
+                            <div class="text" *ngIf="viewGeneralPropertiesList?.hidden == false" l10nTranslate>{{'TEXT_HIDDEN'}}</div>
+                        </label>
+                    </div>
+                </div>
+                <div *ngIf="!showFormFields" class="form-group">
+                    <label class="ebLabel" l10nTranslate>{{'TEXT_PARTITION_ID'}}</label>
+                    <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                        <span>{{selectedPartition?.login}}</span>
+                    </div>
+                </div>
+            </form>
+        </div> 
+    </div>
+</div>       
+   
+    <ecb-modal-dialog [open]="confirmDialog == 1" [closeOnEscape]="false" (onClose)="onModalDialogCloseCancel($event)">
+        <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+        <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+    </ecb-modal-dialog>
+    
+    <ecb-modal-dialog [contentType]="'none'" [closeOnEscape]="false" [open]="confirmDialog == 2" (onClose)="onModalDialogCloseHide($event)" [defaultFooterButtons]="false" [primaryButtons]="[1]">
+        <dialog-header *ngIf="displayBundle">
+            <span l10nTranslate>{{'TEXT_HIDE'}}</span>&#32;<span l10nTranslate>{{'TEXT_BUNDLE'}}</span>
+        </dialog-header>
+        <dialog-header *ngIf="!displayBundle" l10nTranslate>{{'TEXT_HIDE_PRODUCT_OFFER'}}</dialog-header>
+        <dialog-body l10nTranslate>
+            <p>
+            <span l10nTranslate>{{'TEXT_HIDE'}}</span> &#32;{{POProperties['_value']?.name}}? </p>
+            <p>{{POProperties['_value']?.description}}</p>
+        </dialog-body>
+        <dialog-button-1 l10nTranslate>{{'TEXT_HIDE'}}</dialog-button-1>
+        <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+    </ecb-modal-dialog>
+    
+    <ecb-modal-dialog [contentType]="'none'" [closeOnEscape]="false" [open]="confirmDialog == 3" (onClose)="onModalDialogCloseShow($event)" [defaultFooterButtons]="false" [primaryButtons]="[1]">
+        <dialog-header *ngIf="displayBundle">
+        <span l10nTranslate>{{'TEXT_UNHIDE'}}</span>&#32;<span l10nTranslate>{{'TEXT_BUNDLE'}}</span>
+        </dialog-header>
+        <dialog-header *ngIf="!displayBundle" l10nTranslate>{{'TEXT_UNHIDE_PRODUCT_OFFER'}}</dialog-header>
+            <dialog-body l10nTranslate>
+                <p>
+                    <span l10nTranslate>{{'TEXT_UNHIDE'}}</span> &#32;{{POProperties['_value'].name}}? </p>
+                <p>{{POProperties['_value'].description}}</p>
+            </dialog-body>
+            <dialog-button-1 l10nTranslate>{{'TEXT_UNHIDE'}}</dialog-button-1>
+            <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+        </ecb-modal-dialog>
+    
+    <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}">
+    </div>
+    

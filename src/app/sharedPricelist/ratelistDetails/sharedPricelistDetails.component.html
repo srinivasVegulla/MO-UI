@@ -1,0 +1,85 @@
+<div>
+        <div *ngIf="createSPErrorMessage">
+            <div class="row">
+                <div class=" ecb-alertCreatePOEerrormsg col-xs-12 col-sm-6  col-md-6 col-lg-offset-4 col-lg-4 col-lg-offset-4  alert alert-danger "
+                    role="alert">
+                    <p l10nTranslate>
+                        <strong>{{"TEXT_CREATESR_ERROR"}}</strong>
+                    </p>
+                    <span class="ebNotification-close" (click)="removeError()">
+                        <i class="ebIcon ebIcon_close_red"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+          <div *ngIf="isDeleteSRError">
+                  <div class="row">
+                      <div class=" ecb-alertCreatePOEerrormsg col-xs-12 col-sm-6  col-md-6 col-lg-offset-4 col-lg-4 col-lg-offset-4  alert alert-danger " role="alert">
+                          <p l10nTranslate><strong>{{deleteSRError}}</strong></p>
+                          <span class="ebNotification-close" (click)="deleteErrorMessage()">
+                                    <em class="ebIcon ebIcon_close_red"></em>
+                          </span>
+                      </div>
+                  </div>
+          </div>
+        <div class="row ecb-rowContainer">
+          <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ">
+              <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+              <ecb-loader *ngIf="showSPPropertiesSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+              <ecb-spproperties [properties]="selectedSharedPricelist" (updateSPList)="updateProductOffer($event)" [selectedPartition]="selectedPartition" [errorMessage]="errorMessage">
+              </ecb-spproperties>    
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ">
+              <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+              <ecb-loader *ngIf="showInUseSkeleton" mode="skeleton" (updateSPList)="updateSPList" fill="widget" type="widget"></ecb-loader>
+              <ecb-inuse [inUseData]="priceListInUseInfo" [errorMessage]="errorMessage"></ecb-inuse>
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ">
+              <ecb-spextended-properties [extendedProperties]="selectedSharedPricelist"  [errorMessage]="errorMessage"> </ecb-spextended-properties>
+          </div> 
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading  ecb-ratelistMapHeading">
+            <a class="ecb-addPriceableItem" *ngIf="addRatesTableCapability" (click)="showAddRateTable()" l10nTranslate>{{ "TEXT_ADD_RATE_TABLE_PI" }}</a>
+            <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_RATE_TABLES'}}</h2>
+          </div>
+          <div class="panel-body">
+              <div class="alert alert-danger" role="alert" *ngIf="isRatelistMappingError">
+              <p>
+                {{rateDetailsFetchError}}
+              </p>
+            </div>
+          <div *ngIf="!isRatelistMappingError">
+            <div class="row">
+            <div class="col-sm-12 col-md-12 col-xs-12 col-lg-12">
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+              <ecb-loader *ngIf="showRateListMappings" mode="skeleton" fill="widget" type="widget"></ecb-loader> 
+              <ecb-ratelist-mappings *ngIf="pricelistId != null" [pricelistIdParam]="pricelistId" (onRateTableLoad)="onRateTableInfoLoad($event)"
+                (onRateTableResponse)="onRateTableInfoResponse($event)" (onAddRateTableClick)="onAddRateTableClick($event)" (onLoadErrors)="displayHttpErrors($event)"></ecb-ratelist-mappings>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+              <div *ngIf="rateTableInfoLoading" class="ecb-LoaderContainer">
+                      <ecb-loader mode="dot" fill="widget" backDropClassName="ecb-loaderMinHeight" ></ecb-loader>
+              </div>
+              <div *ngIf="isParamTableInfo()" class="row ecb-rateTableMargin">
+                <h2>{{paramTableInfo.paramtableDisplayName}}</h2>
+                <ecb-loader *ngIf="rateTableInfoLoading" mode="dot" fill="widget"></ecb-loader>
+                <ecb-schedules [type]="'SharedPriceDetails'" [rateScheduleData]="paramTableInfo['schedules']" [subscriptionCount]="getSubscriptionCount()"
+                [schedulesLoadingInfo]="rateTableInfoLoading" [selectedRate]="paramTableInfo"></ecb-schedules>
+                <ecb-rates-table [type]="'SharedPriceDetails'" *ngIf="paramTableInfo['schedules'] != null && paramTableInfo['schedules'].length > 0"></ecb-rates-table>
+              </div>
+            </div>
+            </div>
+            </div>
+         </div>
+        </div>
+          <ecb-localization *ngIf="showLocalizationPanel" (localizationPanel)="hidelocalizationWidget($event)"></ecb-localization>
+          <ecb-ratelist-addRateTable *ngIf="isAddRateTable" (onClose)="onAddRateTableClose($event)" [param]="addRateTableParam"></ecb-ratelist-addRateTable>
+      </div>
+      <div id="footer" class="ebPageFooter">
+          <div class="col-xs-12">
+              <div class="input-group">
+              </div>
+          </div>
+      </div>
+      

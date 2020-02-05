@@ -1,0 +1,203 @@
+buildscript {
+    ext { springBootVersion = '1.5.17.RELEASE' }
+    repositories { mavenCentral() }
+    dependencies { classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") }
+}
+
+plugins {
+  id 'org.sonarqube' version '2.6.2'
+  id 'net.saliman.cobertura' version '2.5.4' apply false
+  id 'com.bmuschko.docker-remote-api' version '3.2.5'
+}
+
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'project-report'
+
+jar {
+  group = 'com.ericsson.ecb'
+  baseName = 'ecb-metraoffer-ui'
+  apply from: "$rootDir/gradle/versioning.gradle"
+
+  version = project.version.toString()
+}
+
+  repositories {
+    mavenLocal();
+    mavenCentral();
+    maven { url "http://$repoUrl/$repoKey"
+    credentials {
+	          username = "$repoUsername"
+	          password = "$repoPassword"
+	        }
+	  }
+  }
+
+  apply plugin: 'maven-publish'
+  apply plugin: 'jacoco'
+  
+  apply plugin: 'jdepend'
+
+  jdepend {
+    toolVersion = '2.9.1'
+    ignoreFailures = true
+  }
+  
+    sonarqube {
+        properties {
+            property "sonar.sources", "src/main/java"
+        }
+    }
+
+
+  String key = rootProject.repoKey 
+  ext.fullRepoUrl = "http://$repoUrl/$key"
+
+  publishing {
+    publications {
+      webApp(MavenPublication) {
+        from components.java
+ 
+        publish {
+          dependsOn build
+        }
+      }
+    }
+
+    repositories {
+      maven {
+        url fullRepoUrl
+        credentials {
+          username = "$repoUsername"
+          password = "$repoPassword"
+        }
+      }
+    }
+  }
+
+  sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+def String ecbVsn = "${majorVersion}.${minorVersion}"
+
+dependencies {
+    if (rootProject.name == "ecb-api") {
+		compile project(':ecb-oauth2')
+		compile project(':ecb-common')
+		compile project(':ecb-foundation:ecb-foundation-client')
+		compile project(':ecb-catalog:ecb-catalog-client')
+		compile project(':ecb-customer:ecb-customer-client')
+		compile project(':ecb-pricing:ecb-pricing-client')
+		compile project(':ecb-billing:ecb-billing-client')
+		compile project(':ecb-billing:ecb-metadata-client')
+    } else {
+		compile group: 'com.ericsson.ecb', name: 'ecb-oauth2', version: "${ecbVsn}.+"
+		compile group: 'com.ericsson.ecb', name: 'ecb-common', version: "${ecbVsn}.+"
+		compile group: 'com.ericsson.ecb', name: 'ecb-foundation-client', version: "${ecbVsn}.+"
+		compile group: 'com.ericsson.ecb', name: 'ecb-catalog-client', version: "${ecbVsn}.+"
+		compile group: 'com.ericsson.ecb', name: 'ecb-customer-client', version: "${ecbVsn}.+"
+		compile group: 'com.ericsson.ecb', name: 'ecb-pricing-client', version: "${ecbVsn}.+"
+		compile group: 'com.ericsson.ecb', name: 'ecb-billing-client', version: "${ecbVsn}.+"
+		compile group: 'com.ericsson.ecb', name: 'ecb-metadata-client', version: "${ecbVsn}.+"
+    }
+
+    compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.4.0.jre8'
+	compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '5.4'
+	compile group: 'net.minidev', name: 'json-smart', version: '2.3'
+	compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.59'
+	compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.59'
+
+	compile group: 'com.nimbusds', name: 'oauth2-oidc-sdk', version: '5.47'
+
+	compile group: 'org.springframework.boot', name: 'spring-boot', version: springBootVersion
+	compile group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: springBootVersion
+	testCompile group: 'org.springframework.boot', name: 'spring-boot-test', version: springBootVersion
+    testCompile group: 'org.hsqldb', name: 'hsqldb', version:'2.4.0'
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+    compile(group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion) {
+		exclude(module: 'commons-logging')
+    }
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jetty', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: springBootVersion
+    
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-security', version: '1.2.2.RELEASE'
+
+//  RA-284 Temporarily remove references to logstash-logback-encoder for 17.0
+//	compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: logstashLogbackEncoderVersion
+
+    compile group: 'io.springfox', name: 'springfox-swagger2', version:'2.8.0'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version:'2.8.0'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
+    compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: mybatisSpringBootStarterVersion
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter', version: springCloudStarterVersion
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: jacksonVersion
+
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: springCloudConfigClientVersion
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka', version: springCloudStarterEurekaVersion
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-hystrix', version: springCloudStarterHystrixVersion
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-netflix-hystrix-stream', version: springCloudNetflixCore
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-stream-kafka', version: springCloudStarterStreamKafkaVersion
+    compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: springSecurityOauth2Version 
+    runtime group: 'org.springframework.security', name: 'spring-security-jwt', version: springSecurityJwtVersion
+    compile group: 'org.springframework.security', name: 'spring-security-data', version: springSecurityDataVersion
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-zuul', version: springCloudStarterZuulVersion
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-hystrix-dashboard', version: springCloudStarterHystrixVersion
+    compile group: 'io.github.openfeign', name: 'feign-slf4j', version: '9.5.1'
+    compile group: 'net.sf.supercsv', name: 'super-csv', version: '2.4.0'
+    compile group: 'com.google.guava', name: 'guava', version: guavaVersion
+    runtime group: 'com.netflix.eureka', name: 'eureka-client', version: netflixEurekaClient
+    runtime group: 'com.thoughtworks.xstream', name: 'xstream', version: thoughtworksXstreamVersion
+    
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+    testCompile group: 'org.springframework', name: 'spring-test', version: springFramework
+    testCompile group: 'org.mockito', name: 'mockito-all', version:'1.10.19'
+}
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+            html.enabled false
+        }
+    }
+    check.dependsOn jacocoTestReport
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.RELEASE"
+    }
+}
+
+
+eclipse {
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
+}
+
+    String mavenGroupId = 'com.ericsson.ecb'
+    String mavenVersion = project.version.toString()
+
+    String mavenArtifactId = name
+
+    group = mavenGroupId
+    version = mavenVersion
+
+    configurations {
+        testArtifacts.extendsFrom testRuntime
+    }
+    task testJar(type: Jar) {
+        classifier "test"
+        from sourceSets.test.output
+    }
+    artifacts {
+        testArtifacts testJar
+        archives jar
+    }
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '3.5'
+}

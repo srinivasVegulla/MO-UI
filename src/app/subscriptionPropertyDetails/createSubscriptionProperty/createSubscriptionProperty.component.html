@@ -1,0 +1,353 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-ngxasidepanel ecb-subscriptionproperties">
+  <div class="panel panel-default">
+    <div class="panel-heading ">
+      <div class="row">
+        <h2 *ngIf="createSubscriptionProperty" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_CREATE_SUBSCRIPTION_PROPERTY'}}</h2>
+        <h2 *ngIf="!createSubscriptionProperty" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_SUBSCRIPTION_PROPERTY'}}</h2>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ecb-editOverlayLink">
+          <button class="ebBtn ecbBtn-margin" (click)="saveSubscriptionProperties()" [disabled]="setSaveDisabled()" [ngClass]="{'ebBtn-primary': !isSaveDisabled}"
+            l10nTranslate>{{'TEXT_SAVE'}}</button>
+          <button class="ebBtn ebBtn-default" (click)="cancelAsidePanel()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div *ngIf="isUsedInOfferings" class="ebNotification ebNotification_color_paleBlue">
+        <div class="ebNotification-content ">
+          <span class="ebNotification-label">
+            <span class="ecb-notification-content" l10nTranslate>{{'TEXT_PROPERTY_IS_PART_OF'}}</span>
+            <a (click)="openInUseOfferings(selectedProperty)">{{entityCount}}
+              <span l10nTranslate>{{'TEXT_OFFERINGS'}}</span>
+            </a>.</span>
+        </div>
+      </div>
+      <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+        <button type="button" class="close" data-dismiss="alert">
+          <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <p>{{httpErrorMessage}}</p>
+      </div>
+      <div *ngIf="nameExist && !subscriptionPropertiesForm.controls.name.hasError('required')" class="alert alert-danger" role="alert" l10nTranslate>
+        <button type="button" class="close" data-dismiss="alert">
+          <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <p>{{subscriptionPropertiesFormName}} <span l10nTranslate>{{'TEXT_NAME_CATEGORY_EXIST'}}</span> {{subscriptionPropertiesFormCatergory}}.</p>
+        <p l10nTranslate *ngIf="!showCategoryNameDisplayName">{{'TEXT_SELECT_ENTER_CATEGORY'}}</p>
+        <p l10nTranslate *ngIf="showCategoryNameDisplayName">{{'TEXT_NAME_CATEGORY_RENAME'}}</p>
+      </div>
+      <form [formGroup]="subscriptionPropertiesForm" (keydown)="onEnterSaveSubscriptionProperties($event)"  class="ecb-asideform" novalidate>
+        <div class="row">
+          <!-- category -->
+          <ecb-combobox [label]="comboboxLabel" [ngClass]="{'comboBox': !showCategoryNameDisplayName  && !isUsedInOfferings}" [options]="comboboxOptions" [MaximumLength]="20" [setDefaultOption]="defaultCategory" [resetCombobox]="resetDefaultOption"
+            (optionSelected)="setCategory($event)" [ReadonlyMode]="isUsedInOfferings"></ecb-combobox>
+          <!-- category -->
+          <!--Display category -->
+          <div *ngIf="!showCategoryNameDisplayName"  class="form-group col-md-12">
+            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DISPLAY_CATEGORY'}}
+
+            </label>
+            <div class="input-group col-xs-12" l10nTranslate>
+              <input type="text" class="ebInput" maxlength="20" name="displayCategory"  formControlName="displayCategory" [readonly]="isUsedInOfferings"
+                tabindex="2" />
+            </div>
+          </div>
+          <!--Display category -->
+          <!-- name -->
+          <div class="form-group col-md-12" [ngClass]="{'inputBackGround': !showCategoryNameDisplayName && !isUsedInOfferings}">
+            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+            <div class="input-group col-xs-12" *ngIf="showCategoryNameDisplayName" l10nTranslate>
+              <input #propertyName type="text"  class="ebInput" (change)="enableSaveBUtton()" maxlength="20" name="name" (keydown)="disableSpace($event)" (focusout)="removeSpace()" formControlName="name"
+                [readonly]="isUsedInOfferings" [ngClass]="{'ecb-fieldEmptyValidator': (subscriptionPropertiesForm.controls.name.hasError('required') && subscriptionPropertiesForm.controls.name.touched)}" tabindex="2" />
+                <span *ngIf="!isUsedInOfferings" class="input-group-required"></span>
+            </div>
+            <div class="input-group col-xs-12" *ngIf="!showCategoryNameDisplayName" l10nTranslate>
+               <input type="text" class="ebInput"  maxlength="20" name="name" formControlName="name"
+                    tabindex="2" readonly/>
+            </div>
+            <div *ngIf="subscriptionPropertiesForm.controls.name.hasError('required') && subscriptionPropertiesForm.controls.name.touched"
+              class="ebInputError">
+              <span class="statusError"></span>
+              <span l10nTranslate>{{'TEXT_NAME_REQUIRED'}}</span>
+            </div>
+          </div>
+          <!-- name -->
+          <!-- Display name -->
+          <div *ngIf="!showCategoryNameDisplayName" class="form-group col-md-12">
+            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DISPLAY_NAME'}}</label>
+            <div class="input-group col-xs-12" l10nTranslate>
+              <input  type="text" class="ebInput" maxlength="20" name="displayName"  formControlName="displayName" [readonly]="isUsedInOfferings"
+                 tabindex="2" />
+            </div>
+          </div>
+          <!--Display name -->
+          <!-- description -->
+          <div class="form-group col-md-12">
+            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+        <div *ngIf="isUsedInOfferings" class="ecb-inputReadOnly ecb-wordbreak" [ngClass]="{'ecb-wordBreakAll': isNoBreakString(subscriptionPropertiesForm.controls.description.value)}">{{subscriptionPropertiesForm.controls.description.value}}</div>
+              <textarea *ngIf="!isUsedInOfferings" class="form-control ecbTextArea" type="text" #textAreaEdit [ngClass]="autoGrow()" tabindex="3" maxlength="255" name="description"
+              formControlName="description"></textarea>
+          </div>
+          <!-- description -->
+          <!-- Property type -->
+          <div class="form-group col-md-12">
+            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_PROPERTY_TYPE'}}</label>
+            <div *ngIf="isUsedInOfferings" class="ecb-inputReadOnly">{{subscriptionPropertiesForm.controls.specType.value}}</div>
+            <select *ngIf="!isUsedInOfferings" class="ebInput ecb-sideSelect" id="test" tabindex="4" name="specType" formControlName="specType">
+              <option *ngFor="let property of propertyTypeKeys" [value]="propertyTypes[property]">{{propertyTypes[property]}}</option>
+            </select>
+          </div>
+          <!-- String Property type -->
+          <div *ngIf="subscriptionPropertiesForm.controls.specType['_value'] == 'String (Text Input)'">
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DEFAULT_VALUE'}}</label>
+              <div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12" l10nTranslate>
+              <input type="text" class="ebInput ebString" tabindex="5" name="stringValue" maxlength="20" formControlName="stringValue" [readonly]="isUsedInOfferings">
+              <span *ngIf="!isUsedInOfferings"></span>
+            </div>
+            </div>
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_STRING_LENGTH'}}</label>
+              <input type="number" class="ebInput" tabindex="6" name="stringLength" formControlName="stringLength" (keydown)="disableMathKeys($event)"
+                min="0" [readonly]="isUsedInOfferings" />
+            </div>
+          </div>
+          <!-- String Property type -->
+          <!-- Integer Property type -->
+          <div *ngIf="subscriptionPropertiesForm.controls.specType['_value'] == 'Integer (Numeric Input)'">
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DEFAULT_VALUE'}}</label>
+              <div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12" l10nTranslate>
+              <input type="number" class="ebInput" tabindex="7" name="intValue" formControlName="intValue" (keydown)="disableMathKeys($event)" min="0" [readonly]="isUsedInOfferings"
+              [ngClass]="{'ecb-fieldEmptyValidator': (subscriptionPropertiesForm.controls.intValue.hasError('required') && subscriptionPropertiesForm.controls.intValue.dirty)
+                  }"/>
+                  <span *ngIf="!isUsedInOfferings" class="input-group-required"></span>
+                  </div>
+                  <div *ngIf="subscriptionPropertiesForm.controls.intValue.hasError('required') && subscriptionPropertiesForm.controls.intValue.dirty"
+                    class="ebInputError">
+                      <span class="statusError"></span>
+                      <span l10nTranslate>{{'TEXT_DEFAULT_VALUE_REQUIRED'}}</span>
+                    </div>
+            </div>
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_MIN_VALUE'}}</label>
+              <input type="number" class="ebInput" tabindex="8" name="intMinValue" formControlName="intMinValue"  (keydown)="disableMathKeys($event)" min="0" [readonly]="isUsedInOfferings"
+              [ngClass]="{'ecb-fieldEmptyValidator': subscriptionPropertiesForm.controls.intMinValue.hasError('isIntValueMinimum')}"/>
+              <div [hidden]="!subscriptionPropertiesForm.controls.intMinValue.hasError('isIntValueMinimum')" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MIN_LESS_THAN_MAX'}}</span>
+              </div>
+            </div>
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_MAX_VALUE'}}</label>
+              <input type="number" class="ebInput" tabindex="9" name="intMaxValue" formControlName="intMaxValue" (keydown)="disableMathKeys($event)" min="0" [readonly]="isUsedInOfferings"
+              [ngClass]="{'ecb-fieldEmptyValidator': subscriptionPropertiesForm.controls.intMaxValue.hasError('isIntValueMaximum')}"/>
+              <div [hidden]="!subscriptionPropertiesForm.controls.intMaxValue.hasError('isIntValueMaximum')" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MAX_LESS_THAN_MIN'}}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Integer Property type -->
+          <!-- Decimal Property type -->
+          <div *ngIf="subscriptionPropertiesForm.controls.specType['_value'] == 'Decimal (Numeric Input)'">
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DEFAULT_VALUE'}}</label>
+              <div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12" l10nTranslate>
+              <input type="number" class="ebInput" tabindex="10" name="decimalValue" formControlName="decimalValue" [readonly]="isUsedInOfferings"  (keydown)="disableMathKeys($event)" min="0"
+              [ngClass]="{'ecb-fieldEmptyValidator': (subscriptionPropertiesForm.controls.decimalValue.hasError('required') 
+                  && subscriptionPropertiesForm.controls.decimalValue.dirty)}"/>
+                  <span *ngIf="!isUsedInOfferings" class="input-group-required"></span>  
+            </div>
+            <div *ngIf="subscriptionPropertiesForm.controls.decimalValue.hasError('required') && subscriptionPropertiesForm.controls.decimalValue.dirty" class="ebInputError">
+                  <span class="statusError"></span>
+                      <span l10nTranslate>{{'TEXT_DEFAULT_VALUE_REQUIRED'}}</span>
+            </div>
+          </div>
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_MIN_VALUE'}}</label>
+              <input type="number" class="ebInput" tabindex="11" name="decimalMinValue" formControlName="decimalMinValue" [readonly]="isUsedInOfferings" (keydown)="disableMathKeys($event)" min="0"
+              [ngClass]="{'ecb-fieldEmptyValidator': subscriptionPropertiesForm.controls.decimalMinValue.hasError('isDecimalValueMinimum')}"/>
+              <div [hidden]="!subscriptionPropertiesForm.controls.decimalMinValue.hasError('isDecimalValueMinimum')" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MIN_LESS_THAN_MAX'}}</span>
+              </div>
+            </div>
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_MAX_VALUE'}}</label>
+              <input type="number" class="ebInput" tabindex="12" name="decimalMaxValue" formControlName="decimalMaxValue" [readonly]="isUsedInOfferings" (keydown)="disableMathKeys($event)" min="0"
+              [ngClass]="{'ecb-fieldEmptyValidator': subscriptionPropertiesForm.controls.decimalMaxValue.hasError('isDecimalValueMaximum')}"/>
+              <div [hidden]="!subscriptionPropertiesForm.controls.decimalMaxValue.hasError('isDecimalValueMaximum')" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MAX_LESS_THAN_MIN'}}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Decimal Property type -->
+          <!-- List Property type -->
+          <div *ngIf="subscriptionPropertiesForm.controls.specType['_value'] == 'List (Dropdown)'">
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_CHOICES'}}</label>
+              <div *ngIf="isUsedInOfferings" class="ecb-selectedaccounttypes">
+                <span *ngFor="let choice of propertyChoiceList">
+                  <div class="accountTypeButton">{{choice}}</div>
+                </span>
+              </div>
+              <div *ngIf="!isUsedInOfferings">
+                <textarea #textarea formControlName="list" class="ecbTextArea" name="value" (blur)="displayErrorIfAny()" (keypress)="enteredValues($event)" (input)="enteredValues($event)" rows={{defaultChoiceList.length}}></textarea>
+                <div class="ecb-inputpadding">
+                  <span l10nTranslate>{{'TEXT_SEPARATE_VALUE_WITH_SPACE'}}</span>
+                </div>
+              </div>
+              <div *ngIf="showMessage === 'doubleSpace' && displayChoiceError" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_ONLY_SINGLE_SPACE'}}</span>
+              </div>
+              <div *ngIf="showMessage === 'minimumlength' && displayChoiceError" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MINIMUM_CHOICES'}}</span>
+              </div>
+            </div>
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DEFAULT_VALUE'}}</label>
+              <div *ngIf="isUsedInOfferings" class="ecb-inputReadOnly">{{subscriptionPropertiesForm.controls.defaultItem.value}}</div>
+              <div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12" l10nTranslate>
+              <select *ngIf="!isUsedInOfferings" tabindex="14" class="ebInput" name="defaultItem" formControlName="defaultItem"
+              [ngClass]="{'ecb-fieldEmptyValidator': (subscriptionPropertiesForm.controls.defaultItem.hasError('required') 
+                  && subscriptionPropertiesForm.controls.defaultItem.dirty)}">
+                <option *ngFor="let choice of defaultChoiceList" [value]="choice">{{choice}}</option>
+              </select>
+                  <span *ngIf="!isUsedInOfferings" class="input-group-required"></span>  
+            </div>
+            <div *ngIf="subscriptionPropertiesForm.controls.list.hasError('required') && subscriptionPropertiesForm.controls.list.dirty"
+            class="ebInputError">
+            <span class="statusError"></span>
+            <span l10nTranslate>{{'TEXT_DEFAULT_VALUE_REQUIRED'}}</span>
+            </div>      
+            </div>
+          </div>
+          <!-- List Property type -->
+          <!-- Boolean Property type -->
+          <div *ngIf="subscriptionPropertiesForm.controls.specType['_value'] == 'Boolean (Checkbox)'">
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DEFAULT_VALUE'}}</label>
+              <div class="ebRadioBtn">
+                <label>
+                  <input type="radio" name="booleanPropertyType" tabindex="15" [value]="false" formControlName="booleanPropertyType" [ngClass]="{'ecb-option-readonly': isUsedInOfferings === true}" (click)="disbaleDefaultAction($event)">
+                  <span class="ecbradio" l10nTranslate>{{'TEXT_FALSE_UNCHEKCED'}}</span>
+                </label>
+              </div>
+              <div class="ebRadioBtn">
+                <label>
+                  <input type="radio" name="booleanPropertyType" tabindex="16" [value]="true" formControlName="booleanPropertyType" [ngClass]="{'ecb-option-readonly': isUsedInOfferings === true}" (click)="disbaleDefaultAction($event)">
+                  <span class="ecbradio" l10nTranslate>{{'TEXT_TRUE_CHEKCED'}}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- Boolean Property type -->
+          <!-- Date & Time Property type -->
+          <div *ngIf="subscriptionPropertiesForm.controls.specType['_value'] == 'Date & Time (DateTime Input)'">
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DEFAULT_VALUE'}}</label>
+              <div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12" l10nTranslate>
+              <input type="text" *ngIf="isUsedInOfferings" class="ebInput" name="value" value="{{subscriptionPropertiesForm.controls.dateValue.value | dateFormatPipe : localeDateFormat}}" readonly [ngClass]="{'ecb-fieldEmptyValidator': (subscriptionPropertiesForm.controls.dateValue.hasError('required') 
+              && subscriptionPropertiesForm.controls.dateValue.dirty)}"/>          
+            
+              <p-calendar *ngIf="!isUsedInOfferings" name="dateValue" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput ecb-calendarRequired" formControlName="dateValue" [placeholder]="calenderLocale.placeHolder" [locale]="calenderLocale" 
+              (onClose)="onFormFieldChange()" [showIcon]="true">
+              </p-calendar>
+              
+              <span *ngIf="!isUsedInOfferings" class="input-group-required"></span>          
+            </div>
+            <div *ngIf="subscriptionPropertiesForm.controls.dateValue.hasError('required') &&subscriptionPropertiesForm.controls.dateValue.dirty"
+            class="ebInputError">
+              <span class="statusError"></span>
+              <span l10nTranslate>{{'TEXT_DEFAULT_VALUE_REQUIRED'}}</span>
+            </div>
+            </div>
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_MIN_DATE'}}</label>
+              <input type="text" *ngIf="isUsedInOfferings" class="ebInput" name="minValue" value="{{subscriptionPropertiesForm.controls.dateMinValue.value | amDateFormat:calenderLocale.amLocaleDateFormat}}" readonly/>
+              <p-calendar *ngIf="!isUsedInOfferings" name="dateMinValue" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput" formControlName="dateMinValue"
+                [placeholder]="calenderLocale.placeHolder"  tabindex="17" [locale]="calenderLocale" (onClose)="onFormFieldChange()" [styleClass]="{'ecb-fieldEmptyValidator': subscriptionPropertiesForm.controls.dateMinValue.hasError('isDateValueMinimum')}" [showIcon]="true">
+              </p-calendar>
+              <div [hidden]="!subscriptionPropertiesForm.controls.dateMinValue.hasError('isDateValueMinimum')" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MIN_LESS_THAN_MAX'}}</span>
+              </div>
+            </div>
+            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_MAX_DATE'}}</label>
+              <input *ngIf="isUsedInOfferings" type="text" class="ebInput" name="maxValue" value="{{subscriptionPropertiesForm.controls.dateMaxValue.value | amDateFormat:calenderLocale.amLocaleDateFormat}}" readonly/>
+              <p-calendar *ngIf="!isUsedInOfferings" name="dateMaxValue" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput" formControlName="dateMaxValue"
+                [placeholder]="calenderLocale.placeHolder"  tabindex="18" [locale]="calenderLocale" (onClose)="onFormFieldChange()" [styleClass]="{'ecb-fieldEmptyValidator': subscriptionPropertiesForm.controls.dateMaxValue.hasError('isDateValueMaximum')}" [showIcon]="true">
+              </p-calendar>
+              <div [hidden]="!subscriptionPropertiesForm.controls.dateMaxValue.hasError('isDateValueMaximum')" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MAX_LESS_THAN_MIN'}}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Date & Time Property type -->
+          <!-- Visisbility for Subscription -->
+          <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <label for="radio button" class="ebLabel" l10nTranslate>{{'TEXT_VISIBILITY_FOR_SUBSCRIPTION'}}</label>
+            <div class="ebRadioBtn">
+              <label>
+                <input type="radio" tabindex="19" name="userVisible" id="optionsRadios2" [value]="false" (click)="hideSubscriptionProperty(true, $event)" formControlName="userVisible" [ngClass]="{'ecb-option-readonly': isUsedInOfferings === true}">
+                <span class="ecbradio" l10nTranslate>{{'TEXT_HIDDEN'}}</span>
+              </label>
+            </div>
+            <div class="ebRadioBtn_last">
+              <label>
+                <input type="radio" name="userVisible" tabindex="20" id="optionsRadios1" [value]="true" (click)="hideSubscriptionProperty(false, $event)" formControlName="userVisible" [ngClass]="{'ecb-option-readonly': isUsedInOfferings === true}">
+                <span class="ecbradio" l10nTranslate>{{'TEXT_SHOWN'}}</span>
+              </label>
+            </div>
+          </div>
+          <!-- Visisbility for Subscription -->
+          <!-- Editing for Subscription -->
+          <div *ngIf="showEditingForSubscription" class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <label for="radio button" class="ebLabel" l10nTranslate>{{'TEXT_EDITING_FOR_SUBSCRIPTION'}}</label>
+            <div class="ebRadioBtn">
+              <label>
+                <input type="radio" name="editingForSubscriptionCode" tabindex="21" id="optionsRadios2" value="RO" formControlName="editingForSubscriptionCode" [ngClass]="{'ecb-option-readonly': isUsedInOfferings === true}" (click)="disbaleDefaultAction($event)">
+                <span class="ecbradio" l10nTranslate>{{'TEXT_READ_ONLY'}}</span>
+              </label>
+            </div>
+            <div class="ebRadioBtn">
+              <label>
+                <input type="radio" name="editingForSubscriptionCode" tabindex="22" id="optionsRadios1" value="ENR" formControlName="editingForSubscriptionCode" [ngClass]="{'ecb-option-readonly': isUsedInOfferings === true}" (click)="disbaleDefaultAction($event)">
+                <span class="ecbradio" l10nTranslate>{{'TEXT_EDITABLE_NOT_REQUIRED'}}</span>
+              </label>
+            </div>
+            <div class="ebRadioBtn_last">
+              <label>
+                <input type="radio" name="editingForSubscriptionCode" tabindex="23" id="optionsRadios1" value="ER" formControlName="editingForSubscriptionCode" [ngClass]="{'ecb-option-readonly': isUsedInOfferings === true}" (click)="disbaleDefaultAction($event)">
+                <span class="ecbradio" l10nTranslate>{{'TEXT_EDITABLE_REQUIRED'}}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <!-- Editing for Subscription -->
+      </form>
+      
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12">
+            <div class="input-group ecb-sidebarFooter">
+                <input type="text"  class="ebInput" placeholder="" readonly>
+                <span class="ecb-requriedIndicator" l10nTranslate> {{'TEXT_REQUIRED_FIELD'}} </span><span class="input-group-required"> </span>
+              </div>
+        </div>
+      </div> 
+    </div>
+  </div>
+</div>
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+  <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+  <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>

@@ -1,0 +1,278 @@
+<div *ngIf="viewPriceableItem || PIServerError">
+  <ngx-aside #unitDetails [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false"
+    [showOverlay]="false" class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}" (keyup)="onEnterSavePIunitDetails($event, unitDetails)">
+    <div  class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel panel-default ecb-editpanelheight">
+        <div class="panel-heading ecb-panelHeading">
+          <div class="row">
+		    <div class="col-xs-6 ecb-editOverlayLink">
+              <button class="ebBtn ecbBtn-margin" [disabled]="saveDisabled" [ngClass]="{'ebBtn-primary': !saveDisabled}" (click)="savePIunitDetails(unitDetails)"
+                l10nTranslate>{{'TEXT_SAVE'}}</button>
+              <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+            </div>
+            <h2 class="col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT'}}
+              <span l10nTranslate>{{'TEXT_UNIT_DETAILS'}} </span>
+            </h2>          
+          </div>
+        </div>
+        <div class="panel-body">
+          <div *ngIf="httpErrorMessage != undefined" class="alert alert-danger" role="alert" l10nTranslate>
+            <button type="button" class="close" data-dismiss="alert">
+              <span aria-hidden="true" (click)="httpErrorMessage = undefined">×</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <p>{{httpErrorMessage}}</p>
+          </div>
+          <div *ngIf="isPItemplate" class="ebNotification ebNotification_color_paleBlue ecb-marginbottom">
+            <div class="ebNotification-content ecb-infotext">
+              <span class="ebNotification-label" l10nTranslate>
+                {{'TEXT_CHANGES_IMPACT'}}
+                <a (click)="openInUseOfferings()">
+                  <span l10nTranslate>{{'TEXT_EXISTING_PI'}}</span>
+                </a>
+              </span>
+            </div>
+          </div>
+          <form form #f="ngForm" [formGroup]="PIUnitDetailsForm" class="ecb-asideform" novalidate>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_UNIT_NAME'}}</label>
+              <div class="input-group col-xs-12 col-sm-12">
+                <input id="initFocusName" type="text" class="ebInput" tabindex="1" name="unitName" formControlName="unitName" (keydown)="disableSpace($event)" (focusout)="removeSpace()"  [readonly]= "!isPItemplate"
+                [ngClass]="{'ecb-fieldEmptyValidator': (PIUnitDetailsForm.controls.unitName.hasError('required') && PIUnitDetailsForm.controls.unitName.touched && isPItemplate) }" autofocus/>
+                <span [ngClass]="{'input-group-required':isPItemplate}"></span>
+              </div>
+              <div *ngIf="PIUnitDetailsForm.controls.unitName.hasError('required')"
+                class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_UNIT_NAME_REQUIRED'}}</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate> {{'TEXT_UNIT_DISPLAY_NAME'}}</label>
+              <div class="input-group col-xs-12 col-sm-12">
+                <input id="initFocusUDName" type="text" class="ebInput" tabindex="2" name="unitDisplayName" (keydown)="disableSpace($event)" (focusout)="removeSpace()" formControlName="unitDisplayName"
+                [ngClass]="{'ecb-fieldEmptyValidator': (PIUnitDetailsForm.controls.unitDisplayName.hasError('required') && isPItemplate) }" autofocus>
+                <span class="input-group-required"></span>
+              </div>
+              <div *ngIf="PIUnitDetailsForm.controls.unitDisplayName.hasError('required')"
+                class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_DISPLAYNAME_REQUIRED'}}</span>
+              </div>
+            </div>
+            <div class="form-group">
+                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_RATING_TYPE'}}</label>
+                <div class="ebRadioBtn ecbRatingType">
+                  <div *ngIf="isPItemplate">
+                    <label>
+                      <input type="radio" tabindex="3" name="ratingType" formControlName="ratingType" [value]='1' [checked]="viewPriceableItem?.ratingType === 1">
+                      <div class="text" l10nTranslate>{{'TEXT_MULTI_BUCKET'}}</div>
+                    </label>
+                    <label>
+                      <input type="radio" tabindex="4" name="ratingType" formControlName="ratingType" [value]='0' [checked]="viewPriceableItem?.ratingType === 0">
+                      <div class="text" l10nTranslate>{{'TEXT_SINGLE_BUCKET'}}</div>
+                    </label>
+                  </div>
+                  <div *ngIf="!isPItemplate">
+                    <label>
+                      <input type="radio" [ngClass]="{'readonly-radio':viewPriceableItem?.ratingType == 1}" name="ratingType" [checked]="viewPriceableItem?.ratingType == 1"
+                        [disabled]="viewPriceableItem?.ratingType == 0" tabindex="3">
+                      <div class="readonly" l10nTranslate *ngIf="viewPriceableItem?.ratingType == 1">
+                        <em class="fa fa-check-circle"></em>{{'TEXT_MULTI_BUCKET'}}</div>
+                      <div class="text" *ngIf="viewPriceableItem?.ratingType == 0" l10nTranslate>{{'TEXT_MULTI_BUCKET'}}</div>
+                    </label>
+                    <label>
+                      <input type="radio" [ngClass]="{'readonly-radio':viewPriceableItem?.ratingType == 0}" name="ratingType" [checked]="viewPriceableItem?.ratingType == 0"
+                        [disabled]="viewPriceableItem?.ratingType == 1" tabindex="4">
+                      <div class="readonly" l10nTranslate *ngIf="viewPriceableItem?.ratingType == 0">
+                        <em class="fa fa-check-circle"></em>{{'TEXT_SINGLE_BUCKET'}}
+                      </div>
+                      <div class="text" *ngIf="viewPriceableItem?.ratingType == 1" l10nTranslate>{{'TEXT_SINGLE_BUCKET'}}</div>
+                    </label>
+                  </div>
+                </div>
+            </div>
+            <div class="form-group">
+              <label class="ebLabel" l10nTranslate>{{'TEXT_SALES_VALUE_TIME'}}</label>
+              <div class="input-group col-xs-12 col-sm-12">
+                <select class="ebInput ecb-sideSelect" name="unitValue" formControlName="integral" tabindex="5">
+                  <option *ngFor="let unitValue of unitValueOptions" [value]="unitValue?.value" [selected]="viewPriceableItem?.integral ==true ? 'selected' : null">{{unitValue.label}}</option>
+                </select>
+              </div>
+              <div *ngIf="!isPItemplate">
+              <div class="ebRadioBtn">
+                  <label>
+                    <input type="radio" [ngClass]="{'readonly-radio':!viewPriceableItem?.integral}" name="integral" [checked]="!viewPriceableItem?.integral"
+                      [disabled]="viewPriceableItem?.integral">
+                    <div class="readonly" l10nTranslate *ngIf="!viewPriceableItem?.integral">
+                      <em class="fa fa-check-circle"></em>{{'TEXT_DECIMAL'}}</div>
+                    <div class="text" *ngIf="viewPriceableItem?.integral" l10nTranslate>{{'TEXT_DECIMAL'}}</div>
+                  </label>
+                  <label>
+                    <input type="radio" [ngClass]="{'readonly-radio':viewPriceableItem?.integral}" name="integral" [checked]="viewPriceableItem?.integral"
+                      [disabled]="!viewPriceableItem?.integral">
+                    <div class="readonly" l10nTranslate *ngIf="viewPriceableItem?.integral">
+                      <em class="fa fa-check-circle"></em>{{'TEXT_INTEGER'}}
+                    </div>
+                    <div class="text" *ngIf="!viewPriceableItem?.integral" l10nTranslate>{{'TEXT_INTEGER'}}</div>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_UNIT_MINIMUM_VALUE'}}</label>
+              <div class="input-group col-xs-12 col-sm-12">
+                <input type="number" class="ebInput" tabindex="7" name="minUnitValue" formControlName="minUnitValue" [readonly]="!isPItemplate" min="0" (keydown)="disableMathKeys($event)"/>
+                <span [ngClass]="{'input-group-required':isPItemplate}"></span>
+              </div>
+              <div [hidden]="!minError" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MIN_LESS_THAN_MAX'}}</span>
+              </div>
+              <div *ngIf="PIUnitDetailsForm.controls.minUnitValue.hasError('required')"
+                class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MIN_UNIT_VALUE_REQUIRED'}}</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_UNIT_MAXIMUM_VALUE'}}</label>
+              <div class="input-group col-xs-12 col-sm-12">
+                <input type="number" class="ebInput" tabindex="8" name="maxUnitValue" onKeyPress="if(this.value.length==9) return false;" min="0" max="999999999" maxlength="9" formControlName="maxUnitValue" [readonly]="!isPItemplate"  min="0" (keydown)="disableMathKeys($event)"/>
+                <span [ngClass]="{'input-group-required':isPItemplate}"></span>
+              </div>
+              <div [hidden]="!maxError" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MAX_LESS_THAN_MIN'}}</span>
+              </div>
+              <div *ngIf="PIUnitDetailsForm.controls.maxUnitValue.hasError('required')"
+                class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_MAX_UNIT_VALUE_REQUIRED'}}</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_VALID_ENUMERATION_VALUES'}}</label>
+              <textarea #textarea *ngIf="showCover" tabindex="9" class="ecbTextArea" [style.height]="validEnumValueHeight + 'px'"
+                name="validEnumValues" formControlName="validEnumValues" [ngClass]="{'ecb-fieldEmptyValidator': (showMessage === 'doubleSpace') || (showMessage === 'invalid') }"
+                [readonly]="!isPItemplate" (keypress)="addTextArea(textarea,$event)"></textarea>
+              <div *ngIf="showMessage === 'space' && isPItemplate" class="ecb-inputpadding">
+                <span l10nTranslate>{{'TEXT_SEPARATE_VALUE_WITH_SPACE'}}</span>
+              </div>
+              <div *ngIf="showMessage === 'doubleSpace'" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_ONLY_SINGLE_SPACE'}}</span>
+              </div>
+              <div *ngIf="showMessage === 'invalid'" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_ENTER_VALUE_IN_RANGE'}}</span>
+                <span>{{'(' + priceableItemData?.minUnitValue + ' ' +'-'}}
+                {{ priceableItemData?.maxUnitValue + ').'}}</span>
+                <span l10nTranslate>{{'TEXT_ENTER_RANGE_FIELDS'}}</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-xs-12 col-sm-12">
+                <div class="input-group ecb-sidebarFooter">
+                    <input type="text"  class="ebInput" placeholder="" readonly>
+                    <span class="ecb-requriedIndicator" l10nTranslate> {{'TEXT_REQUIRED_FIELD'}}</span><span class="input-group-required"> </span>
+                </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </ngx-aside>
+<div class="panel panel-default">
+  <div class="panel-heading ecb-panelHeading">
+    <div *ngIf="UnitDetails_Edit" class="ecb-panelHeaderLink">
+      <a title="{{editTooltip}}" (click)="displayCoverHandler(unitDetails,true)" l10nTranslate>{{'TEXT_EDIT'}}</a>
+    </div>
+    <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_UNIT_DETAILS'}}</h2>
+  </div>
+  <div class="panel-body">
+    <form>
+      <div class="form-group">
+        <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_UNIT_NAME'}}</label>
+        <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+          <span>{{viewPriceableItem.unitName}}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="simple-input" class="ebLabel" l10nTranslate> {{'TEXT_UNIT_DISPLAY_NAME'}}</label>
+        <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+            <span>{{viewPriceableItem?.unitDisplayName}}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_RATING_TYPE'}}</label>
+        <div class="ebRadioBtn">
+          <label>
+            <input type="radio" [ngClass]="{'readonly-radio':viewPriceableItem?.ratingType == 1}" name="ratingType" [checked]="viewPriceableItem?.ratingType == 1"
+              [disabled]="viewPriceableItem?.ratingType == 0">
+            <div class="readonly" l10nTranslate *ngIf="viewPriceableItem?.ratingType == 1">
+              <em class="fa fa-check-circle"></em>{{'TEXT_MULTI_BUCKET'}}</div>
+            <div class="text" *ngIf="viewPriceableItem?.ratingType == 0" l10nTranslate>{{'TEXT_MULTI_BUCKET'}}</div>
+          </label>
+          <label>
+            <input type="radio" [ngClass]="{'readonly-radio':viewPriceableItem?.ratingType == 0}" name="ratingType" [checked]="viewPriceableItem?.ratingType == 0"
+              [disabled]="viewPriceableItem?.ratingType == 1">
+            <div class="readonly" l10nTranslate *ngIf="viewPriceableItem?.ratingType == 0">
+              <em class="fa fa-check-circle"></em>{{'TEXT_SINGLE_BUCKET'}}
+            </div>
+            <div class="text" *ngIf="viewPriceableItem?.ratingType == 1" l10nTranslate>{{'TEXT_SINGLE_BUCKET'}}</div>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_SALES_VALUE_TIME'}}</label>
+        <div class="ebRadioBtn">
+          <label>
+            <input type="radio" [ngClass]="{'readonly-radio':!viewPriceableItem?.integral}" name="integral" [checked]="!viewPriceableItem?.integral"
+              [disabled]="viewPriceableItem?.integral">
+            <div class="readonly" l10nTranslate *ngIf="!viewPriceableItem?.integral">
+              <em class="fa fa-check-circle"></em>{{'TEXT_DECIMAL'}}</div>
+            <div class="text" *ngIf="viewPriceableItem?.integral" l10nTranslate>{{'TEXT_DECIMAL'}}</div>
+          </label>
+          <label>
+            <input type="radio" [ngClass]="{'readonly-radio':viewPriceableItem?.integral}" name="integral" [checked]="viewPriceableItem?.integral"
+              [disabled]="!viewPriceableItem?.integral">
+            <div class="readonly" l10nTranslate *ngIf="viewPriceableItem?.integral">
+              <em class="fa fa-check-circle"></em>{{'TEXT_INTEGER'}}
+            </div>
+            <div class="text" *ngIf="!viewPriceableItem?.integral" l10nTranslate>{{'TEXT_INTEGER'}}</div>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_UNIT_MINIMUM_VALUE'}}</label>
+        <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+          <span>{{viewPriceableItem?.minUnitValue}}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_UNIT_MAXIMUM_VALUE'}}</label>
+        <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+          <span>{{viewPriceableItem?.maxUnitValue}}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_VALID_ENUMERATION_VALUES'}}</label>
+        <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+          <span>{{enumerationValues}}</span>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+  <ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)" [closeOnEscape]="false">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+  </ecb-modal-dialog>
+</div>
+<ecb-inuse-offerings-modal-dialog *ngIf="showInUseOfferings" [offeringsData]="inUseOfferingsData" [offeringsLocation]="inUseOfferingsLocation" (inUseModalDialogClose)="hideInUseModalDialog($event)"></ecb-inuse-offerings-modal-dialog>
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>

@@ -1,0 +1,36 @@
+{
+    
+    "displayname": "sample po",
+    "changeddisplayname": "sample po",
+    "descriptionname": "Product Offering for audio conferencing reference implementation using currency USD",
+    "changeddescriptionname": "a simple test product offering",
+    "currencyname": "USD",
+    "changedcurrencyname": "USD",
+    "effstartdate": "06/07/2016",
+    "changedeffstartdate": "01/01/2008",
+    "effenddate": "",
+    "changedeffenddate": "04/01/2020",
+    "avaistartdate": "04/01/2001",
+    "changedavaistartdate": "01/01/2008",
+    "avaienddate": "",
+    "changedavaienddate": "04/01/2020",
+    "searchname": "Revenue Split",
+    "numofoffers": "(14)",
+    "alert": "No priceable items associated with this Product Offer.",
+    "alert1": "An error occurred while fetching the details. Please try again. ",
+    "unitdetailsname": "Unit Details",
+    "billingdetailsname": "Billing",
+    "edittext": "Edit",
+    "savetext": "Save",
+    "canceltext": "Cancel",
+    "sendingudrcdata": "udrc",
+    "sendingdata": "1",
+    "sendingdata1": "a",
+    "offerslistheading": "Offerings List (14)",
+    "propertiesdetailsname": "Properties",
+    "extendedpropheading": "Extended Properties",
+    "displaynameadj": "1"
+   
+ 
+
+  }

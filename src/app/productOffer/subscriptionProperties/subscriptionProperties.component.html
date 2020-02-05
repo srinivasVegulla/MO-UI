@@ -1,0 +1,86 @@
+<div class="panel panel-default">
+    <ecb-addsubscription-properties *ngIf="initializeSubscription" [productOfferId]="productOfferId"></ecb-addsubscription-properties>
+  <div class="panel-heading ecb-panelHeading">  
+		<div class="ecb-panelHeaderLink" *ngIf="addSubPropCapability">
+            <a title (click)="openAddSubscriptionItem()" l10nTranslate>
+                {{ "TEXT_ADD" }}
+            </a>
+        </div>  
+        <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_SUBSCRIPTION_PROPERTIES'}}</h2>       
+  </div>
+  <div class="ecb-subscriptionPanelBody panel-body">
+     <div *ngIf="errorMessage" class="alert alert-danger ecb-subError" role="alert" l10nTranslate>
+        {{'TEXT_ERROR_MESSAGE_SUBSCRIPTION_PROPERTIES'}}
+     </div>
+     <div *ngIf="subscriptionAddError" class="alert alert-danger ecb-subError" role="alert">
+        {{ subscriptionErrorMessage }} <span l10nTranslate>{{ TEXT_COULDNT_ADD_TRY_AGAIN_LATER }}</span>
+     </div>
+     <div *ngIf="noSubscriptionProperties && !isBundle" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+        <div class="ebNotification-content ecb-infotext">           
+            <span class="ebNotification-label">
+                <span l10nTranslate>{{'TEXT_NO_SUBSCRIPTION_PROPERTIES_MESSAGE'}} </span>
+            </span>
+        </div>
+    </div>
+    <div *ngIf="noSubscriptionProperties && isBundle" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+        <div class="ebNotification-content ecb-infotext">           
+            <span class="ebNotification-label">
+                <span l10nTranslate>{{'TEXT_NO_SUBSCRIPTION_PROPERTIES_MESSAGE_2'}} </span>
+            </span>
+        </div>
+    </div>
+    <!--loader -->
+    <ecb-loader *ngIf="showLoader" mode="dot" fill="widget" backDropClassName="ecb-loaderMinHeight"></ecb-loader>
+    <ecb-loader *ngIf="showSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+    <!--loader -->
+    <div *ngIf="!showLoader">
+   <p-dataTable *ngIf="!errorMessage && !noSubscriptionProperties && !subscriptionAddError" [value]="subscriptionList" rowGroupMode="subheader" groupField="category" [rowStyleClass]="getRowClass" [class]="'ecb-subscriptionPropertes ecb-subscriptionRowHeader'">
+      <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['category']}}</ng-template>
+      <p-column [styleClass] = "'ecb-Actions'">
+        <ng-template pTemplate="header">
+            <span title="{{'TEXT_ACTIONS' | translate:lang}}"  l10nTranslate>{{'TEXT_ACTIONS'}}
+            </span>
+        </ng-template>
+        <ng-template let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span *ngIf="addSubPropCapability" class="ecb-deleteSubscription">
+            <a>
+              <i class="fa fa-minus-circle" title='{{"TEXT_REMOVE_TEMPORARY"| translate:lang}}' aria-hidden="true" (click)="deleteSubscription(data,i)">
+            </i>
+            </a>
+            <span class="ecb-subcriptionToolTipError" *ngIf="errorTooltip && i ==tooltipIndex">
+                <ecb-errortooltip class="ecb-errorSubscriptionProperties" [text] = "deleteErrorMessage" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+            </span>
+          </span>
+        </ng-template>
+      </p-column>
+      <p-column field="name">
+          <ng-template pTemplate="header">
+              <span title="{{'TEXT_PROPERTY_NAME' | translate:lang}}"  l10nTranslate>{{'TEXT_PROPERTY_NAME'}}
+              </span>
+          </ng-template>
+      </p-column>
+      <p-column field="userVisible" header="Subscriber Visible">
+          <ng-template pTemplate="header">
+              <span title="{{'TEXT_SUBSCRIBER_VISIBLE' | translate:lang}}"   l10nTranslate>{{'TEXT_SUBSCRIBER_VISIBLE'}}
+              </span>
+          </ng-template>
+        <ng-template let-col let-data="rowData" pTemplate="body">
+          <span *ngIf="data['userVisible']">Yes</span>
+          <span *ngIf="!data['userVisible']">No</span>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+    </div>
+    
+</div>
+<ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+    <dialog-header l10nTranslate>{{'TEXT_REMOVE_SUBSCRIPTION'}}</dialog-header>
+    <dialog-body l10nTranslate>
+        <p>
+            <span l10nTranslate>{{'TEXT_REMOVE'}}</span> &#32;{{deleteSubscriptionDetails?.name}}&#32; &#63;</p>
+        <p>{{deleteSubscriptionDetails?.description}}</p>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_REMOVE'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+</div>

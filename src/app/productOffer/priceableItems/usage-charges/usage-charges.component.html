@@ -1,0 +1,73 @@
+
+<div class="ecb-positionRelative">
+<div *ngIf="!isDeletePOError">
+    <div *ngFor="let usage of usageChargeCardsType; let i = index">
+        <div class="ecbClickableCard" id="cardTotalHeightUsage-{{i}}" *ngIf="showPiCard(usage.itemInstanceId)">
+            <ecb-loader *ngIf="showSkeleton" mode="skeleton" fill="widget" type="widget" backDropClassName="ecb-loaderMinHeight"></ecb-loader>                
+            <div (click)="redirectToPIDetailsPage(productOfferId,usage,PIType)">
+                <div class="ecbClickableCard-heading">
+                    <div class="display_name">
+                        {{usage.displayName}}
+                    </div>
+                </div>
+                <!-- To Remove PI Instance and Showing  PI Name -->
+                <div class="ecbClickableCard-body" id="cardBodyUsage-{{i}}">
+                    <p>
+                        <!--Requried for feature use <a href="#" ><img src="../../assets/images/ericssonIcons/products-750x423.jpg"></a> -->{{usage.description}}
+                    </p>
+                            <div class="properties">
+                        <label for="PIcard" class="ebLabel" l10nTranslate>{{'TEXT_RATE_TABLES'}}<span>&#58;</span></label>
+                        <div *ngFor="let inputFieldString of usage.parameterTable">
+                                <p *ngIf="inputFieldString.displayName">{{inputFieldString.displayName}}</p>
+                                <p *ngIf="!inputFieldString.displayName">{{inputFieldString.name}}</p>
+                    </div>
+                    <label class="ebLabel ecb-usageChildPI" l10nTranslate *ngIf="showChildTitleName(usage)">{{'TEXT_CHILD_PRICEABLE_ITEMS'}}
+                        <span>&#58;</span>
+                    </label>
+                    <div class="ecb-usageChildPI" *ngFor="let child  of usage.childs">
+                        <span>
+                            <a *ngIf="!child.paramtableId" (click)="redirectToPIChildDetailsPage(productOfferId,child,PIType,usage)"> {{child.displayName}} </a>
+                        </span>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ecbClickableCard-footer">
+              <div class="actionIcons">
+                <span *ngIf="removePICapability" [class.disableEditLink]="disableDeletePi">
+                  <a *ngIf="disableDeletePi">
+                    <i class="fa fa-minus-circle" title='{{"TEXT_REMOVE_TEMPORARY"| translate:lang}}' aria-hidden="true" (click)="removePIInstanceIcon(usage.itemInstanceId, i)"></i>
+                  </a>
+                  <a *ngIf="!disableDeletePi">
+                    <i class="fa fa-minus-circle" title='{{"TEXT_REMOVE_TEMPORARY"| translate:lang}}' [class.fa-disabled]="!disableDeletePi" aria-hidden="true"></i>
+                  </a>
+                </span>
+              </div>
+            </div>
+        </div>
+        <div class="ecbClickableCard deletePopUp" [ngStyle]="{ 'min-height':height + 'px'}" *ngIf="showConfirmationDialogue(usage.itemInstanceId)">
+            <div class="ecbClickableCard-heading heading-{{i}}">
+                <div class="display_name">
+                  <span l10nTranslate>{{'TEXT_REMOVE_PRICEABLE_ITEM'}}</span> &#32; &#63;
+                </div>
+            </div>
+            <div class="ecbClickableCard-body" [ngStyle]="{ 'min-height':bodyHeight + 'px'}">
+              <div><span l10nTranslate>{{'TEXT_REMOVE'}} </span>{{usage.displayName}} &#32; &#63;</div>
+              <p>{{usage.description}}</p>
+            </div>
+            <div class="ecbClickableCard-footer ecb-height100percent ecb-buttons" >
+                <button class="ebBtn ebBtn-primary" (click)="removePIInstanceCard(usage.itemInstanceId)" l10nTranslate>{{'TEXT_REMOVE'}}</button>
+                <button class="ebBtn" (click)="cancelPIInstanceCard()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="isDeletePOError">
+  <div class="col-xs-12 alert alert-danger" role="alert">
+    <p l10nTranslate><strong>{{deletePOError}}</strong></p>
+    <span class="ebNotification-close" (click)="deleteErrorMessage()">
+      <i class="ebIcon ebIcon_close_red"></i>
+    </span>
+  </div>
+</div>
+</div>

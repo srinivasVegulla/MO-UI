@@ -1,0 +1,98 @@
+<div class="panel panel-default">
+  <ecb-addproductoffertobundle *ngIf="initializePOtoBundle" [selectedBundleData]="selectedBundleData"></ecb-addproductoffertobundle>
+  <div class="panel-heading">
+    <a *ngIf="addPOCapability" class="ecb-addPriceableItem" [ngClass]="(disableAddPo== true)?'ecb-enablePiAdd':'ecb-disablePiAdd'"
+      (click)="openAddPoListInBundle()" l10nTranslate>
+      {{ "TEXT_ADD" }}</a>
+    <h2 class="ecb-priceableItemText" l10nTranslate>
+      <img class="ecb-productOfferIcon" title='{{"TEXT_PRODUCT_OFFER"| translate:lang}}'  src="../../../assets/images/ericssonIcons/Icon_ProductOffer.svg"  alt="Offer Icon"> {{'TEXT_PRODUCTS'}}
+    </h2>
+
+  </div>
+  <div class="panel-body row">
+    <div>
+      <!-- loader -->
+      <ecb-loader *ngIf="showSkeleton" mode="skeleton" fill="widget" type="widget" [styling]="loaderStyle"></ecb-loader>
+      <ecb-loader *ngIf="showLoader" mode="dot" fill="widget" [styling]="loaderStyle" backDropClassName="ecb-loaderMinHeight"></ecb-loader>
+      <!-- loader -->
+      <div *ngFor="let poCards of productOfferCards; let i = index">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 ebPadding_bothNone ">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="ecbPoClickableCard" id="cardTotalHeightPO-{{i}}" *ngIf="showPoCard(poCards.offerId)">
+                <div (click)="redirectToPoDetailsPage(poCards)">
+                  <div class="ecbClickableCard-heading">
+                    <div class="display_name">
+                      {{poCards.displayName}}
+                    </div>
+                  </div>
+                  <div class="ecbClickableCard-body" id="cardBodyPO-{{i}}">
+                    <p>
+                      <!---Requried for feature use  <img src="../../assets/images/ericssonIcons/products-750x423.jpg"> -->
+                      {{poCards.description}}
+                    </p>
+                    <div class="properties">
+                      <label for="PIcard" class="ebLabel" l10nTranslate>{{'TEXT_PI'}}
+                        <span>&#58;</span>
+                      </label>
+                      <ol>
+                      <li *ngFor="let piItem of poCards.priceableItems;let i = index ">
+                        <a (click)="redirectToPiDetailsPage(poCards.offerId,piItem.itemInstanceId,piItem.itemInstanceKind,poCards,piItem)">{{piItem.itemInstanceDisplayName}}</a>
+                      </li>
+                      </ol>
+                    </div>
+                  </div>
+                  <div class="ecbClickableCard-footer">
+                    <span *ngIf="addPOCapability">
+                      <a class="actionIcons" *ngIf="disableAddPo">
+                        <i class="fa fa-minus-circle" aria-hidden="true" title='{{"TEXT_REMOVE_TEMPORARY"| translate:lang}}' (click)="removePOInstanceIcon(poCards.offerId, i)"></i>
+                      </a>
+                      <a class="actionIcons" *ngIf="!disableAddPo">
+                        <i class="fa fa-minus-circle ecb-pidDeleteDisable" title='{{"TEXT_REMOVE_TEMPORARY"| translate:lang}}' aria-hidden="true"></i>
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="ecbClickableCard ecb-deletePoCard" [ngStyle]="{ 'min-height':height + 'px'}" *ngIf="showConfirmationDialogue(poCards.offerId)">
+                <div class="ecbClickableCard-heading">
+                  <div class="display_name  removePIInstance">
+                    <div class="removePIInstance-header" l10nTranslate>{{'TEXT_REMOVE_PRODUCT'}}</div>
+                  </div>
+                </div>
+                <div class="ecbClickableCard-body" [ngStyle]="{ 'min-height':bodyHeight + 'px'}">
+                  <div class="removePIInstance-header">
+                    <span l10nTranslate>{{'TEXT_REMOVE'}} </span>{{poCards.displayName}}&#63; &#32;
+                    <p>{{poCards.description}}</p>
+                  </div>
+                </div>
+                <div class="ecbClickableCard-footer ecb-height100percent">
+                  <button class="ebBtn ebBtn-primary" (click)="removePoFromBundle(poCards.offerId)" l10nTranslate>{{ 'TEXT_REMOVE' }}</button>
+                  <button class="ebBtn ebBtn-default" (click)="cancelPOInstanceCard()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="noProductOffers" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="ebNotification-content ecb-infotext">
+          <span class="ebNotification-label">
+            <span l10nTranslate>{{'TEXT_NO_PRODUCT_OFFERS'}} </span>
+          </span>
+        </div>
+      </div>
+      <div *ngIf="isDeletePOError">
+        <div class="col-xs-12 col-sm-12 col-md-offset-2 col-md-8 col-lg-8 alert alert-danger" role="alert">
+          <p>
+            {{deletePOError}}
+          </p>
+          <span class="ebNotification-close" (click)="deleteErrorMessage()">
+            <em class="ebIcon ebIcon_close_red"></em>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

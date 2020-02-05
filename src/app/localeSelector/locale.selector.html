@@ -1,0 +1,7 @@
+<div class="locale-selector btn-group">
+		<img *ngFor="let item of lables"
+			 src="/static/default/localeConfig/{{localeFlagData[item].langCode}}.png"
+			 title="{{localeFlagData[item].title}}"
+			 (click)="changeLocale(localeFlagData[item].langCode)"
+			 [ngClass]="{'selected-locale': isSelected(localeFlagData[item].langCode)}"/>
+</div>

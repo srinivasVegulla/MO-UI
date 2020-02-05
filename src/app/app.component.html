@@ -1,0 +1,15 @@
+<router-outlet></router-outlet>
+<ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)" [defaultFooterButtons]="false">
+    <dialog-header l10nTranslate>{{'TEXT_LEAVE_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_LEAVE_WITHOUT_SAVING'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_RETURN'}}</dialog-button-2>
+</ecb-modal-dialog>
+
+<div class="ticketLoginPage" *ngIf="ticketLoginLoading">
+    <div class="ecb-LoaderContainer">
+        <span class="ebLoader-Dots"></span>
+    </div>
+</div>
+
+<ecb-loader></ecb-loader>

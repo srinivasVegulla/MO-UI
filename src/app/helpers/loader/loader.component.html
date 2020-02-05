@@ -1,0 +1,32 @@
+<!-- Dot loader template -->
+<div *ngIf="mode === 'dot'">
+    <!-- page level -->
+    <div *ngIf="fill === 'page'">
+        <div class="ebLoader ecb-loaderContainer ecb-fullPageLoader">
+            <div class="ebLoader-Holder">
+                <span class="ebLoader-Dots"></span>
+            </div>
+        </div>
+    </div>
+    <!-- page level -->
+    <!-- widget level -->
+    <div *ngIf="fill === 'widget'">
+        <div class="ebLoader ecb-loaderWidgetContainer" [ngStyle]="styleObject" [ngClass]="getClassName('backdrop')">
+            <div class="ebLoader-Holder" [ngClass]="getClassName('loader')">
+                <span class="ebLoader-Dots"></span>
+            </div>
+        </div>
+    </div>
+    <!-- widget level -->
+</div>
+<!-- Dot loader template ends-->
+<!-- Skeleton loader template -->
+<div *ngIf="mode === 'skeleton'">
+    <!-- grid level -->
+    <div *ngIf="fill === 'grid'" [ngStyle]="styleObject" [ngClass]="{ 'gridSkeleton':type === 'grid'}"></div>
+    <!-- grid level -->
+    <!-- widget level -->
+    <div *ngIf="fill === 'widget'" [ngStyle]="styleObject" [ngClass]="{ 'widgetSkeleton':type === 'widget'}"></div>
+    <!-- widget level -->
+</div>
+<!-- Skeleton loader template ends -->

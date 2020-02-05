@@ -1,0 +1,9 @@
+{
+
+    "searchcategory": "boolean",
+     "categoryname": "string",
+    "name": "string sample2",
+    "description": " protractor testing2",
+    "propertytype": "sample1",
+    "anothername": "string sample protractor testing"
+}

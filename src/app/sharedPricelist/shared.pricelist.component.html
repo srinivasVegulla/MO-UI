@@ -1,0 +1,148 @@
+<div class="panel panel-default ecb-sharedPricelist">
+        <div class="panel-heading">
+            <div class="ebButtonCommands-placement ecbCommandsCenterAlign">
+                <span>
+                    <em class="fa fa-refresh ecb-enableAlignIcon" title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+                </span>
+                <div *ngIf="createSharedRateCapability" class="ebLayout-HeadingCommands-separator"></div>
+                <a *ngIf="createSharedRateCapability" (click)="openCreatePricelistPanel(sharedPricelists)">
+                    <span l10nTranslate>{{"TEXT_CREATE_RATELIST"}}</span>
+                </a>
+            </div>
+            <h2>
+                <span l10nTranslate>{{"TEXT_RATELISTS"}}</span> ({{totalCount}})</h2>
+        </div>
+        <div *ngIf="showInuseSubscribersInfo">
+            <ecb-ratelist-inusesubscribers [priceListIdVal]="selectedSharedPricelistSubscribers" (onClose)="onSubscriberClosed()"></ecb-ratelist-inusesubscribers>
+        </div>
+        <ecb-inuse-offerings-modal-dialog *ngIf="showInuseOfferingsInfo" [offeringsData]="inUseOfferingsData" [offeringsLocation]="inUseOfferingsLocation" (inUseModalDialogClose)="hideInUseModalDialog($event)"></ecb-inuse-offerings-modal-dialog>
+        <!--Error while fetching initial table data -->
+        <div *ngIf="errorMessage">
+            <div class="container-fluid">
+            <div class="row">
+                <div class=" col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+                <p class="filterFetchingError">{{errorMessage}}</p>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!--Error while fetching initial table data -->
+        <div class="ecb-positionRelative">   
+          <div *ngIf="loadGridData" class="panel panel-body eb-adjustPanelBodyPadding ecb-tableOverflow" [ngStyle]="calculateGridScrollHeight()" ecb-infinite-scroller [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)"
+            (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()" >
+            <ecb-loader *ngIf="pricelistFetching" mode="dot" fill="widget"></ecb-loader>
+            <p-dataTable #sharedPricelistDatatable [value]="sharedPricelist" (onLazyLoad)="loadData($event)" [scrollable]="columnDef.scrollable" [lazy]="columnDef.lazy" [rowStyleClass]="getRowClass" sortField={{columnDef.defaultSortColumn}} sortOrder={{convertedDefaultSortOrder}} [immutable]="false">
+                <p-column [style]="col.style" *ngFor="let col of sharedPricelistCols" [field]="col.field" [header]="col.key | translate:lang"
+                    [sortable]="col.sortable" filter="col.filter" required="true">
+                    <ng-template pTemplate="header" let-col let-rowData="rowData">
+                            <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                        </ng-template>
+                    <ng-template pTemplate="filter" let-col>
+                        <div>
+                            <input type="text" *ngIf="(col.field === 'name' || col.field === 'description')else filterElseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}'
+[(ngModel)]="filterFields[col.field]" pInputText (keyup)="filterDataKeys($event,col.field,filterFields[col.field])" class="ecb-filterInput"/>
+                            <ng-template #filterElseBlock>
+                                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                            </ng-template>
+                            <div class="ecb-clearFilterMain">
+                                <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                    <em class="fa fa-times-circle fa-lg"></em>
+                                </div>
+                            </div>
+                        </div>
+                   
+                </ng-template>
+
+                <ng-template pTemplate="filter" let-col *ngIf="col.field === 'offeringsCount'">
+                    <div>
+                        <ecb-number-date-filter (selectedUserFilter)="fetchRateListCount($event)" [filterKind]="'number'" [selectedColumnToFilter]="'offeringsCount'" [columnPlacement]="'last'">
+                        </ecb-number-date-filter>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="filter" let-col *ngIf="col.field === 'useAccCount'">
+                    <div>
+                        <ecb-number-date-filter (selectedUserFilter)="fetchRateListCount($event)" [filterKind]="'number'" [selectedColumnToFilter]="'useAccCount'" [columnPlacement]="'middle'">
+                        </ecb-number-date-filter>
+                    </div>
+                </ng-template>
+
+                <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <a *ngIf="copySharedRateCapability">
+                        <em class="fa fa-clone" title='{{"TEXT_COPY"| translate:lang}}' (click)="copyPricelist(data,i)" aria-hidden="true"></em>
+                    </a>
+                    <a *ngIf="deleteSharedRateCapability">
+                        <em class="fa fa-times-circle" title='{{"TEXT_DELETE"| translate:lang}}' [class.disable]="!isDeleteSharedList(data)" (click)="deletePricelist(data,i)" aria-hidden="true"></em>
+                    </a>
+                    <span class="ecb-poListTooltip" *ngIf="errorTooltip && i == tooltipIndex">
+                        <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="deletePlError" (onClose)="OnTooltipClose($event)"></ecb-errortooltip>
+                    </span>
+                </ng-template>
+                <ng-template *ngIf="col.field == 'currency'" pTemplate="filter" let-col>
+                    <ecb-dropdown [options]='currencies' [modelValue]='currencyFirstItem' [primaryOption]='currencyFirstItem' (changeItem)="changeCurrencyItem($event)">
+                    </ecb-dropdown>
+                </ng-template>
+                <ng-template *ngIf="col.field == 'plpartitionid'" pTemplate="filter" let-col>
+                    <ecb-dropdown [options]='partitions' [modelValue]='partitionFirstItem' [primaryOption]='partitionFirstItem' (changeItem)="changePartitionItem($event)">
+                    </ecb-dropdown>
+                </ng-template>
+                <ng-template *ngIf="col.field == 'plpartitionid'" let-data="rowData" pTemplate="body" let-col>
+                    <span>{{getPartitionNameById(data[col.field])}}</span>
+                </ng-template>
+                <ng-template *ngIf="col.field === 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <a (click)="redirectToDetailPage(data)">{{data[col.field]}}</a>
+                </ng-template>
+                <ng-template *ngIf="col.field === 'useAccCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="ecb-cursorPointer text-right" (click)="openInuseSubscribers(i)" *ngIf="sharedPricelist[i].useAccCount !== 0">
+                        <a>{{data[col.field]}}</a>
+                    </div>
+                </ng-template>
+                <ng-template *ngIf="col.field === 'offeringsCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="ecb-cursorPointer text-right" (click)="openInuseOfferings(data)" *ngIf="sharedPricelist[i].offeringsCount !== 0">
+                        <a>{{data[col.field]}}</a>
+                    </div>
+                </ng-template>
+            </p-column>
+        </p-dataTable>
+        <div *ngIf="getErrorMessageType() !== 0">
+                <div class="ecb-infoStyling">
+                        <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+                            <p>{{sharedPricelistError}}</p>
+                            </div>
+                            <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                    <div class="ebNotification-content ecb-infotext"> 
+                                        <span class="ebNotification-label">
+                                            <span l10nTranslate>{{'TEXT_NO_SHARED_RECORDS'}} </span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                    <div class="ebNotification-content ecb-infotext"> 
+                                        <span class="ebNotification-label">
+                                            <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                                        </span>
+                                    </div>
+                                </div>
+                    </div>
+                </div>
+            <ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+                <dialog-header l10nTranslate>{{'TEXT_DELETE_SHARED_RATE'}}</dialog-header>
+                <dialog-body l10nTranslate>
+                    <p>
+                        <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deletePriceListData?.name}}&#32; &#63;</p>
+                    <p>{{deletePriceListData?.description}}</p>
+                </dialog-body>
+                <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+                <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+            </ecb-modal-dialog>
+            </div>
+    
+        </div>
+     </div>   
+        <div>
+            <ngx-aside #sharedPricelists [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+                class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}">
+                <ecb-createShared-pricelist (isFormDirty)="displayNavoutDialog($event)" *ngIf="showCover" [copyPricelist]="priceListData" [createRateList]="isCreateRateList"> </ecb-createShared-pricelist>
+            </ngx-aside>
+        </div>
+        <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>

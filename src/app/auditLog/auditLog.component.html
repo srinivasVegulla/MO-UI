@@ -1,0 +1,161 @@
+<!--panel starts from here -->
+<div class="panel panel-default ecb-primeNgTable">
+  <!--panel header -->
+  <div class="panel-heading">
+    <div class="ebButtonCommands-placement">
+      <a (click)="exportToCSV()">
+        <em class="fa fa-download" title='{{"TEXT_DOWNLOAD"| translate:lang}}' aria-hidden="true"></em>
+      </a>
+      <a>
+        <em class="fa fa-refresh ecb-enableAlignIcon" title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+      </a>
+    </div>
+    <h2 l10nTranslate>{{"TEXT_AUDITLOG_TABLE"}}
+      <span>({{logListLength}})</span>
+    </h2>
+  </div>
+  <div class="ecb-positionRelative panel-body">
+    <div *ngIf="auditConfigDataError">
+      <div class="row">
+      <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert">
+          <button *ngIf="!loadError" type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true" (click)="auditConfigDataError = ''">×</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <p>{{auditConfigDataError}}</p>
+      </div>
+      </div>
+      </div>
+    <div *ngIf="loadGridData" class="ecb-tableOverflow " [ngStyle]="calculateGridScrollHeight()" [scrollerContext]="'self'" ecb-infinite-scroller (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+      <!--table strats from here -->
+      <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"></ecb-loader>
+      <p-dataTable class="auditLogListTable" #datatable [value]="auditLogList" [scrollable]="columnDef.scrollable" [lazy]="columnDef.lazy"
+        (onLazyLoad)="loadData($event)" scrollWidth="getDeviceWidth()" sortField={{columnDef.defaultSortColumn}} sortOrder={{convertedDefaultSortOrder}} [immutable]="false">
+        <p-column [style]="col.style" *ngFor="let col of cols" [field]="col.field" [header]="col.key | translate:lang" [sortable]="col.sortable"
+          filter="col.filter" required="true">
+          <ng-template pTemplate="header" let-col let-rowData="rowData">
+              <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+          </ng-template>
+          <ng-template pTemplate="filter">
+            <div>
+              <input type="text" *ngIf="(col.field !== 'ruleSetStartDate') else elseBlock"
+                placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText
+              (keyup)="filterDataKeys($event,col.field,filterFields[col.field])" class="ecb-filterInput" />
+              <ng-template #elseBlock>
+                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+              </ng-template>
+              <div class="ecb-clearFilterMain">
+                <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                  <i class="fa fa-times-circle fa-lg"></i>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="filter" let-col *ngIf="col.field === 'createDt'">
+            <div>
+              <ecb-number-date-filter (selectedUserFilter)="fetchCreateDtValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'createDt'" [columnPlacement]="'first'"></ecb-number-date-filter>
+            </div>
+          </ng-template> 
+          <ng-template pTemplate="filter" let-col *ngIf="col.field === 'auditId'">
+            <div>
+                <ecb-number-date-filter (selectedUserFilter)="fetchNumberFilter($event)" [filterKind]="'number'" [selectedColumnToFilter]="'auditId'" [columnPlacement]="'middle'"></ecb-number-date-filter>
+            </div>
+          </ng-template>
+
+        <ng-template pTemplate="filter" let-col *ngIf="col.field === 'eventId'">
+          <div>
+              <ecb-number-date-filter (selectedUserFilter)="fetchNumberFilter($event)" [filterKind]="'number'" [selectedColumnToFilter]="'eventId'" [columnPlacement]="'middle'"></ecb-number-date-filter>
+          </div>
+        </ng-template>
+
+        <ng-template let-col *ngIf="col.field === 'ruleSetStartDate'">
+          <div>
+              <ecb-number-date-filter (selectedUserFilter)="fetchCreateDtValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'ruleSetStartDate'" [columnPlacement]="'last'"></ecb-number-date-filter>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="filter" let-col *ngIf="col.field === 'entityId'">
+          <div>
+              <ecb-number-date-filter (selectedUserFilter)="fetchNumberFilter($event)" [filterKind]="'number'" [selectedColumnToFilter]="'entityId'" [columnPlacement]="'middle'"></ecb-number-date-filter>
+          </div>
+        </ng-template>
+
+          <ng-template *ngIf="col.field == 'createDt'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">{{auditLogList[i].createDt | amDateFormat: calenderLocale.dateAndTimeFormat}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'auditId'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span class="ecb-numberColumn">{{auditLogList[i].auditId}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'user'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">{{auditLogList[i].user}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'loggedInAs'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">{{auditLogList[i].loggedInAs}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'eventName'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">
+              <a [ngClass]="{'ecb-preventEvent' : validateEventName(auditLogList[i].eventId)}" (click)="getRateSchedulesAuditLogInfo(data)">{{auditLogList[i].eventName}}</a>
+            </span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'eventId'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span class="ecb-numberColumn">{{auditLogList[i].eventId}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'item'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">{{auditLogList[i].item}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'item'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">{{auditLogList[i].item}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'entityId'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span class="ecb-numberColumn">{{auditLogList[i].entityId}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'applicationName'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">{{auditLogList[i].applicationName}}</span>
+          </ng-template>
+          
+          <ng-template *ngIf="col.field == 'details'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">{{auditLogList[i].details}}</span>
+          </ng-template>
+
+          <ng-template *ngIf="col.field == 'ruleSetStartDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span style="word-wrap:break-word;">{{auditLogList[i].ruleSetStartDate  | amDateFormat: calenderLocale.amLocaleDateFormat}}</span>
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+      <div *ngIf="getErrorMessageType() !== 0">
+          <div class="ecb-infoStyling">
+                  <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+                      <p>
+                          {{auditLogGridErrMsg}}
+                      </p>
+                  </div>
+                <div  class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations" *ngIf="getErrorMessageType() === 2">
+                  <div class="ebNotification-content ecb-infotext">           
+                      <span class="ebNotification-label">
+                          <span l10nTranslate>{{'TEXT_NO_AUDITLOG_RECORDS'}} </span>
+                      </span>
+                  </div>
+                </div>
+                <div  class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations" *ngIf="getErrorMessageType() === 3">
+                  <div class="ebNotification-content ecb-infotext">           
+                      <span class="ebNotification-label">
+                          <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                      </span>
+                  </div>
+                  </div>
+          </div>
+      </div>
+    </div>
+   </div>
+<div *ngIf="showRateChanges"> 
+    <ecb-rate-changes (onClose)="onRateChangeClose($event)" [param]="selectedRateChange"></ecb-rate-changes>
+</div>

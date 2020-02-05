@@ -1,0 +1,163 @@
+<div class="modalDialog" tabindex="-1" [ngStyle]="{'display': visible ? 'block' : 'none'}">
+    <div class="modal-dialog" [ngClass]="{'ecb-createOfferingModal': createOffering}">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="ebDialogBox-contentBlock_type_warning" *ngIf="!createOffering">
+                <div class="alert-warning alert-dismissible ">
+                    <button type="button" class="close ecb-toggleFloatLeft" data-dismiss="alert" (click)="hide()">
+                        <span aria-hidden="true">x</span>
+                        <span class="sr-only ">Close</span>
+                    </button>
+                </div>
+                <div *ngIf="popupHeader" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate> {{popupHeaderName}} </div>
+                </div>
+                <!-- <div *ngIf="deleteContainer" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate> {{popupHeaderName}} </div>
+                </div>
+                <div *ngIf="deleteModalRateFromList" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate> {{popupHeaderName}} </div>
+                </div>
+                <div>
+                    <div *ngIf="deleteScheduleMessage" class="" l10nTranslate > {{popupHeaderName}} </div>
+                </div> -->
+    
+            <div *ngIf="saveUnsave " class="ebDialogBox-primaryText" l10nTranslate>
+                    <div l10nTranslate>
+                    <p> {{popupBodyName}}</p>
+                    </div>
+                    <div *ngIf="widgetHandler == 'edit'" class="schedulesPopupBody" l10nTranslate>
+                        <p>
+                            <span l10nTranslate>{{popupBodyName}} </span>
+                            <span l10nTranslate> {{'TEXT_WILL_OVERRIDE'}}</span> existing one</p>
+                    </div>
+    
+                </div>
+                <div *ngIf="deletePODetails" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate>
+                        <p>
+                            <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{popupBodyName?.name}}&#32; &#63; </p>
+                        <p>{{popupBodyName?.description}}</p>
+                    </div>
+                </div>
+                <div *ngIf="hidePO" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate>
+                        <p>
+                            <span l10nTranslate>{{'TEXT_HIDE'}}</span> &#32;{{popupBodyName?.name}}&#32; &#63; </p>
+                        <p>{{popupBodyName?.description}}</p>
+                    </div>
+                </div>
+                <div *ngIf="unHidePO" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate>
+                        <p>
+                            <span l10nTranslate>{{'TEXT_UNHIDE'}}</span> &#32;{{popupBodyName?.name}}&#32; &#63; </p>
+                        <p>{{popupBodyName?.description}}</p>
+                    </div>
+                </div>
+                <div *ngIf="deleteModalRateFromList" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate>
+                        <br>
+                        <p> &#32;
+                            <span l10nTranslate> {{'TEXT_DEL_RATE'}} </span>? </p>
+                        <p [innerHTML]='popupBodyName'></p>
+                    </div>
+                </div>
+                <div *ngIf="deleteScheduleMessage" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate>
+                       
+                </div>
+                <div *ngIf="widgetHandler == 'hideProductOffer'" class="ebDialogBox-primaryText" l10nTranslate>
+                    <div class="" l10nTranslate>
+                        <p>
+                            <span l10nTranslate>{{'TEXT_HIDE'}}</span> &#32;{{popupBodyName?.displayName}}&#32; &#63; </p>
+                        <p>{{popupBodyName?.description}}</p>
+                    </div>
+                </div>
+            <div *ngIf="widgetHandler == 'showProductOffer'" class="ebDialogBox-primaryText" l10nTranslate>
+                <div class="" l10nTranslate>
+                    <p>
+                        <span l10nTranslate>Show</span> &#32;{{popupBodyName?.displayName}}&#32; &#63; </p>
+                    <p>{{popupBodyName?.description}}</p>
+                </div>
+            </div>
+                <div *ngIf="addNewScheduleCancelled" class="ebDialogBox-primaryText" l10nTranslate>
+                    <p> {{popupBodyName}} </p>
+                </div>
+                <div *ngIf="editRateSourcePopup" class="ebDialogBox-primaryText">
+                <p><span l10nTranslate>{{'TEXT_WANT_TO_REPLACE_RATE_SOURCE'}}</span> {{popupBodyName[1]}} <span l10nTranslate>{{'TEXT_WILL_OVERRIDE'}} </span> {{popupBodyName[0]}} ? </p>
+                </div>
+            </div>
+            <div *ngIf="createOffering" class="ecb-createOfferingModal">
+                <div class="alert-warning alert-dismissible ">
+                    <button type="button" class="close ecb-toggleFloatLeft" data-dismiss="alert" (click)="hide()">
+                        <span aria-hidden="true">x</span>
+                        <span class="sr-only ">Close</span>
+                    </button>
+                </div>
+                <h2 l10nTranslate>{{'TEXT_CREATE_OFFERING'}}</h2>
+                <ul>
+                    <li><span class="bundleIcon"></span><a (click)="triggerOffering('bundle')" l10nTranslate>{{'TEXT_CREATE_BUNDLE'}}</a></li>
+                    <li><span class="productOfferIcon"></span><a (click)="triggerOffering('productOffer')" l10nTranslate>{{'TEXT_CREATE_PRODUCT'}}</a></li>
+                </ul>
+            </div>
+        </div>
+        <div *ngIf="!createOffering" class="modal-footer">
+            <div *ngIf="saveUnsave">
+                <div *ngIf="!widgetHandler">
+                    <button *ngIf="SaveBtnType == 'ProductOffer'" class="ebBtn ebBtn-primary" [disabled]="disableSaveBtn" (click)="addProductOfferDetails()"
+                        l10nTranslate>{{'TEXT_SAVE'}}</button>
+                    <button *ngIf="SaveBtnType == 'PIDetails'" class="ebBtn ebBtn-primary" (click)="SavePIRateScheduleDetails()" l10nTranslate>{{'TEXT_SAVE'}}</button>
+                    <button *ngIf="SaveBtnType != 'EditSchedules'" class="ebBtn" (click)="leaveDoNotSave()" l10nTranslate>{{'TEXT_LEAVE'}}</button>
+                </div>
+                <div *ngIf="SaveBtnType == 'EditSchedules'">
+                    <div *ngIf="widgetHandler != 'updatePO'">
+                        <button class="ebBtn" *ngIf="SaveBtnType != 'schedules'" (click)="leaveDoNotSaveSchedules()" l10nTranslate> {{'TEXT_LEAVE_WITHOUT_SAVING'}}</button>
+                        <button class="ebBtn" *ngIf="SaveBtnType != 'schedules'" (click)="leaveSchedulesWidget()" l10nTranslate>{{'TEXT_RETURN'}}</button>
+                    </div>
+                </div>
+                <!-- </div> -->
+    
+                <div *ngIf="widgetHandler == 'updatePO'">
+                    <button class="ebBtn" (click)="discardPropertiesWidget()" l10nTranslate>{{'TEXT_CANCEL_WITHOUT_SAVING'}}</button>
+                    <button class="ebBtn" (click)="leavePropertiesWidget()" l10nTranslate>{{'TEXT_RETURN'}}</button>
+                </div>
+        
+            </div>
+            <div *ngIf="widgetHandler == 'updatePONavOut'">
+                <button class="ebBtn" (click)="navigateToPOList()" l10nTranslate>{{'TEXT_LEAVE_WITHOUT_SAVING'}}</button>
+                <button class="ebBtn" (click)="leavePropertiesWidget()" l10nTranslate>{{'TEXT_RETURN'}}</button>
+            </div>
+            <div *ngIf="widgetHandler == 'hideProductOffer'">
+                <button class="ebBtn" (click)="hideProductOffer()" l10nTranslate>{{'TEXT_HIDE'}}</button>
+                <button class="ebBtn" (click)="cancelHidingPO()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+            </div>
+            <div *ngIf="widgetHandler == 'showProductOffer'">
+                <button class="ebBtn" (click)="showProductOffer()" l10nTranslate>Show</button>
+                <button class="ebBtn" (click)="cancelHidingPO()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+            </div>
+            <div *ngIf="addNewScheduleCancelled">
+                <button class="ebBtn ebBtn-primary" (click)="discardSchedulesWidget()" l10nTranslate> {{'TEXT_CANCEL_BTN_SCHED'}}</button>
+                <button class="ebBtn" (click)="deletePOPUPCancel()" l10nTranslate>{{'TEXT_RETURN'}}</button>
+            </div>
+            <div *ngIf="deleteContainer">
+                <button *ngIf="deletePOFromDetails" class="ebBtn ebBtn-primary" (click)="deleteProductOfferDetails()" l10nTranslate>{{'TEXT_DELETE'}}</button>
+                <button *ngIf="deleteBundleFromDetails" class="ebBtn ebBtn-primary" (click)="deleteBundle()" l10nTranslate>{{'TEXT_DELETE'}}</button>
+                <button *ngIf="deleteModalPOFromList" class="ebBtn ebBtn-primary" (click)="deletePOFromList()" l10nTranslate>{{'TEXT_DELETE'}}</button>
+                <button class="ebBtn ebBtn-primary" *ngIf="deleteModalRateFromList" (click)="deleteRate()" l10nTranslate>{{'TEXT_DELETE'}}</button>
+                <button class="ebBtn ebBtn-primary" *ngIf="hidePO" (click)="hideProductOfferFromList()" l10nTranslate>{{'TEXT_HIDE'}}</button>
+                <button class="ebBtn ebBtn-primary" *ngIf="unHidePO" (click)="unHideProductOffer()" l10nTranslate>{{'TEXT_UNHIDE'}}</button>
+                <button class="ebBtn" (click)="deletePOPUPCancel()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+            </div>
+            <div *ngIf="editRateSourcePopup">
+                <button class="ebBtn" (click)="CopyAndReplacerates()" l10nTranslate>{{'TEXT_CONTINUE_WITH_NEW_SOURCE'}}</button>
+                <button class="ebBtn ebBtn-primary" (click)="cancelCopyOfRateSource()" l10nTranslate>{{'TEXT_RETURN'}}</button>
+            </div>
+            <div *ngIf="widgetHandler == 'save localization changes'">
+                    <button class="ebBtn  ebBtn-primary" (click)="SaveLocalizationChanges()" l10nTranslate>Change & Save</button>
+                    <button class="ebBtn" (click)="hidePopupLocalization()" l10nTranslate>{{'TEXT_RETURN'}}</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    

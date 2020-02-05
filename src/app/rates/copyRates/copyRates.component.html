@@ -1,0 +1,128 @@
+<ecb-modal-dialog [styleClass]="'ecb-copyRatesSchedules'" [open]="confirmDialog == 1" (onClose)="onModalDialogClose()" [header]="false"
+    [body]="false" [footer]="false" [closeOnEscape]="true">
+    <dialog-header-template>
+        <div>
+            <h2 l10nTranslate>{{'TEXT_COPY_RATES'}}</h2>
+             <!--error while Adding data -->
+            <div *ngIf="showErrorMessage">
+                <div class="row">
+                    <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger ecb-clearFix" role="alert">
+                        <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                        <span class="sr-only">Close</span>
+                        </button>
+                        <p class="ecb-unicodeBidi">{{errorMessageDisplay}}</p>
+                    </div>
+                </div>
+            </div>
+            <!--error while Adding data -->
+            <h3 class="ecb-title" l10nTranslate>{{"TEXT_RATE_SCHDULE_LIST"}}
+                <span>({{rateScheduleListCount}})</span>
+            </h3>
+            <div class="ecb-copy">
+                <button class="ebBtn" [disabled]="!isCopyEnabled" [ngClass]="{'ebBtn-primary': isCopyEnabled}"  (click)="displayCopyRateSchedules()" l10nTranslate>{{'TEXT_COPY'}}</button>
+            </div>
+        </div>
+        
+    </dialog-header-template>
+    <dialog-body-template> 
+    <div class="ecb-positionRelative">
+        <div class='ecb-RateSchedulesList' [scrollerContext]="'self'"
+            ecb-infinite-scroller (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+            <ecb-loader *ngIf="copyRatesLoading" mode="dot" fill="widget" type="widget"></ecb-loader>                  
+            <p-dataTable *ngIf="loadGridData" [value]="rateSchedules" [scrollable]="columnDef.scrollable" [lazy]="columnDef.lazy" (onLazyLoad)="loadData($event)"
+                scrollWidth="getDeviceWidth()" [immutable]="false" sortField={{columnDef.defaultSortColumn}} sortOrder={{convertedDefaultSortOrder}}>
+                <p-column [style]="col.style" *ngFor="let col of copyRatesCols" [field]="col.field" [header]="col.key | translate:lang"
+                 [sortable]="col.sortable">
+                 <ng-template *ngIf="col.field === 'choose'" let-idx="rowIndex" let-data="rowData" pTemplate="body">
+                        <span>
+                           <input type="radio" class="ebRadioBtn_noText" name="scheduleRowIndex" 
+                           [value]="2" (change)="getRatesTable(idx)" [checked]="idx === rowIndex">
+                        </span>
+                    </ng-template>                  
+                    <ng-template #filter pTemplate="filter">
+                        <div>
+                            <input type="text" *ngIf="(col.field !== 'pricelistType' && col.field !== 'pricelistName' 
+                            && col.field !== 'ruleCount'  && col.field !== 'choose');else elseBlock"
+                                placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]"
+                                pInputText (input)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                            <ng-template #elseBlock>
+                                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                            </ng-template>
+                            <div class="ecb-clearFilterMain">
+                                <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                                    <em class="fa fa-times-circle-o fa-lg"></em>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template *ngIf="col.field == 'ruleCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <span class="ecb-numberColumn">{{rateSchedules[i].ruleCount}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field == 'startDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="header" >
+                            <span l10nTranslate>{{startValue}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field == 'endDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="header" >
+                            <span l10nTranslate>{{endValue}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field == 'startDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body" >
+                        <div *ngIf="rateSchedules[i]['startDateType'] == 'EXPLICIT_DATE' || rateSchedules[i]['startDateType'] == 'NEXT_BILL_PERIOD'">                           
+                            <span l10nTranslate>{{'TEXT_ABSOLUTE'}}</span>
+                            <span [innerHTML]="rateSchedules[i][col.field] | amDateFormat:calenderLocale.amLocaleDateFormat"></span>
+                        </div>                      
+                        <div *ngIf="rateSchedules[i]['startDateType'] == 'NOT_SET' || rateSchedules[i]['startDateType'] == 'NO_DATE'">
+                            <p l10nTranslate> {{'TEXT_NO_STARTDATE'}} </p>
+                        </div>
+                        <div *ngIf="rateSchedules[i]['startDateType'] == 'SUBSCRIPTION_RELATIVE'" >                                                     
+                            <span class="ecb-numberColumn">{{rateSchedules[i].startDateOffset}}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template *ngIf="col.field == 'endDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <div *ngIf="rateSchedules[i]['endDateType'] == 'EXPLICIT_DATE' || rateSchedules[i]['endDateType'] == 'NEXT_BILL_PERIOD'">
+                            <span l10nTranslate>{{'TEXT_ABSOLUTE'}}</span>
+                            <span [innerHTML]="rateSchedules[i][col.field] | amDateFormat:calenderLocale.amLocaleDateFormat"></span>
+                        </div>                    
+                        <div *ngIf="rateSchedules[i]['endDateType'] == 'NOT_SET' || rateSchedules[i]['endDateType'] == 'NO_DATE'">
+                            <p l10nTranslate> {{'TEXT_NO_ENDDATE'}} </p>
+                        </div>
+                        <div *ngIf="rateSchedules[i]['endDateType'] == 'SUBSCRIPTION_RELATIVE'" >                                                     
+                                <span class="ecb-numberColumn">{{rateSchedules[i].startDateOffset}}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header" let-col let-rowData="rowData">
+                            <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                        </ng-template>
+                </p-column>
+            </p-dataTable>
+            <div *ngIf="getErrorMessageType() !== 0">
+                <div class="ecb-infoStyling">
+                    <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                        <div class="ebNotification-content ecb-infotext"> 
+                            <span class="ebNotification-label">
+                                <span l10nTranslate>{{'TEXT_NO_COPY_RATES'}} </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                        <div class="ebNotification-content ecb-infotext"> 
+                            <span class="ebNotification-label">
+                                <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </dialog-body-template>
+</ecb-modal-dialog>
+<ecb-modal-dialog [open]="confirmDialog2 == 1" (onClose)="onModalDialogCopyCancel()" [footer]="false">
+    <dialog-header l10nTranslate>{{'TEXT_COPIED_RATES_HEADING'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_COPIED_RATES_MESSAGE'}}</dialog-body>
+    <dialog-footer-template>
+        <div class="modal-footer">
+            <button class="ebBtn ebBtn-primary" (click)="copyRateSchedule()" l10nTranslate>{{'TEXT_COPY_REPLACE_RATES'}}</button>
+            <button class="ebBtn ebBtn-default" (click)="onModalDialogCopyCancel()" l10nTranslate>{{'TEXT_DO_NOT_COPY'}}</button>
+        </div>
+    </dialog-footer-template>
+</ecb-modal-dialog>

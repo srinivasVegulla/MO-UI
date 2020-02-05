@@ -1,0 +1,135 @@
+<div class="ecb-permissionsFormMain row">
+    <ngx-aside #editRateSource [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+        class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}">
+        <div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading ">
+                    <div class="row">
+                        <h2 class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_RATE_TABLE'}}</h2>
+                        <div class="col-lg-6 ecb-editOverlayLink">
+                            <button class="ebBtn ecbBtn-margin" id="saveRates" [disabled]="!isSaveEnabled" [ngClass]="{'ebBtn-primary': isSaveEnabled}"
+                                (click)="saveRateSource(editRateSource)" l10nTranslate>{{'TEXT_SAVE'}}</button>
+                            <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler(editRateSource,false)" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body panel-rates">
+                    <div *ngFor="let rate of rates; let i = index" [attr.data-index]="i">
+                        <div class="ecbRate" *ngIf="rate.paramtableId ==paramtableId">
+                            <h3>{{rate.paramtableDisplayName}}</h3>
+                            <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert">
+                                <button type="button" class="close ecb-closeRtl" data-dismiss="alert">
+                                    <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                                    <span class="sr-only">Close</span>
+                                </button> 
+                                <p>{{httpErrorMessage}}</p>
+                            </div>
+                        </div>
+                        <form *ngIf="rate.paramtableId ==paramtableId" class="ecb-propertiesFormMain  col-xs-12 col-sm-12 col-md-6 col-lg-6 ecb-toggleFloat"
+                            form #frm="ngForm" [formGroup]="EditRate" class="ngForm" novalidate>
+                            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-removePadding">
+                                    <label class="ebLabel" l10nTranslate>{{'TEXT_RATE_SOURCE'}}</label>
+                                    <div class="dropdown">
+                                        <button class="ecb-sideSelect ebInput dropdown-toggle ecb-RatesourceDropdown ecb-RatesourceDropdownRtl" type="button" id="dropdownMenu1"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" [disabled]="productOffer?.isStartDateAvailable"
+                                            l10nTranslate>
+                                        {{selectedPriceList}}
+                                    </button>
+                                <ul class="dropdown-menu ecb-rateSourceMenu ecb-rateSourceMenuRtl" aria-labelledby="dropdownMenu1">                                
+                                            <li (click)="local(rate)" [ngClass]="{'ebComponentList-item_selected ebComponentList-item_selectedRtl': (!isICB && priceListId == nonSharedPriceListId)}"
+                                                l10nTranslate><a>{{'TEXT_LOCAL'}}</a></li>
+                                            <span role="separator" class="ebComponentList-group-header"></span>
+                                            <li *ngFor="let list of sharedPriceLists" [ngClass]="{'ebComponentList-item_selected ebComponentList-item_selectedRtl':(priceListId == list.pricelistId)}"
+                                                (click)="handleRowSelect(list,rate)"><a><span l10nTranslate> {{'TEXT_SHARED'}} </span>- {{list.name}}</a></li>
+                                        </ul>
+                                    </div>
+                            </div>
+                            <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-removePadding">
+                                <div class="ebCheckbox_last">
+                                     <label>
+                                        <input type="checkbox"  [checked]="rate.canicb" name="customRates" formControlName="customRates" (change)="isFormValid()">
+                                            <div class="text readonly" id="customRates">
+                                              <span l10nTranslate>{{'TEXT_ALLOW_CUSTOM_RATES'}} </span>
+                                            </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                        <!--  </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ngx-aside>
+</div>
+<!-- </div> -->
+<div class="panel panel-default">
+    <div class="ecb-positionRelative">
+        <ecb-loader *ngIf="ratesLoading" mode="dot" fill="widget" backDropClassName="ecb-loaderMinHeight"></ecb-loader>
+        <div *ngIf="isCapableOf('RateTables_View')">
+            <div *ngFor="let rate of rates; let i = index" [attr.data-index]="i">
+                <div class="ecbRateTableHeader panel-heading ecb-panelHeading">                  
+                        <div *ngIf="isCapableOf('RateTables_Edit') && expandIndex === i" class="ecb-panelHeaderLink text-right">
+                            <a title="Edit" (click)="displayCoverHandler(editRateSource, rate, i)" l10nTranslate class="ecb-rateTable">
+                                {{'TEXT_EDIT'}}</a>
+                        </div>
+						 <h2>
+                            <span class="ecb-priceableItemText ecbRateTableTitle ecbRateTableTitleRtl">
+                                <a data-toggle="collapse" aria-expanded="true" (click)="showSchedules(i, rate.paramtableId, rate.itemTemplateId, rate.pricelistId)">
+                                    <i class="fa fa-chevron-circle-down ecbRateSourceAccordian" title='{{"TEXT_EXPAND" | translate:lang}}' aria-hidden="true" *ngIf="i != expandIndex"></i>
+                                    <i class="fa fa-chevron-circle-up ecbRateSourceAccordian" title='{{"TEXT_COLLAPSE" | translate:lang}}' aria-hidden="true" *ngIf="i == expandIndex"></i>
+                                </a>
+                                <span l10nTranslate>{{'TEXT_RATES_TABLE'}}</span>: {{rate.paramtableDisplayName}}
+                            </span>
+                        </h2>
+                </div>
+                <div class="panel-body">  
+                    <div class="collapse" [ngClass]="expandPanelBody(i)" id="rateschedule-{{i}}">
+                            <div class="ecb-rateSourceNomargin">
+                                <ecb-loader *ngIf="showRatesSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                                <div class="form-group">
+                                    <label class="ebLabel rates-padding">
+                                        <span l10nTranslate>{{'TEXT_RATE_SOURCE'}}</span>
+                                    </label>
+                                    <div l10nTranslate>{{persistSelectedPriceList}}</div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="ebCheckbox_last">   
+                                        <label>
+                                            <input type="checkbox" [ngClass]="{'readonly-checkbox' : rate.canicb}" [checked]="rate.canicb" disabled="disabled">
+                                            <div class="text" [ngClass]="{'readonly' : rate.canicb}">
+                                                <span l10nTranslate>{{'TEXT_ALLOW_CUSTOM_RATES'}} </span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12" *ngIf="isCapableOf('Schedules_View')">
+                          <ecb-schedules [type]="'Ratedetails'" *ngIf="expandIndex == i" [rateScheduleData]="rateSchedules"
+                                    [subscriptionCount]="paramTables.subscriptionCount" [schedulesLoadingInfo]="schedulesLoading"
+                                    [schedulesOnLoading]="schedulesOnLoading" [priceListID]="priceListId" [selectedRate]="rates[i]">
+                        </ecb-schedules>
+                     </div>    
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12" *ngIf="isCapableOf('Rates_View')">
+                        <ecb-rates-table [type]="'Ratedetails'" *ngIf="expandIndex == i" [editRateSource]="isEditRateSource"
+                            [ratesTableOnLoading]="isRatesTableOnLoading" [rateInfo]="rates[i]" [loadRateProperties]="properties"></ecb-rates-table>
+                            
+                    </div>                        
+                </div>
+   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>
+
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}">
+</div>

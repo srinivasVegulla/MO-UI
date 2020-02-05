@@ -1,0 +1,1174 @@
+body[dir="RTL"] {
+    
+        
+    .ecb-tableOverflow {
+      //  width: 100%; commented to replace the infinite scroll css
+    }
+    /* IE8, FF, Saf, Opera (Everything but IE 6,7) */
+    html>
+    /**/
+    .ecb-tableOverflow {
+        min-width: 2200px !important;
+    }
+    
+    div.ecb-tableOverflow {
+      //  min-width: 2200px !important; commented to replace the infinite scroll css 
+    }
+    
+    .ebPageTitle-container {
+        padding-right: 24px;
+        padding-left: 0;
+    }
+    
+        //POLIST datatable column header misalignment fix starts
+    .ui-datatable-scrollable-header-box {
+        margin-right: 0px !important;
+    }
+    
+    //bug 3253
+    .ecb-alignPiSelect{
+        position: relative;
+        left: -12px;
+    }
+    
+    //css for PC-2215_bug
+    .ecbRateTableTitle i{
+        float: right;
+        padding-right: 0px;
+        padding-left: 14px;
+    }   
+        
+    //rtl for 404 page
+    .ecb-errPageList{
+        margin-left: 0px;
+        padding-right: 15px;
+    }
+    
+    .fa-5 {
+        float: right;
+    }
+    
+    .ecb-errPageList {
+        position: relative;
+        right: 6%;
+    }
+    
+    .ecb-errPageList > ul{
+      padding-right: 0px;
+      }
+    
+      .ecb-imgRtl, .ecb-404Content{
+        float:right;
+    }
+    
+    
+     .ui-datatable .ui-datatable-data > tr > td{
+      text-align: right;
+      //padding : 0 5px 0 0;
+    }
+    
+        //POLIST datatable column header misalignment fix ends
+        .ui-datatable table {
+            table-layout: fixed;
+        }
+        //POLIST sorting icon
+        .ecb-viewList .ui-datatable .ui-sortable-column-icon {
+            float: left;
+        }
+        /* RTL for POlist error occured while fetching starts here*/
+    
+        .ebCloseIconAlignment {
+            float: left;
+            left: 0px;
+            right: initial;
+        }
+        .filterFetchingError {
+            float: right;
+            margin-left: 20px;
+        }
+        .ui-column-title {
+            float: right;
+            text-align: right;
+        }
+        .integerValue {
+            text-align: left;
+        }
+        .ecb-clearFilter {
+            left: 21px;
+            right: auto;
+            position: absolute;
+            padding: 0px;
+            padding-right: 20px;
+            width: 15px;
+            height: 15px;
+            top: -27px;
+            cursor: pointer;
+            color: $ebColor_textLinkBlue;
+        }
+        @mixin ecb-clearFilter{
+            position: absolute;
+            padding: 0px;
+            padding-right: 20px;
+            width: 15px;
+            height: 15px;
+            top: -27px;
+            cursor: pointer;
+            color: #0066b3;
+          }
+          
+          .ecb-clearFilterRtl{
+            @include ecb-clearFilter();
+            left: 25px ;
+            right: auto;
+          }
+          .ecb-clearFilterLtr{
+            @include ecb-clearFilter();
+            right: auto ;
+            left: 5px;
+          }
+        /* RTL for POlist error occured while fetching ends here*/
+        /*ProductOfferList page RTL styles starts*/
+    
+        .pullingRight {
+            display: inline !important;
+            float: left;
+        }
+        .eb-ProductOfferListHeadingAlignment,
+        .eb-ProductOfferListHeadingAlignment > h2 {
+            display: inline;
+        }
+        /*ProductOfferList page RTL styles ends*/
+    
+        .systemBar .ecb-pullItems {
+            float: left !important;
+        }
+        .ebSystemBar-logo,
+        .ecb-companyIogo {
+            float: right !important;
+        }
+        .dropdown-menu.system-bar-dropdown {
+            left: 2%;
+            right: inherit;
+        }
+        .systemBar-topMenuList > li {
+            float: right !important;
+        }
+        .systemBar-topMenuList li:last-child a {
+            border-right: 1px solid #bbbbbc;
+        }
+        .ebText,
+        .ebLightBlue {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .ebIcon_user {
+            float: right !important;
+        }
+        .ecb-rtlViewPageTitle {
+            padding-right: 38px;
+            padding-left: 0px;
+        }
+        .ecb-rtlBreadcrumb {
+            padding-right: 20px;
+        }
+    
+        .list-group-item {
+            padding: 5px 0px;
+        }
+        /*breadcrumb changes start*/
+    
+        .ecb-listgroupItem a {
+            height: 30px;
+            display: table;
+            width: 100%;
+            text-align: right;
+            padding-right: 10px;
+        }
+    
+        .ecb-hidenavIcon {
+            visibility: hidden !important;
+        }
+        .ecb-navchildMenu >li {
+            padding-left: 0px !important;
+            padding-right: 26px !important;
+        }
+        /*breadcrumb changes end*/
+        /* login page rtl started*/
+    
+        .ecb-loginBtn {
+            float: right;
+        }
+        .security-login-view {
+            margin: 0;
+        }
+        .security-login-view .login-background {
+            width: 66.6% !important;
+            right: 0;
+        }
+        .ecb-dangerClose {
+            float: left !important
+        }
+        
+        .input-group .form-control:first-child,
+        .input-group .ebInput:first-child,
+        .input-group-addon:first-child,
+        .input-group-required:first-child,
+        .input-group-btn:first-child > .btn,
+        .input-group-btn:first-child > .ebBtn,
+        .input-group-btn:first-child > .btn-group > .btn,
+        .input-group-btn:first-child > .ebBtnGroup > .btn,
+        .input-group-btn:first-child > .btn-group > .ebBtn,
+        .input-group-btn:first-child > .ebBtnGroup > .ebBtn,
+        .input-group-btn:first-child > .dropdown-toggle,
+        .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle),
+        .input-group-btn:last-child > .ebBtn:not(:last-child):not(.dropdown-toggle),
+        .input-group-btn:last-child > .btn-group:not(:last-child) > .btn,
+        .input-group-btn:last-child > .ebBtnGroup:not(:last-child) > .btn,
+        .input-group-btn:last-child > .btn-group:not(:last-child) > .ebBtn,
+        .input-group-btn:last-child > .ebBtnGroup:not(:last-child) > .ebBtn {
+            border-radius: $border-radius-none;
+            border-bottom-left-radius: 0;
+            border-top-left-radius: 0;
+            text-align: right;
+        }
+        .ebInput {
+            box-shadow: inset 0px 1px 0px 0px #cccccc;
+        }
+        .ecb-btn{
+            border-bottom-left-radius: 4px !important;
+            border-top-left-radius: 4px !important;
+            border-bottom-right-radius: 0 !important;
+            border-top-right-radius: 0 !important;
+        }
+        .input-group .form-control:last-child,
+        .input-group .ebInput:last-child,
+        .input-group-addon:last-child,
+        .input-group-required:last-child,
+        .input-group-btn:last-child > .btn,
+        .input-group-btn:last-child > .ebBtn,
+        .input-group-btn:last-child > .btn-group > .btn,
+        .input-group-btn:last-child > .ebBtnGroup > .btn,
+        .input-group-btn:last-child > .btn-group > .ebBtn,
+        .input-group-btn:last-child > .ebBtnGroup > .ebBtn,
+        .input-group-btn:last-child > .dropdown-toggle,
+        .input-group-btn:first-child > .btn:not(:first-child),
+        .input-group-btn:first-child > .ebBtn:not(:first-child),
+        .input-group-btn:first-child > .btn-group:not(:first-child) > .btn,
+        .input-group-btn:first-child > .ebBtnGroup:not(:first-child) > .btn,
+        .input-group-btn:first-child > .btn-group:not(:first-child) > .ebBtn,
+        .input-group-btn:first-child > .ebBtnGroup:not(:first-child) > .ebBtn {
+            border-radius: $border-radius-none;
+            border-bottom-right-radius: 0;
+            border-top-right-radius: 0;
+        }
+        .ecb-sideSelect{
+            background: url('assets/images/ericssonIcons/dropdown-arrow-blue.svg') no-repeat center left 12px;
+        }
+        .ecb-requriedIndicator {
+            text-align: left;
+        }
+        .ecb-sidebarFooter {
+           float: left;
+        }
+        .ebInput[readonly] {
+            box-shadow: none;
+        }
+        .ecbCheckboxText {
+            padding-right: 30px;
+        }
+        .ebRadioBtn .text {
+            padding-right: 25px !important;
+        }
+        .accountTypeButton {
+            margin-left: 5px;
+        }
+    
+        //use this class to toggle float values in case of LTR and RTL
+        .ebCheckbox .text, .ebCheckbox_last .text {
+            float: left;
+        }
+        .ecb-rateEdit , .ecb-noConditions  {
+            float: left;   
+          }
+          
+        .ecb-priceableItemText {
+            float: right;
+        }
+        .ecb-toggleFloat {
+            float: right !important;
+        }
+        .ecb-toggleFloatLeft {
+            float: left !important;
+            right: 550px !important;
+        }
+        .ebTable-header {
+            padding: 0px 0px 0px 18px !important;
+        }
+        .ui-datatable .ui-column-title {
+            float: right;
+        }
+    
+        .ui-treenode-label span {
+            unicode-bidi: embed !important;
+        }
+        
+        .ui-treenode-label span::before {
+            content: "\200E"
+        }
+    
+        .ui-treenode-label span::after {
+            content: "\200E"
+        }
+    
+        h2,p,input,textarea,dialog-header{
+            unicode-bidi:plaintext;
+            text-align: right;
+        }
+  
+        .ecb-wordbreak{
+            unicode-bidi:plaintext;
+            text-align: right;
+        }
+        .ebCommands-placement {
+            float: left;
+        }
+        /* media query start */
+    
+        @media (max-width: $screen-md) {
+            .ecb-pageTitle {
+                padding-right: 14px;
+            }
+            .ecb-mobileDevPageTitle {
+                padding-right: 26px !important;
+            }            
+            .ecb-WarnColumnLeft {
+                left: 400px;
+            }
+            .ecb-WarnColumnRight {
+                left: 575px;
+            }
+        }
+        //POPUP Model dialog
+        .ebDialogBox-contentBlock_type_warning {
+            padding-right: 40px;
+            margin: 15px;
+            background: url(assets/images/ericssonIcons/warning_icon.svg) right top no-repeat;
+            padding-left: 10px;
+        }
+        .ebDialogBox-contentBlock_type_success {
+            padding-right: 63px;
+            margin: 15px;
+            background: url('assets/images/ericssonIcons/tick_green_28px.svg') right top no-repeat;
+        }
+        .ebDialogBox-contentBlock_type_error {
+            padding-right: 63px;
+            margin: 15px;
+            background: url('assets/images/ericssonIcons/error_icon.svg') right top no-repeat;
+        }
+        .ebDialogBox-contentBlock_type_information {
+            padding-right: 63px;
+            margin: 15px;
+            background: url('assets/images/ericssonIcons/information_icon.svg') right top no-repeat;
+        }
+        //error popup in POList
+        .ebInfoPopup-content_corner_default {
+            right: 30px;
+        }
+        .ebInfoPopup-content_corner_default .ebInfoPopup-arrowShadow {
+            right: 0px;
+            border-color: transparent transparent #f6bac1 transparent;
+            top: -13px;
+            left: initial;
+            border-width: 0px 12px 12px 14px;
+        }
+        .ebInfoPopup-content_corner_default .ebInfoPopup-arrowBorder {
+            right: 0px;
+            border-color: transparent transparent #f6bac1 transparent;
+            top: -13px;
+            border-width: 0px 12px 12px 14px;
+            left: initial;
+        }
+        .ebInfoPopup-content_corner_default .ebInfoPopup-closeButton {
+            left: 0px;
+            right: initial;
+        }
+        .ebNotification-close {
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            right: initial;
+        }
+        /*PC-704 start*/
+    
+        .ecb-addPriceableItem {
+            float: left !important;
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .ecb-addPriceableItemButton {
+            float: left;
+        }
+
+        .alert-danger .close{
+            float: left;
+        }
+
+        .alert-dismissible .close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: inherit;
+            right: auto !important;
+        }
+        .ui-datatable .ui-sortable-column-icon {
+            float: left;
+        }
+        /*PC-704 end*/
+        /*PC-703 start*/
+    
+    /*PC-1602 ---- PC-1606 New design RTL changes*/
+    .ecb-panelHeading .ecb-panelHeaderLink {   
+        float: left;
+        margin: 14px 0 0 0;
+    }
+    .ecb-editOverlayLink {
+      padding: 5px 0 0 15px;
+      float: left;
+      text-align: left;
+    }
+    
+    
+    .ecb-subcriptionToolTipError{
+      top: 0px;
+      position: relative;
+      left: 60px;
+    }
+    
+    //PC-1883 Bug Start
+    .ecb-contextBar{
+        padding:0 0 15px 4px;
+    }
+    //PC-1883 Bug End
+    
+    .ecb-viewList .ui-dropdown .ui-dropdown-trigger{
+       right : 150px;
+       }
+    
+    .ecb-viewList .ui-dropdown .ui-dropdown-label{
+        text-align: right;
+        padding-right: 13px;
+    }
+    
+    // PC-1927 dropdown alignment
+    
+        .ecb-viewListSchedule .ui-dropdown .ui-dropdown-label,
+        .ui-dropdown-panel .ui-dropdown-item {
+        text-align: right;
+    }
+    
+      .ecb-viewListSchedule .ui-dropdown .ui-dropdown-trigger {
+         right: 145px;
+     }
+    
+    .ui-datatable .ui-datatable-data > tr > td{
+        text-align:right;
+    }
+    .ebButtonCommands-placement {
+      float: left;
+    }
+    
+        @media screen and (min-width: $screen-sm) and (min-height: 1024px){
+            .ecb-subcriptionToolTipError {
+                top: -40px;
+              }
+    
+        }
+    
+        @media screen and (min-width:1024px) and (min-height: 768px){
+          .ecb-subcriptionToolTipError {
+            top: -40px;
+          }
+        }
+    
+        .ecb-rtlSubscribe .ebInfoPopup-content_corner_default {
+            left: initial;
+        }
+        .ecb-rtlSubscribe .tooltiptext{
+            padding: 0px !important;
+            min-width: 110px;
+            width: auto;
+        }
+        .ecb-rtlSubscribe .ebInfoPopup-content_corner_default .ebInfoPopup-arrowShadow{
+            border-color: transparent transparent #999 transparent;
+            top: -14px;
+            right: 22px;
+            border-width: 7px 7px 7px 7px;
+        }
+        .ecb-rtlSubscribe .ebInfoPopup-content_corner_default .ebInfoPopup-arrowBorder{
+            border-color: transparent transparent #fff transparent;
+            top: -14px;
+            border-width: 7px 7px 7px 7px;
+            right: 22px;
+        }
+        .tooltip.ecb-rtlSubscribe {
+            text-align: center;
+        }
+        .ebQuickActionBar .pull-right {
+            float: left !important;
+        }
+        .ebQuickActionBar .pull-left {
+            float: right !important;
+        }
+        .ebQuickActionBar {
+            width: 98%;
+        }
+    
+    .ecb-localization{
+          position: absolute;
+        right: 0px;
+        top: 10px;
+    }
+    .ecb-errorSubscriptionProperties{
+        top: 15px;
+      }
+      .ebInfoPopup-errorContentText {
+        margin-right: 20px;
+    }
+    .ecb-localizationaside {
+      padding-right: 0;
+  }	
+        .ui-tree .ui-tree-container{
+            left: auto;
+        }
+        .ui-treenode-content {
+            padding-left: 10px;
+        }
+        .ui-tree .ui-treenode-children{
+           margin: 0;
+           padding: 0 1em 0 0;
+        }
+        
+        /*PC-300*/
+        .ecb-headingTypePo{
+          width: 30px;
+          position: relative;
+          left: 0px;
+          top: -2px;
+        }
+        .ecb-treePosition{
+            /* float:left; */
+        }
+    
+    .ecbRateTableTitleRtl i {
+      padding: 0px 5px;
+      float: right;
+    }
+    .ecb-RatesourceDropdownRtl {
+       text-align: right;
+    }
+    .ecb-RatesourceDropdownRtl .chevron {
+        position: absolute;
+        top: 25%;
+        right: 93%;
+    }
+    .ebComponentList-item_selectedRtl:before{
+       right: 0px !important;
+    }
+    .ecb-rateSourceMenuRtl li a{
+         text-align: right;
+    }
+    .ecb-closeRtl {
+        float: left;
+    }
+    
+    .ScheduleNumericals {
+        padding-left: 7px;
+        padding-right: 7px; 
+        text-align: left;
+    }
+    /*1950 RTL start*/
+    .ecb-RtlTreePosition {
+        position: absolute;
+        right: 6px;
+        top: 44px;
+        left: unset;
+    }
+    
+    .chevron.right:before {
+        transform: rotate(225deg);
+    }
+    .chevron.left:before{
+        transform: rotate(45deg);
+    }
+    .ecb-expandMoreIcon{
+        float: left;
+    }
+    .ebComponentList-item_selected:before{
+        right: -3px;
+        left: unset;
+    }
+    .ebComponentList-group {
+      text-align: right;
+    }
+    /*1950 RTL end*/
+    
+    
+      .ecb-numberColumn{
+          float: left;
+      }
+        .ecb-subscriptionproperties .dropdown-menu-right {
+            right: auto;
+            left: 0;
+        }
+    
+      .ecb-offeringlocations img {
+        float: right;
+        padding: 2px 5px;
+      }
+    
+        #mainratechange{
+          text-align: right;
+        }
+    
+        .ecb-copy {
+            float: left;
+            margin: -40px 0px;
+        }
+    
+        .ecb-productOfferIcon {
+            right: 0;
+        }
+    
+        .ecbReasonCheck{
+          float: right !important;
+        }
+    
+        .ecb-adjManditory {
+            position: absolute;
+            left: 0px;
+            height: 75px;
+            top: 0px;
+            right: initial;
+        }
+    
+        .ecb-adjNamesDropdown {
+            position: absolute;
+            left: 5px;
+            top: 1px;
+            bottom: 1px;
+            cursor: pointer;
+            right: initial;
+        }
+    
+        .ecb-adjNamesIcon {
+            position: relative;
+            top: 40%;
+            left: 8px;
+            right: initial;
+        }
+    
+        .ecb-adjNameIcon {
+            float: left;
+        }
+    
+        .fa-caret-right:before {
+            content: "\F0D9";
+        }
+    
+        .chevron.left:before {
+            left: -2px;
+        }
+    
+        .ecb-rtltextalignright {
+          text-align: right !important;
+        }
+    
+        .ecb-rtlLeftView {
+          float: left !important;
+         }
+        
+         span.chevron.down{
+             float: left !important;
+         }
+    
+        .dropdown-menu {
+          right: 0;
+        }
+    
+        .ui-multiselect .ui-multiselect-trigger{
+            left: 0;
+            right: inherit;
+            padding: 0;
+        }
+        .ui-multiselect .ui-multiselect-label{
+            padding-right: 0;
+        }
+    
+        .ebNotification-label {
+          padding-right: 20px;
+          margin: 8px;
+          float: right;
+          font-size: 1.2rem;
+          line-height: 1.6rem;
+          display: inline-block;
+          white-space: normal;
+          vertical-align: middle;
+          background: url(assets/images/ericssonIcons/information_blue_16px.svg) right top no-repeat;
+        }
+    
+        .ecbPoClickableCard {
+            float: right;
+        }
+    
+        .text-right {
+          text-align: left;
+        }
+    
+        .pull-left {
+          float: right !important;
+        }
+        .ecbSplLeftPadding {
+          padding: 0 0 0 8px;
+        }
+        .pull-right {
+          float: left !important;
+        }
+        .ebComponentList-subitem {
+          padding: 0 2.6rem 0 .8rem !important;
+        }
+        .ebComponentList-group-subheader {
+          padding: 0 1.8rem 0 .8rem !important;
+        }
+        .ecb-selectOption:hover {
+            background: url('assets/images/ericssonIcons/dropdown-arrow-blue.svg') no-repeat center left 12px;
+            padding: 2px 12px;
+        }
+        .ecb-adjReasonDropdownIcon{
+            position: relative;
+            right: -5px;
+        }
+        .ecb-adjAsidePanel aside{
+            overflow-y: hidden;
+        }
+        .ecb-selectOption:hover, .ecb-selectOption:focus{
+            padding: 2px 12px;
+        }
+        .ecb-sideSelect, .ecb-selectOption:hover, .ecb-selectOption:focus  {
+            background: url('assets/images/ericssonIcons/dropdown-arrow-blue.svg') no-repeat center left 12px;
+        }
+        .ecb-adjReasonDropdownIcon{
+            position: relative;
+            right: -5px;
+        }
+        .ecb-adjAsidePanel aside{
+            overflow-y: hidden;
+        }
+        .ecb-rateEdit,.ecb-schedulesEditLink{
+            float: left;
+        }
+        ngx-aside aside {
+            padding-left: 0 !important;
+            section {
+                overflow: auto !important;
+            }
+        }
+        .ecb-columnPlacementRight{
+            width: 180px;
+            cursor: default;
+        }
+        .ecb-columnPlacementLeft{
+            right: 0;
+            left: inherit;
+            cursor: default;
+        }
+        .ecb-adjustmentslist .ui-dropdown .ui-dropdown-label{
+            text-align: right;
+        }
+        .ecb-adjustmentslist .ui-dropdown .ui-dropdown-trigger{
+            right: auto;
+            left: 5px;
+        }
+        .ecb-accountTypes .ui-multiselect-close{
+            left: 0.375em;
+            right: inherit;
+         }
+            
+        .ecb-showFilter label {
+            float: right !important;
+            padding: 5px;
+        }
+        .ecb-filterInput {
+            padding-right: 1.2rem;
+            padding-left: 2.8rem;
+          }
+        .ecb-filterContainer .ecb-filterInput:hover, .ecb-filterContainer .ecb-filterInput:focus {
+            background: url('assets/images/ericssonIcons/dropdown-arrow-blue.svg') no-repeat center left 12px;
+         }
+         
+        .ecb-accountTypes .ui-multiselect-header{
+            text-align: right;
+        }
+        .ecb-accountTypes .ui-multiselect-panel .ui-multiselect-item{
+            text-align: right;
+        }
+        .ui-datatable .ui-datatable-thead tr>th.ecb-primeNgColumn>span.ui-column-title {
+            float: right;
+        }
+        .ebCheckbox .readonly, .ebRadioBtn .readonly {
+            margin: 0 -15px 0 0;
+            padding-right: 8px !important;
+        }
+        .ebInput[readonly] {
+            padding-right: 0;
+            margin-left: 0;
+        }
+        span, td {
+            unicode-bidi: plaintext;
+        } 
+    
+        .ecb-calStdHolContainer {
+            .ecb-daysoftheweek > div:first-child a {
+              border-radius: 0 3px 3px 0;
+            }
+            .ecb-daysoftheweek > div:last-child a {
+              border-radius: 3px 0 0 3px;
+            }
+            p-dropdown .ui-dropdown-label{
+              padding-right: 28px;
+              text-align: right;
+            }
+            .ui-dropdown .ui-dropdown-trigger {
+                right:unset;
+                left: 5px;
+            }
+            .ecb-periodTimeEdit {
+              > div {
+                float: right;
+              }
+              input {
+                text-align: left;
+              }
+            }
+            .ecb-calCodeType {
+              margin-right: -7px !important;
+            }
+            .ecb-calCellData {
+              margin-right: 5px;
+              margin-left: 0;
+            }
+            .ecb-calendarBar {
+              margin-right: -9px;
+            }
+            .ecb-daysoftheweek > div {
+              float: right;
+            }
+            .ecb-calendarBar0 {
+              background-image: linear-gradient(270deg, transparent 0, transparent 8px, $ebColor_orange 9px, $ebColor_orange 19px, $ebColor_orange_40 20px, $ebColor_orange_40 100%);
+            }
+            .ecb-calendarBar1 {
+              background-image: linear-gradient(270deg, transparent 0, transparent 8px, $ebColor_Link 9px, $ebColor_Link 19px, $ebColor_textLinkBlue_40 20px, $ebColor_textLinkBlue_40 100%);
+            }
+            .ecb-calendarBar2 {
+              background-image: linear-gradient(270deg, transparent 0, transparent 8px, $ebColor_darkGreen_80 9px, $ebColor_darkGreen_80 19px, $ebColor_darkGreen_20 20px, $ebColor_darkGreen_20 100%);
+            }
+            .ecb-calendarBar3 {
+              background-image: linear-gradient(270deg, transparent 0, transparent 8px, $ebColor_grey_80 9px, $ebColor_grey_80 19px, $ebColor_grey_20 20px, $ebColor_grey_20 100%);
+            }
+        }
+    
+        @media (min-width: $screen-sm) and (max-width:$screen-md) {
+            .security-login-view .login-background {
+              width: 50% !important;
+            }
+        }
+        @media (min-width:$screen-md) and (max-width:$screen-lg) {
+            .security-login-view .login-background {
+              width: 60% !important;
+            }
+        }
+        .ecb-propertiesFormMain .ui-inputtext, .ecb-permissionsFormMain .ui-inputtext, .ecb-subscriptionproperties .ui-inputtext {
+            border-radius: $border-radius-none;
+            float: right;
+        }
+        .ecb-propertiesFormMain .ui-button, .ecb-permissionsFormMain .ui-button, .ecb-subscriptionproperties .ui-button {
+            border-radius: $border-radius-none;
+            margin-right: 0;
+        }
+        .ecb-propertiesFormMain .ui-calendar .ui-button, .ecb-permissionsFormMain .ui-calendar .ui-button, .ecb-subscriptionproperties .ui-calendar .ui-button {
+            border-left: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: $border-radius-none !important;
+        }
+        .ecb-calStdHolDefEdit .ebInput {
+          float: right;
+        }
+        .ui-calendar:hover .ui-button { 
+             border-left: 1px solid #666666 !important;
+        }
+        .ecb-calStdHolDefEdit .ui-calendar .ui-button {
+            margin-right: -23px;
+        }
+        .ecb-calStdHolDefEdit .ui-calendar:hover .ui-button {
+            border: none !important;
+        }
+    
+        .ebLoader-Dots, .ebLoader-Dots:before, .ebLoader-Dots:after {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-color: $ebColor_paleBlue_40;
+            border-radius: 2px;
+            -webkit-animation-duration: .9s;
+            -moz-animation-duration: .9s;
+            -ms-animation-duration: .9s;
+            animation-duration: .9s;
+            -webkit-animation-name: pulse;
+            -moz-animation-name: pulse;
+            -ms-animation-name: pulse;
+            animation-name: pulse;
+            -webkit-animation-iteration-count: infinite;
+            -moz-animation-iteration-count: infinite;
+            -ms-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
+            -webkit-animation-delay: .6s;
+            -moz-animation-delay: .6s;
+            -ms-animation-delay: .6s;
+            animation-delay: .6s;
+        }
+    
+        .ebLoader-Dots:before {
+            content: "";
+            position: absolute;
+            left: -20px;
+            -webkit-animation-delay: .9s;
+            -moz-animation-delay: .9s;
+            -ms-animation-delay: .9s;
+            animation-delay: .9s;
+        }
+    
+        .ebLoader-Dots:after {
+            content: "";
+            position: absolute;
+            right: -20px;
+            -webkit-animation-delay: .3s;
+            -moz-animation-delay: .3s;
+            -ms-animation-delay: .3s;
+            animation-delay: .3s;
+        }
+    
+        .widgetSkeleton, .gridSkeleton {
+            transform: scalex(-1);
+            right: 10px;
+         }
+         .ecb-rowContainer{
+            .widgetSkeleton {
+                left: 0px;
+                right: 19px
+               
+            }
+          }
+    
+          .ecb-loaderWidgetContainer {
+              right: 9px;
+          }
+         
+         .ecb-loginConatiner {
+          .ecb-loaderWidgetContainer {
+            right: -1px;
+          }
+        } 
+  
+        .ecbClickableCard-footer  {
+          .actionIcons {
+            float: right;
+          }
+        }
+      .ecbClickableCard-footer a i {
+          padding-bottom: 8px;
+      }
+        .rtlDefaultStyling {
+            direction: ltr;
+            text-align: right;
+        }
+        .ecbClickableCard-body p{
+            @extend .rtlDefaultStyling;
+         }
+          .ecbClickableCard-heading .display_name {
+            @extend .rtlDefaultStyling;
+          }
+          .ecb-propertiesFormMain .ebInput, .ecb-permissionsFormMain .ebInput, .ecb-subscriptionproperties .ebInput, .ecb-calStdHolDefEdit .ebInput {
+            text-align: right;
+          }
+          .ecb-displayAdjName {
+            direction: rtl;
+          }
+          .ecb-editabletableinput {
+            textarea {
+                direction: rtl;
+              }
+          }
+          .ecb-inputReadOnly {
+            padding: 6px 0;
+          }
+          .ui-datatable .ui-datatable-thead tr > th.ecb-primeNgColumn {
+              border-right: none !important;
+          }
+          .ui-datatable .ui-datatable-thead tr > th.ecb-primeNgColumn:last-child {
+              border-left:none !important;
+          }
+          #ecb-schedulesTableEdit .ui-datatable .ui-datatable-data tr td.ui-editable-column:first-child {
+              border-right: none !important;
+          }
+    
+        @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+            /* IE10+ specific styles go here */
+            .panel, .ecbPriceableItemCard  {
+              border-radius: 0;
+            }
+            .ecb-RTLCheckbox .fa-check {
+                margin-right: -10px;
+            }
+            .ecb-adjManditory {
+                left: 0 !important;
+                right: auto !important;
+            }
+            .ecb-adjReasonDropdownIcon {
+                position: absolute;
+                left: 4px !important;
+                right: auto !important;
+            }
+        }
+        .ecb-removeAsidePanelScroll th[style*="ltr"] {
+            div.ecb-clearFilter {
+              right: 5px;
+              left: auto;
+            }
+            span.ui-sortable-column-icon {
+              margin-left: 12px
+            }
+          }
+          .ecb-subscriptionPropertes .ui-datatable .ui-datatable-thead  tr  th:last-child {
+            border-left: none !important;
+          }
+        .ecb-removeAsidePanelScroll {
+            ngx-aside aside section{
+              overflow: hidden !important;
+            }
+        }
+        .ecb-ratesManditoryCheck , .ui-datatable .ui-datatable-data tr td.ui-editable-column input.ecb-ratesManditoryCheck:focus{
+           border-left: 4px solid $ecb_manditoryField !important;
+           border-right: none !important;
+        }  
+        .ecb-inUseSharedRate .ui-datepicker{
+            left: 0 !important;
+        }
+        .ecb-editOverlayLink .selectedItems{
+            margin: 0 3px 0 10px;
+        }   
+        //skeleton loader animation css start 
+        .ecb-POSkeletonLoader {
+            .widgetSkeleton {
+                right: 20px;
+            }
+        }
+        .ecb-PISkeletonLoader {
+            .widgetSkeleton {
+                 right: 20px;
+             }
+        }
+        .ecb-WarnColumnLeft{
+            left: 0px
+        }
+        .ecb-WarnColumnRight {
+            left: 230px;
+        }
+        .ecb-WarnMessage {
+            padding-right: 0px;
+            padding-left: 10px;
+        }    
+        @media (max-width: $screen-lg-desktop) {
+            .ecb-WarnColumnLeft {
+                left: 270px;
+            }
+            .ecb-WarnColumnRight {
+                left: 430px;
+            }
+        }
+        .ecbWarnPopup-closeButton {
+            right: 350px;           
+        }
+        .ecb-WarningApproval {
+            background: url(/assets/images/ericssonIcons/warning_orange_16px.svg) no-repeat 99%;
+            padding-right: 40px;
+            background-position-y: 10px;
+            background-color: $ebColor_orange_20;
+        }
+        .ecb-wordbreak .fa-circle {
+            float: right;
+            padding-left: 5px;
+        }
+        .ecb-approvalChanges {
+            margin: 0px -15px 0px 15px;
+        }
+        .ecb-originalItem {
+            text-align: left;
+        }
+        .ecb-OfferingChanges {
+            padding-right: 0px;
+        }
+        .ebCheckboxLoc {
+            padding-left: 5px;
+            padding-right: 20px;
+        }
+    }
+    //RTL main css tag end here.
+
+@media (max-width: $screen-xs)
+{
+  .security-login-view .login-content {
+      padding: 40px 0 !important;
+    }
+  .ecb-WarnColumnLeft {
+        left: 620px;
+    }
+    .ecb-WarnColumnRight {
+        left: 1050px;
+    }
+}
+
+@media (max-width: $screen-md)
+{
+  .ecbPageContainer{
+      padding-top: 0px !important;
+      margin-top: 0px;     
+  }
+  .ecb-ticketBodyContent .ecbPageContainer{
+      margin-top: 72px;
+  }
+  .ecb-ticketBodyContent .ebPageTitle-container {
+      display: block !important;
+  }
+}
+
+@media (max-width: $screen-sm){
+  .ecb-mobileDevPageTitle{
+    padding-left: 26px !important;
+  }  
+    .ecb-WarnColumnLeft {
+        left: 400px;
+    }
+    .ecb-WarnColumnRight {
+        left: 910px;
+    }
+}
+/* media query end */
+//POPUP Model dialog
+.ebDialogBox-primaryText {
+    padding-left: 17px;
+
+
+}
+.ecb-unicodeBidi{
+    unicode-bidi: plaintext;
+}

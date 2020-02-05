@@ -1,0 +1,36 @@
+<div class="panel panel-default" *ngIf="rateTableData.length >0">
+  <div class="panel-heading ecb-panelHeading">   
+      <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_RATE_TABLES'}}</h2> 
+  </div>
+  <div class="panel-body">
+      <div *ngIf="isRateTableLoadError" class="alert alert-danger" role="alert" l10nTranslate>
+          <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true" (click)="httpErrorMessage === undefined">×</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <p>{{httpErrorMessage}}</p>
+        </div>
+        <div *ngIf="!isRateTableLoadError && loadGridData">
+          <p-dataTable [value]="rateTableData">
+            <p-column *ngFor="let col of piRateTableCols" [field]="col.field" [header]="col.key | translate:lang">
+                <ng-template pTemplate="header" let-col let-rowData="rowData">	
+                    <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>	
+                </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+        <!--Error while fetching initial table data -->
+        <div *ngIf="localeErrorMessage">
+            <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+                <p class="filterFetchingError" l10nTranslate>
+                    <strong>{{"TEXT_FILTERED_DATA_FETCHING_ERROR"}}</strong>
+                </p>
+                </div>
+            </div>
+            </div>
+        </div>
+  </div>
+  
+</div>

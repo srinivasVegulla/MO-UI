@@ -1,0 +1,57 @@
+<div class="ecb-commonDialog" tabindex="-1" [ngClass]="{'ecb-approvalChanges': visibleAnimate, 'modalDialog': isModal, 'ecb-customDialog': !isModal && !visibleAnimate}" [ngStyle]="{'display': visible ? 'block' : 'none'}" (keydown)="function($event)">
+    <div [ngClass]="getStyleClasses()" id="{{ popupId }}">
+    <div [ngClass]="{'modal-content': !visibleAnimate}">
+    <div [ngClass]="{'modal-body': !visibleAnimate}">
+        <div class="alert-warning alert-dismissible " *ngIf="isCloseIcon">
+            <button type="button" class="close" #btnFocus (click)="closeDialog()">
+                <span class="pull-right" aria-hidden="true">x</span>
+                <span class="sr-only ">Close</span>
+            </button>
+        </div>
+        <div *ngIf="!dialogHeader">
+          <ng-content select="dialog-header-template" ></ng-content>
+        </div>
+        <div *ngIf="!dialogBody">
+          <ng-content select="dialog-body-template" ></ng-content>
+        </div>
+        <div [innerHtml]="contentHtmlTemplate" *ngIf="contentHtml != undefined"></div>
+<div [ngClass]="{'ebDialogBox-contentBlock_type_warning': setContentType === 'warning', 'ebDialogBox-contentBlock_type_success': setContentType === 'success', 'ebDialogBox-contentBlock_type_error': setContentType === 'error', 'ebDialogBox-contentBlock_type_none': setContentType === 'none', 'ebDialogBox-contentBlock_type_information': setContentType === 'info'}"
+    *ngIf="dialogHeader || dialogBody">
+            <div class="ebDialogBox-primaryText ecb-confirmDialog-header" *ngIf="dialogHeader">
+                <ng-content select="dialog-header"></ng-content>
+            </div>
+            <div class="ebDialogBox-primaryText ecb-confirmDialog-desc" *ngIf="dialogBody">
+                <p>
+                    <ng-content select="dialog-body"></ng-content>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer" *ngIf="dialogFooter">
+        <div *ngIf="!isDefaultFooterButtons">
+            <button class="ebBtn ebBtn-default" (click)="footerButtonClick(1)" *ngIf="footerButtonCount >= 1" [ngClass]="hasPrimaryBtn(1)">
+                <ng-content select="dialog-button-1"></ng-content>
+            </button>
+            <button class="ebBtn ebBtn-default" (click)="footerButtonClick(2)" *ngIf="footerButtonCount >= 2" [ngClass]="hasPrimaryBtn(2)">
+                <ng-content select="dialog-button-2"></ng-content>
+            </button>
+            <button class="ebBtn ebBtn-default" (click)="footerButtonClick(3)" *ngIf="footerButtonCount >= 3" [ngClass]="hasPrimaryBtn(3)">
+                <ng-content select="dialog-button-3"></ng-content>
+            </button>
+            <button class="ebBtn ebBtn-default" (click)="footerButtonClick(4)" *ngIf="footerButtonCount >= 4" [ngClass]="hasPrimaryBtn(4)">
+                <ng-content select="dialog-button-4"></ng-content>
+            </button>
+            <button class="ebBtn ebBtn-default" (click)="footerButtonClick(5)" *ngIf="footerButtonCount >= 5" [ngClass]="hasPrimaryBtn(5)">
+                    <ng-content select="dialog-button-5"></ng-content>
+                </button>
+        </div>
+        <div *ngIf="isDefaultFooterButtons">
+            <button class="ebBtn ebBtn-default" (click)="footerButtonClick(1)" l10nTranslate>{{'TEXT_CANCEL_WITHOUT_SAVING'}}</button>
+            <button class="ebBtn ebBtn-default" (click)="footerButtonClick(2)" l10nTranslate>{{'TEXT_RETURN'}}</button>
+        </div>
+        <ng-content select="dialog-footer"></ng-content>
+    </div>
+    <ng-content select="dialog-footer-template" *ngIf="!dialogFooter"></ng-content>
+    </div>
+    </div>
+</div>

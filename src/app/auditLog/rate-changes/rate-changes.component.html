@@ -1,0 +1,63 @@
+<ecb-modal-dialog [modal]="false" [styleClass]="'ecb-addRateTableDialog'" [open]="true" (onClose)="onAddRateTableClose($event)"
+    [header]="false" [body]="false" [footer]="false" [drag]="true" [closeIcon]="false" [isVisibleAnimate]="showRateChangesOnApproval">
+    <dialog-header-template>
+      <div *ngIf="!showRateChangesOnApproval" class="panel-heading">
+        <h2 class="ecb-toggleFloat" l10nTranslate>{{"TEXT_RATE_CHANGES"}}</h2>  
+        <div class="ecb-editOverlayLink">
+            <button class="ebBtn ebBtn-default" (click)="onAddRateTableClose($event)"><span l10nTranslate>{{"TEXT_CLOSE"}}</span></button>                
+        </div>          
+      </div>
+      <div class="ecbRateTableHeader ecb-toggleFloat col-xs-12 col-sm-12 col-md-12 col-lg-12"> 
+             <span *ngIf="!showRateChangesOnApproval" l10nTranslate>{{'TEXT_RATE_TABLE'}} </span>
+            <span *ngIf="showRateChangesOnApproval" l10nTranslate>{{'TEXT_CHANGE_FOR'}}</span>
+            <span l10nTranslate>{{scheduleHeader}}</span>
+        </div>
+        <div class="ecbRateTableHeader ecb-toggleFloat col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <span l10nTranslate>{{getRateSourceHeader1()}} </span> <br>
+          <span *ngIf="!showRateChangesOnApproval" l10nTranslate>{{getRateSourceHeader2()}} </span>
+        </div>
+    </dialog-header-template>
+    <dialog-body-template>
+        <div  *ngIf="rateChangeError != undefined">
+            <div class="row">
+                <div class=" col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+                    <p class="filterFetchingError">{{rateChangeError}}</p>
+                </div>
+            </div>
+        </div> 
+        <div>           
+            <div class="panel-body ecb-rateTableInfo ecb-rateChangeRateTable ecb-positionRelative" ecb-infinite-scroller [scrollerContext]="'self'"
+            (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+            <ecb-loader *ngIf="rateChangeFetching" mode="dot" fill="widget"></ecb-loader>
+            <p-dataTable  *ngIf="loadGridData && rateChangeGridData.length>0" [value]="rateChangeGridData" [rowStyleClass]="getRowClass" [scrollable]="rateChangeColDef.scrollable" [lazy]="rateChangeColDef.lazy"
+            (onLazyLoad)="loadData($event)" [immutable]="false">                
+            <p-column styleClass="col-button ecb-primeNgColumn" *ngFor="let col of rateTableCols" [field]="col.field" [header]='col.key | translate:lang'  [editable]="false" [style]="col.style">
+                    <ng-template *ngIf="isStaticColumn(col.field)" let-col pTemplate="header">
+                        <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field == staticColumns.CHANGE" let-col let-data="rowData" pTemplate="body">
+                      <span l10nTranslate>{{getChangeTextByType(data)}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="!isStaticColumn(col.field)" let-col pTemplate="header">
+                        <span [ngClass]="getIntegerValue(col)" title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field == staticColumns.IF" let-col pTemplate="body">
+                        <span l10nTranslate>{{col.field}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field == staticColumns.THEN" let-col pTemplate="body">
+                        <span l10nTranslate>{{col.field}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="!isStaticColumn(col.field)" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <div [ngClass]="getTextFieldClass(col)">
+                          <p *ngIf="hasOriginalItems(data) && isRuleChanged(data, col)" class="ecb-originalItem">
+                            {{originalItems[data.order][col.field]}}</p>
+                          {{data[col.field]}}
+                        </div>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+    </div>
+       
+    </dialog-body-template>
+</ecb-modal-dialog>

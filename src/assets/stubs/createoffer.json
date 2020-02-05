@@ -1,0 +1,895 @@
+{
+  "code": 200,
+  "message": "Ok",
+  "data": {
+    "currencies": [
+      {
+        "name": "AED",
+        "enumDataId": 514
+      },
+      {
+        "name": "AFA",
+        "enumDataId": 515
+      },
+      {
+        "name": "AFF",
+        "enumDataId": 516
+      },
+      {
+        "name": "AFN",
+        "enumDataId": 517
+      },
+      {
+        "name": "ALL",
+        "enumDataId": 518
+      },
+      {
+        "name": "AMD",
+        "enumDataId": 519
+      },
+      {
+        "name": "ANG",
+        "enumDataId": 520
+      },
+      {
+        "name": "AOA",
+        "enumDataId": 521
+      },
+      {
+        "name": "ARS",
+        "enumDataId": 522
+      },
+      {
+        "name": "AUD",
+        "enumDataId": 523
+      },
+      {
+        "name": "AWG",
+        "enumDataId": 524
+      },
+      {
+        "name": "AZN",
+        "enumDataId": 525
+      },
+      {
+        "name": "BAM",
+        "enumDataId": 526
+      },
+      {
+        "name": "BBD",
+        "enumDataId": 527
+      },
+      {
+        "name": "BDT",
+        "enumDataId": 528
+      },
+      {
+        "name": "BGN",
+        "enumDataId": 529
+      },
+      {
+        "name": "BHD",
+        "enumDataId": 530
+      },
+      {
+        "name": "BIF",
+        "enumDataId": 531
+      },
+      {
+        "name": "BMD",
+        "enumDataId": 532
+      },
+      {
+        "name": "BND",
+        "enumDataId": 533
+      },
+      {
+        "name": "BOB",
+        "enumDataId": 534
+      },
+      {
+        "name": "BRE",
+        "enumDataId": 535
+      },
+      {
+        "name": "BRL",
+        "enumDataId": 536
+      },
+      {
+        "name": "BSD",
+        "enumDataId": 537
+      },
+      {
+        "name": "BTN",
+        "enumDataId": 538
+      },
+      {
+        "name": "BWP",
+        "enumDataId": 539
+      },
+      {
+        "name": "BYR",
+        "enumDataId": 540
+      },
+      {
+        "name": "BZD",
+        "enumDataId": 541
+      },
+      {
+        "name": "CAD",
+        "enumDataId": 542
+      },
+      {
+        "name": "CDF",
+        "enumDataId": 543
+      },
+      {
+        "name": "CHF",
+        "enumDataId": 544
+      },
+      {
+        "name": "CLP",
+        "enumDataId": 545
+      },
+      {
+        "name": "CNY",
+        "enumDataId": 546
+      },
+      {
+        "name": "COP",
+        "enumDataId": 547
+      },
+      {
+        "name": "CRC",
+        "enumDataId": 548
+      },
+      {
+        "name": "CUC",
+        "enumDataId": 549
+      },
+      {
+        "name": "CUP",
+        "enumDataId": 550
+      },
+      {
+        "name": "CVE",
+        "enumDataId": 551
+      },
+      {
+        "name": "CYP",
+        "enumDataId": 552
+      },
+      {
+        "name": "CZK",
+        "enumDataId": 553
+      },
+      {
+        "name": "DEM",
+        "enumDataId": 554
+      },
+      {
+        "name": "DJF",
+        "enumDataId": 555
+      },
+      {
+        "name": "DKK",
+        "enumDataId": 556
+      },
+      {
+        "name": "DOP",
+        "enumDataId": 557
+      },
+      {
+        "name": "DZD",
+        "enumDataId": 558
+      },
+      {
+        "name": "EEK",
+        "enumDataId": 559
+      },
+      {
+        "name": "EGP",
+        "enumDataId": 560
+      },
+      {
+        "name": "ERN",
+        "enumDataId": 561
+      },
+      {
+        "name": "ESP",
+        "enumDataId": 562
+      },
+      {
+        "name": "ETB",
+        "enumDataId": 563
+      },
+      {
+        "name": "ETP",
+        "enumDataId": 564
+      },
+      {
+        "name": "EUR",
+        "enumDataId": 565
+      },
+      {
+        "name": "FJD",
+        "enumDataId": 566
+      },
+      {
+        "name": "FKF",
+        "enumDataId": 567
+      },
+      {
+        "name": "FKP",
+        "enumDataId": 568
+      },
+      {
+        "name": "FRF",
+        "enumDataId": 569
+      },
+      {
+        "name": "GBP",
+        "enumDataId": 570
+      },
+      {
+        "name": "GEL",
+        "enumDataId": 571
+      },
+      {
+        "name": "GGP",
+        "enumDataId": 572
+      },
+      {
+        "name": "GHS",
+        "enumDataId": 573
+      },
+      {
+        "name": "GIP",
+        "enumDataId": 574
+      },
+      {
+        "name": "GMD",
+        "enumDataId": 575
+      },
+      {
+        "name": "GNF",
+        "enumDataId": 576
+      },
+      {
+        "name": "GQE",
+        "enumDataId": 577
+      },
+      {
+        "name": "GTQ",
+        "enumDataId": 578
+      },
+      {
+        "name": "GYD",
+        "enumDataId": 579
+      },
+      {
+        "name": "HKD",
+        "enumDataId": 580
+      },
+      {
+        "name": "HNL",
+        "enumDataId": 581
+      },
+      {
+        "name": "HRK",
+        "enumDataId": 582
+      },
+      {
+        "name": "HTG",
+        "enumDataId": 583
+      },
+      {
+        "name": "HUF",
+        "enumDataId": 584
+      },
+      {
+        "name": "IDR",
+        "enumDataId": 585
+      },
+      {
+        "name": "IEP",
+        "enumDataId": 586
+      },
+      {
+        "name": "ILS",
+        "enumDataId": 587
+      },
+      {
+        "name": "IMP",
+        "enumDataId": 588
+      },
+      {
+        "name": "INR",
+        "enumDataId": 589
+      },
+      {
+        "name": "IQD",
+        "enumDataId": 590
+      },
+      {
+        "name": "IQQ",
+        "enumDataId": 591
+      },
+      {
+        "name": "IRR",
+        "enumDataId": 592
+      },
+      {
+        "name": "ISK",
+        "enumDataId": 593
+      },
+      {
+        "name": "JEP",
+        "enumDataId": 594
+      },
+      {
+        "name": "JMD",
+        "enumDataId": 595
+      },
+      {
+        "name": "JOD",
+        "enumDataId": 596
+      },
+      {
+        "name": "JPY",
+        "enumDataId": 597
+      },
+      {
+        "name": "KES",
+        "enumDataId": 598
+      },
+      {
+        "name": "KGS",
+        "enumDataId": 599
+      },
+      {
+        "name": "KHR",
+        "enumDataId": 600
+      },
+      {
+        "name": "KMF",
+        "enumDataId": 601
+      },
+      {
+        "name": "KPW",
+        "enumDataId": 602
+      },
+      {
+        "name": "KRW",
+        "enumDataId": 603
+      },
+      {
+        "name": "KWD",
+        "enumDataId": 604
+      },
+      {
+        "name": "KYD",
+        "enumDataId": 605
+      },
+      {
+        "name": "KZT",
+        "enumDataId": 606
+      },
+      {
+        "name": "LAK",
+        "enumDataId": 607
+      },
+      {
+        "name": "LBP",
+        "enumDataId": 608
+      },
+      {
+        "name": "LKR",
+        "enumDataId": 609
+      },
+      {
+        "name": "LRD",
+        "enumDataId": 610
+      },
+      {
+        "name": "LSL",
+        "enumDataId": 611
+      },
+      {
+        "name": "LTL",
+        "enumDataId": 612
+      },
+      {
+        "name": "LVL",
+        "enumDataId": 613
+      },
+      {
+        "name": "LYD",
+        "enumDataId": 614
+      },
+      {
+        "name": "MAD",
+        "enumDataId": 615
+      },
+      {
+        "name": "MDL",
+        "enumDataId": 616
+      },
+      {
+        "name": "MGA",
+        "enumDataId": 617
+      },
+      {
+        "name": "MGF",
+        "enumDataId": 618
+      },
+      {
+        "name": "MKD",
+        "enumDataId": 619
+      },
+      {
+        "name": "MMK",
+        "enumDataId": 620
+      },
+      {
+        "name": "MNT",
+        "enumDataId": 621
+      },
+      {
+        "name": "MOP",
+        "enumDataId": 622
+      },
+      {
+        "name": "MRO",
+        "enumDataId": 623
+      },
+      {
+        "name": "MTL",
+        "enumDataId": 624
+      },
+      {
+        "name": "MUR",
+        "enumDataId": 625
+      },
+      {
+        "name": "MVR",
+        "enumDataId": 626
+      },
+      {
+        "name": "MWK",
+        "enumDataId": 627
+      },
+      {
+        "name": "MXN",
+        "enumDataId": 628
+      },
+      {
+        "name": "MYR",
+        "enumDataId": 629
+      },
+      {
+        "name": "MZN",
+        "enumDataId": 630
+      },
+      {
+        "name": "NAD",
+        "enumDataId": 631
+      },
+      {
+        "name": "NGN",
+        "enumDataId": 632
+      },
+      {
+        "name": "NIO",
+        "enumDataId": 633
+      },
+      {
+        "name": "NOK",
+        "enumDataId": 634
+      },
+      {
+        "name": "NPR",
+        "enumDataId": 635
+      },
+      {
+        "name": "NZD",
+        "enumDataId": 636
+      },
+      {
+        "name": "OMR",
+        "enumDataId": 637
+      },
+      {
+        "name": "PAB",
+        "enumDataId": 638
+      },
+      {
+        "name": "PEN",
+        "enumDataId": 639
+      },
+      {
+        "name": "PGK",
+        "enumDataId": 640
+      },
+      {
+        "name": "PHP",
+        "enumDataId": 641
+      },
+      {
+        "name": "PKR",
+        "enumDataId": 642
+      },
+      {
+        "name": "PLN",
+        "enumDataId": 643
+      },
+      {
+        "name": "PYG",
+        "enumDataId": 644
+      },
+      {
+        "name": "QAR",
+        "enumDataId": 645
+      },
+      {
+        "name": "ROL",
+        "enumDataId": 646
+      },
+      {
+        "name": "RON",
+        "enumDataId": 647
+      },
+      {
+        "name": "RSD",
+        "enumDataId": 648
+      },
+      {
+        "name": "RUB",
+        "enumDataId": 649
+      },
+      {
+        "name": "RUR",
+        "enumDataId": 650
+      },
+      {
+        "name": "RWF",
+        "enumDataId": 651
+      },
+      {
+        "name": "SAR",
+        "enumDataId": 652
+      },
+      {
+        "name": "SBD",
+        "enumDataId": 653
+      },
+      {
+        "name": "SCR",
+        "enumDataId": 654
+      },
+      {
+        "name": "SDD",
+        "enumDataId": 655
+      },
+      {
+        "name": "SDG",
+        "enumDataId": 656
+      },
+      {
+        "name": "SEK",
+        "enumDataId": 657
+      },
+      {
+        "name": "SGD",
+        "enumDataId": 658
+      },
+      {
+        "name": "SHP",
+        "enumDataId": 659
+      },
+      {
+        "name": "SKK",
+        "enumDataId": 660
+      },
+      {
+        "name": "SLL",
+        "enumDataId": 661
+      },
+      {
+        "name": "SOS",
+        "enumDataId": 662
+      },
+      {
+        "name": "SPL",
+        "enumDataId": 663
+      },
+      {
+        "name": "SRD",
+        "enumDataId": 664
+      },
+      {
+        "name": "STD",
+        "enumDataId": 665
+      },
+      {
+        "name": "SVC",
+        "enumDataId": 666
+      },
+      {
+        "name": "SYP",
+        "enumDataId": 667
+      },
+      {
+        "name": "SZL",
+        "enumDataId": 668
+      },
+      {
+        "name": "THB",
+        "enumDataId": 669
+      },
+      {
+        "name": "TJS",
+        "enumDataId": 670
+      },
+      {
+        "name": "TMM",
+        "enumDataId": 671
+      },
+      {
+        "name": "TMT",
+        "enumDataId": 672
+      },
+      {
+        "name": "TND",
+        "enumDataId": 673
+      },
+      {
+        "name": "TOP",
+        "enumDataId": 674
+      },
+      {
+        "name": "TRL",
+        "enumDataId": 675
+      },
+      {
+        "name": "TRY",
+        "enumDataId": 676
+      },
+      {
+        "name": "TTD",
+        "enumDataId": 677
+      },
+      {
+        "name": "TVD",
+        "enumDataId": 678
+      },
+      {
+        "name": "TWD",
+        "enumDataId": 679
+      },
+      {
+        "name": "TZS",
+        "enumDataId": 680
+      },
+      {
+        "name": "UAH",
+        "enumDataId": 681
+      },
+      {
+        "name": "UGX",
+        "enumDataId": 682
+      },
+      {
+        "name": "USD",
+        "enumDataId": 683
+      },
+      {
+        "name": "UYU",
+        "enumDataId": 684
+      },
+      {
+        "name": "UZS",
+        "enumDataId": 685
+      },
+      {
+        "name": "VEB",
+        "enumDataId": 686
+      },
+      {
+        "name": "VEF",
+        "enumDataId": 687
+      },
+      {
+        "name": "VND",
+        "enumDataId": 688
+      },
+      {
+        "name": "VUV",
+        "enumDataId": 689
+      },
+      {
+        "name": "WST",
+        "enumDataId": 690
+      },
+      {
+        "name": "XAF",
+        "enumDataId": 691
+      },
+      {
+        "name": "XAG",
+        "enumDataId": 692
+      },
+      {
+        "name": "XAU",
+        "enumDataId": 693
+      },
+      {
+        "name": "XCD",
+        "enumDataId": 694
+      },
+      {
+        "name": "XDR",
+        "enumDataId": 695
+      },
+      {
+        "name": "XOF",
+        "enumDataId": 696
+      },
+      {
+        "name": "XPD",
+        "enumDataId": 697
+      },
+      {
+        "name": "XPF",
+        "enumDataId": 698
+      },
+      {
+        "name": "XPT",
+        "enumDataId": 699
+      },
+      {
+        "name": "YER",
+        "enumDataId": 700
+      },
+      {
+        "name": "ZAR",
+        "enumDataId": 701
+      },
+      {
+        "name": "ZMK",
+        "enumDataId": 702
+      },
+      {
+        "name": "ZWD",
+        "enumDataId": 703
+      }
+    ],
+    "partitions": [
+      {
+        "login": "syntheticroot",
+        "accountId": -1,
+        "space": "mt"
+      },
+      {
+        "login": "root",
+        "accountId": 1,
+        "space": "mt"
+      },
+      {
+        "login": "demo",
+        "accountId": 123,
+        "space": "mt"
+      },
+      {
+        "login": "GL123",
+        "accountId": 123,
+        "space": "metratech.com/external"
+      },
+      {
+        "login": "hanzel",
+        "accountId": 124,
+        "space": "mt"
+      },
+      {
+        "login": "csr1",
+        "accountId": 125,
+        "space": "system_user"
+      },
+      {
+        "login": "ops",
+        "accountId": 126,
+        "space": "system_user"
+      },
+      {
+        "login": "mcm1",
+        "accountId": 127,
+        "space": "system_user"
+      },
+      {
+        "login": "rm",
+        "accountId": 128,
+        "space": "rate"
+      },
+      {
+        "login": "su",
+        "accountId": 129,
+        "space": "system_user"
+      },
+      {
+        "login": "jcsr",
+        "accountId": 130,
+        "space": "system_user"
+      },
+      {
+        "login": "scsr",
+        "accountId": 131,
+        "space": "system_user"
+      },
+      {
+        "login": "anonymous",
+        "accountId": 132,
+        "space": "auth"
+      },
+      {
+        "login": "csr_folder",
+        "accountId": 133,
+        "space": "auth"
+      },
+      {
+        "login": "mps_folder",
+        "accountId": 134,
+        "space": "auth"
+      },
+      {
+        "login": "mcm_folder",
+        "accountId": 135,
+        "space": "auth"
+      },
+      {
+        "login": "mom_folder",
+        "accountId": 136,
+        "space": "auth"
+      },
+      {
+        "login": "Admin",
+        "accountId": 137,
+        "space": "system_user"
+      },
+      {
+        "login": "MetraViewAdmin",
+        "accountId": 138,
+        "space": "mt"
+      },
+      {
+        "login": "Yajuteja",
+        "accountId": 631257221,
+        "space": "system_user"
+      },
+      {
+        "login": "veerasub",
+        "accountId": 977188173,
+        "space": "veera"
+      },
+      {
+        "login": "System Users",
+        "accountId": 1253832471,
+        "space": "veera"
+      },
+      {
+        "login": "veera",
+        "accountId": 1702627707,
+        "space": "mt"
+      },
+      {
+        "login": "testuser",
+        "accountId": 1817212771,
+        "space": "mt"
+      },
+      {
+        "login": "veeraAdmin",
+        "accountId": 1912172346,
+        "space": "system_user"
+      }
+    ]
+}
+  }

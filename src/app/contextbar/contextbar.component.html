@@ -1,0 +1,200 @@
+<div [ngClass]="{'ecb-contextBarMainMd': !isTicketLogin()}">
+    <div class="ecb-contextBar" *ngIf="SaveBtnType == 'ProductOffer'">
+        <div class="ebQuickActionBar">
+            <div class="ebQuickActionBar-commands pull-right">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <button class="ebBtn ebBtn-default" [ngClass]="{'hidden-sm': !isTicketLogin(), 'hidden-xs': !isTicketLogin()}" (click)="checkConfigurationDetails()" l10nTranslate>{{'TEXT_CONFIGURATION'}}</button>
+                </div>
+                <div *ngIf="displayDeleteBtn" class="ebQuickActionBar-commandsBlock">
+                    <button class="ebBtn ebBtn-default" [disabled]="!isDeletePoEnable" (click)="deleteProductOfferDetails()" l10nTranslate>{{'TEXT_DELETE'}}</button>
+                </div>
+            </div>
+            <div class="ebQuickActionBar-commands pull-left">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <a [ngClass]="{'hidden-sm': !isTicketLogin(), 'hidden-xs': !isTicketLogin()}" (click)="displayCoverHandlerPO()" l10nTranslate>{{"TEXT_LOCALIZATION"}}</a>
+                </div>
+                <div *ngIf="showAprrovalBtn" class="ebQuickActionBar-commandsBlock">
+                    <a l10nTranslate class="ecb-unicodeBidi" (click)="displayApprovalPanel()">{{"TEXT_APPROVAL"}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ecb-contextBar" *ngIf="SaveBtnType == 'bundle'">
+        <div class="ebQuickActionBar">
+            <div class="ebQuickActionBar-commands pull-right">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <button class="ebBtn ebBtn-default" [ngClass]="{'hidden-sm': !isTicketLogin(), 'hidden-xs': !isTicketLogin()}" (click)="checkConfigurationDetails()" l10nTranslate>{{'TEXT_CONFIGURATION'}}</button>
+                </div>
+                <div *ngIf="displayDeleteBtn" class="ebQuickActionBar-commandsBlock">
+                    <button class="ebBtn ebBtn-default" (click)="deleteBundle()" [disabled]="!isDeleteBundleEnable" l10nTranslate>{{'TEXT_DELETE'}}</button>
+                </div>
+            </div>
+            <div class="ebQuickActionBar-commands pull-left">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <a [ngClass]="{'hidden-sm': !isTicketLogin(), 'hidden-xs': !isTicketLogin()}" (click)="displayCoverHandlerPO()" l10nTranslate>{{"TEXT_LOCALIZATION"}}</a>
+                </div>
+                <div *ngIf="showAprrovalBtn" class="ebQuickActionBar-commandsBlock">
+                    <a l10nTranslate class="ecb-unicodeBidi" (click)="displayApprovalPanel()">{{"TEXT_APPROVAL"}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ecb-contextBar" *ngIf="SaveBtnType == 'PIDetails'">
+        <div class="ebQuickActionBar">
+            <div class="ebQuickActionBar-commands pull-right">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <button class="ebBtn ebBtn-primary" (click)="SavePIRateScheduleDetails()" l10nTranslate>{{'TEXT_SAVE'}}</button>
+                </div>
+                <div class="ebQuickActionBar-commandsBlock">
+                    <button class="ebBtn ebBtn-default" [routerLink]="['/ProductCatalog/ProductOfferListComponent']" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ecb-contextBar" *ngIf="SaveBtnType == 'localization'">
+        <div class="ebQuickActionBar">
+            <div class="ebQuickActionBar-commands pull-right">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <button class="ebBtn ebBtn-primary" [disabled]="!isCancelEnable" (click)="SaveLocalizationUpdate()" l10nTranslate>{{'TEXT_SAVE'}}</button>>
+                    <button class="ebBtn ebBtn-default" [disabled]="!isCancelEnable" (click)="cancelPopUP()"  l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ecb-contextBar" *ngIf="SaveBtnType == 'LOPIDetails'">
+        <div class="ebQuickActionBar">
+            <div class="ebQuickActionBar-commands pull-left">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <a [ngClass]="{'hidden-sm': !isTicketLogin(), 'hidden-xs': !isTicketLogin()}" (click)="displayCoverHandlerPO()" l10nTranslate>{{"TEXT_LOCALIZATION"}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ecb-contextBar" *ngIf="SaveBtnType == 'adjustmentReasons'">
+        <div class="ebQuickActionBar ecb-adjlocalization">
+            <div class="ebQuickActionBar-commands pull-left">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <a [ngClass]="{'hidden-sm': !isTicketLogin(), 'hidden-xs': !isTicketLogin()}" (click)="displayCoverHandlerPO()" l10nTranslate>{{"TEXT_LOCALIZATION"}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ecb-contextBar" *ngIf="SaveBtnType == 'PItemplate'">
+        <div class="ebQuickActionBar">
+            <div class="ebQuickActionBar-commands pull-left">
+                <div class="ebQuickActionBar-commandsBlock">
+                    <a [ngClass]="{'hidden-sm': !isTicketLogin(), 'hidden-xs': !isTicketLogin()}" (click)="displayCoverHandlerPO()" l10nTranslate>{{"TEXT_LOCALIZATION"}}</a>
+                </div>
+            </div>
+            <div *ngIf="deletePItemplateData?.kindType !='USAGE'" class="ebQuickActionBar-commands pull-right">
+                <div class="ebQuickActionBar-commandsBlock">>
+                    <button class="ebBtn ebBtn-default" [disabled]="!isDeletePItemplateEnable" (click)="deletePItemplateRecord()" l10nTranslate>{{'TEXT_DELETE'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ecb-contextBar" *ngIf="SaveBtnType == 'sharedRatelist' && displayDeleteBtn">
+        <div class="ebQuickActionBar">
+            <div class="ebQuickActionBar-commands pull-right">
+                <div class="ebQuickActionBar-commandsBlock">>
+                    <button class="ebBtn ebBtn-default" [disabled]="!isDeleteSREnable" (click)="deleteSharedRatelist()" l10nTranslate>{{'TEXT_DELETE'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  <div class="ecb-contextBar" *ngIf="SaveBtnType == 'calendar'">
+    <div class="ebQuickActionBar">
+        <div class="ebQuickActionBar-commands pull-right">
+            <div class="ebQuickActionBar-commandsBlock">>
+                <button class="ebBtn ebBtn-default" [disabled]="isDeleteCalendar" (click)="deleteCalendarDetails()" l10nTranslate>{{'TEXT_DELETE'}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)" [defaultFooterButtons]="false">
+        <dialog-header l10nTranslate *ngIf="!deleteBundleBoolean">{{'TEXT_DELETE'}}
+                <span l10nTranslate>{{'TEXT_PRODUCT_OFFER'}}</span></dialog-header>
+    <dialog-header l10nTranslate *ngIf="deleteBundleBoolean">{{'TEXT_DELETE_BUNDLE'}}</dialog-header>
+    <dialog-body>
+        <p><span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deletePOPData?.name}}&#32; &#63; </p>
+        <p>{{deletePOPData?.description}}</p>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+
+<ecb-modal-dialog [open]="confirmDialog == 2" (onClose)="onCloseDeleteSharedRate($event)" [defaultFooterButtons]="false">
+    <dialog-header l10nTranslate>{{'TEXT_DELETE_SHARED_RATE'}}</dialog-header>
+    <dialog-body l10nTranslate>
+        <p>
+            <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deleteSRData?.name}}&#32; &#63;</p>
+        <p>{{deleteSRData?.description}}</p>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+
+<ecb-modal-dialog [open]="confirmDialog == 3" (onClose)="onModelConfigDialogClose($event)" [header]="false" [footer]="false" [body]="false">
+    <dialog-header-template *ngIf="isPOConfigResult === true">
+        <div class="ebDialogBox-contentBlock_type_success">
+            <div class="ebDialogBox-primaryText ecb-confirmDialog-header">
+                <dialog-header l10nTranslate>{{'TEXT_CONFIGURATION'}}</dialog-header>
+            </div>
+            <dialog-body-template class="ebDialogBox-primaryText ecb-confirmDialog-desc">
+                <div *ngIf="configLoading" class="ecb-LoaderContainer">
+                    <span class="ebLoader-Dots"></span>
+                </div>
+                <p><span l10nTranslate> {{offeringName?.currentPage}}</span></p>
+                <p><span l10nTranslate>{{'TEXT_CONFIGURATION_COMPLETE'}}</span></p>
+            </dialog-body-template>
+        </div>
+    </dialog-header-template>
+    <dialog-header-template *ngIf="isPOConfigResult !== true">
+        <div class="ebDialogBox-contentBlock_type_warning">
+            <div class=" ebDialogBox-primaryText ecb-confirmDialog-header">
+                <dialog-header l10nTranslate>{{'TEXT_CONFIGURATION'}}</dialog-header>
+            </div>
+            <dialog-body-template class="ecb-checkConfigParagraphPadding">
+                <div *ngIf="configLoading" class="ecb-LoaderContainer">
+                    <span class="ebLoader-Dots"></span>
+                </div>
+                <p><span l10nTranslate> {{offeringName?.currentPage}}</span></p>
+                <p><span l10nTranslate> {{'TEXT_CONFIGURATION_INCOMPLETE'}}</span></p>
+                <p><span l10nTranslate>{{isPOConfigResult}}</span></p>
+            </dialog-body-template>
+        </div>
+    </dialog-header-template>
+    <dialog-footer-template>
+        <div class="modal-footer">
+            <button class="ebBtn ebBtn-primary" (click)="onModelConfigDialogClose($event)" l10nTranslate>{{'TEXT_OK'}}</button>
+        </div>
+    </dialog-footer-template>
+</ecb-modal-dialog>
+
+<ecb-modal-dialog [open]="confirmDialog == 4" (onClose)="onCloseDeletePItemplate($event)" [defaultFooterButtons]="false">
+    <dialog-header l10nTranslate>{{'TEXT_DELETE_PI_TEMPLATE'}}</dialog-header>
+    <dialog-body l10nTranslate>
+        <p>
+            <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deletePItemplateData?.displayName}}&#32; &#63;</p>
+        <p>{{deletePItemplateData?.description}}</p>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog === 6" (onClose)="onModalDialogLocalizationCancel($event)" [defaultFooterButtons]="false">
+        <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+        <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+        <dialog-button-1 l10nTranslate>{{'TEXT_CANCEL_WITHOUT_SAVING'}}</dialog-button-1>
+        <dialog-button-2 l10nTranslate>{{'TEXT_RETURN'}}</dialog-button-2>
+</ecb-modal-dialog>
+<ecb-modal-dialog [open]="confirmDialog == 5" (onClose)="onCloseDeleteCalendar($event)" [defaultFooterButtons]="false">
+    <dialog-header l10nTranslate>{{'TEXT_DELETE_CALENDAR'}}</dialog-header>
+    <dialog-body l10nTranslate>
+        <p>
+            <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deleteCalenderData?.name}}&#32; &#63;</p>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+</ecb-modal-dialog>

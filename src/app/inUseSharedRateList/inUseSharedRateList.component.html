@@ -1,0 +1,90 @@
+<ecb-modal-dialog [styleClass]="'ecb-inuseofferings'" [open]="confirmDialog == 1" (onClose)="onModalDialogClose($event)"
+  [heder]="false" [body]="false" [footer]="false">
+  <dialog-body-template>
+    <div class="ecb-inUseSharedRateHeader panel-heading">
+      <h2 l10nTranslate>{{"TEXT_IN_USE_SHARED_RATELISTS"}}
+        <span *ngIf="loadGridData">: {{sharedRatesData.displayName}}</span>
+        <span *ngIf="isPItemplate"> ({{sharedRatesData.chargeType}})</span>
+        <span *ngFor="let child of sharedRatesData.childs"> , {{child.displayName}}</span>
+      </h2>
+      <div *ngIf="isPItemplate">
+        <h3 l10nTranslate>{{"TEXT_SHARED_RATELISTS"}}
+          <span> ({{ sharedRatelistCount }}) </span>
+        </h3>
+      </div>
+    </div>
+    <!--error while fetching data -->
+    <div *ngIf="inUseGridConfigError">
+      <div class="container-fluid">
+        <div class="row">
+          <div class=" col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+            <p class="filterFetchingError">{{inUseGridConfigError}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--error while fetching data -->
+    <div class="ecb-positionRelative">
+      <ecb-loader *ngIf="sharedRateListFetching" mode="dot" fill="widget" type="widget"></ecb-loader>
+    <div *ngIf="loadGridData" class="panel-body ecb-gridInfiniteScroll ecb-inUseSharedRate" [ngStyle]="calculateGridScrollHeight()" ecb-infinite-scroller [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+      <p-dataTable #datatable   [value]="sharedRatelist" [scrollable]="columnDef.scrollable" (onLazyLoad)="loadData($event)" scrollWidth="getDeviceWidth()" sortField={{columnDef.defaultSortColumn}} sortOrder="{{convertedInUseDefaultSortOrder}}" [lazy]="columnDef.lazy" [immutable]="false">
+        <p-column [style]="cols.style" *ngFor="let cols of piTemplateColumns" [field]="cols.field" [header]="cols.key | translate:lang" [sortable]="cols.sortable"
+          filter="cols.filter" required="true">
+          <ng-template pTemplate="filter" let-col>
+            <div>
+              <input type="text" *ngIf="(col.field === 'name' || col.field === 'description') else filterElseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}'
+                [(ngModel)]="filterFields[col.field]" pInputText (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput ecb-inusesharedlistfilter" />
+              <ng-template #filterElseBlock>
+                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+              </ng-template>
+              <div class="ecb-clearFilterMain">
+                <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                  <em class="fa fa-times-circle-o fa-lg"></em>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header" let-col let-rowData="rowData">
+              <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+      <div *ngIf="getErrorMessageType() !== 0">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="alert alert-danger ecb-calInfoMessage" role="alert"
+              *ngIf="getErrorMessageType() === 1">
+              <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                <span class="sr-only">Close</span>
+              </button>
+              <p>{{inUseSharedRatelistErrorMessage}}</p>
+            </div>
+            <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                <div class="ebNotification-content ecb-infotext"> 
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>          
+                    <span class="ebNotification-label">
+                        <span l10nTranslate>{{'TEXT_NO_RECORDS'}} </span>
+                    </span>
+                </div>
+            </div>
+            <div  class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations" *ngIf="getErrorMessageType() === 3">
+                <div class="ebNotification-content ecb-infotext">           
+                    <span class="ebNotification-label">
+                      <div class="row">
+                        <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                      </div>
+                    </span>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    </div>
+  </dialog-body-template>
+</ecb-modal-dialog>

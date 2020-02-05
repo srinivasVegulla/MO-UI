@@ -1,0 +1,13 @@
+<div class="ebInfoPopup-content ebInfoPopup-errorContent_corner_default" *ngIf="!closeError && !isWarning">
+	<div class="ebInfoPopup-closeButton" (click)="closeErrorTooltip()" *ngIf="isCloseIcon">
+		<i class="fa fa-times" aria-hidden="true"></i>
+	</div>
+	<div class="ebInfoPopup-errorContentText" l10nTranslate>{{errorMessage}}</div>
+	<div class="ebInfoPopup-errorArrowBorder"></div>
+</div>
+<div [ngClass]="changeColumnPlacement()" class="alert ecb-WarningPopup" *ngIf="!closeError && isWarning">
+		<div class="ecbWarnPopup-closeButton" (click)="closeErrorTooltip()" *ngIf="isCloseIcon">
+			<i class="fa fa-times" aria-hidden="true"></i>
+		</div>
+		<div class="ecb-WarnMessage" l10nTranslate>{{errorMessage}}</div>
+</div>

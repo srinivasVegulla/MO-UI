@@ -1,0 +1,140 @@
+<div>
+      <div *ngIf="isPILoadError">
+            <div>
+                  <div class=" ecb-alertCreatePOEerrormsg col-xs-12 col-sm-6  col-md-6 col-lg-offset-4 col-lg-4 col-lg-offset-4  alert alert-danger  "
+                        role="alert">
+                        <p l10nTranslate>
+                              {{deleteErrorMessage}}
+                        </p>
+                  </div>
+            </div>
+      </div>
+      <div class="row ecb-rowContainer" *ngIf="!isPILoadError">
+            <div *ngIf="showLoader" class="ebLoader ecb-pageLoaderPosition ecb-fullPageLoader">
+                  <div class="ebLoader-Holder">
+                        <span class="ebLoader-Dots"></span>
+                  </div>
+            </div>
+            <div>
+                  <div *ngIf="priceableItemsData?.kindType == 'NON_RECURRING'">
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3">
+                              <ecb-loader *ngIf="showPIProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-piproperties [PIType]="NON_RECURRING" (isFormDirty)="displayNavoutDialog($event)" [isPItemplate]="true" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    [oneTimeCharges]="priceableItemsData"></ecb-piproperties>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3" *ngIf="isExtendedPropertiesAvailable">
+                              <ecb-loader *ngIf="showExtProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-extended-properties [type]="'PItemplate'" [extendedProperties]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"></ecb-extended-properties>
+                        </div>
+                        <div *ngIf="showAdjustments" class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIAdjustments" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-priceableItem-adjustments [isPItemplate]="true" [piAdjustments]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    (isFormDirty)="displayNavoutDialog($event)"></ecb-priceableItem-adjustments>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIRateTables" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-pt-ratetable [type]="'PItemplate'" [templateData]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"></ecb-pt-ratetable>
+                        </div>
+                  </div>
+                  <div *ngIf="priceableItemsData?.kindType == 'RECURRING'">
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-piproperties [PIType]="PIType" [isPItemplate]="true" (isFormDirty)="displayNavoutDialog($event)" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    [oneTimeCharges]="priceableItemsData"></ecb-piproperties>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIBilling" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-pi-billing [isPItemplate]="true" (isFormDirty)="displayNavoutDialog($event)" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    [billingInformation]="priceableItemsData"></ecb-pi-billing>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 " *ngIf="isExtendedPropertiesAvailable">
+                              <ecb-loader *ngIf="showExtProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-extended-properties [type]="'PItemplate'" [extendedProperties]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"></ecb-extended-properties>
+                        </div>
+                        <div *ngIf="showAdjustments" class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIAdjustments" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-priceableItem-adjustments [isPItemplate]="true" [piAdjustments]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    (isFormDirty)="displayNavoutDialog($event)"></ecb-priceableItem-adjustments>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIRateTables" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-pt-ratetable [type]="'PItemplate'" [templateData]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"></ecb-pt-ratetable>
+                        </div>
+                  </div>
+                  <div *ngIf="priceableItemsData?.kindType == 'UNIT_DEPENDENT_RECURRING'">
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-piproperties [isPItemplate]="true" (isFormDirty)="displayNavoutDialog($event)" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    [oneTimeCharges]="priceableItemsData"></ecb-piproperties>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIBilling" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-pi-billing [isPItemplate]="true" (isFormDirty)="displayNavoutDialog($event)" [billingInformation]="priceableItemsData"
+                                    (isPITemplateUpdated)="updatePITemplate($event)"></ecb-pi-billing>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIUnitDetails" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-unit-details [isPItemplate]="true" (isFormDirty)="displayNavoutDialog($event)" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    [PIdata]="priceableItemsData"></ecb-unit-details>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 " *ngIf="isExtendedPropertiesAvailable">
+                              <ecb-loader *ngIf="showExtProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-extended-properties (isFormDirty)="displayNavoutDialog($event)" [type]="'PItemplate'" [extendedProperties]="priceableItemsData"
+                                    (isPITemplateUpdated)="updatePITemplate($event)"></ecb-extended-properties>
+                        </div>
+                        <div *ngIf="showAdjustments" class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIAdjustments" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-priceableItem-adjustments [isPItemplate]="true" [piAdjustments]="priceableItemsData" (isFormDirty)="displayNavoutDialog($event)"
+                                    (isPITemplateUpdated)="updatePITemplate($event)"></ecb-priceableItem-adjustments>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIRateTables" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-pt-ratetable [type]="'PItemplate'" [templateData]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"></ecb-pt-ratetable>
+                        </div>
+                  </div>
+                  <div *ngIf="priceableItemsData?.kindType == 'USAGE'">
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-piproperties [PIType]="PIType" (isFormDirty)="displayNavoutDialog($event)" [isPItemplate]="true" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    [oneTimeCharges]="priceableItemsData"></ecb-piproperties>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 " *ngIf="isExtendedPropertiesAvailable">
+                              <ecb-loader *ngIf="showExtProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-extended-properties [type]="'PItemplate'" [extendedProperties]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"></ecb-extended-properties>
+                        </div>
+                        <div *ngIf="showAdjustments" class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIAdjustments" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-priceableItem-adjustments [isPItemplate]="true" [piAdjustments]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    (isFormDirty)="displayNavoutDialog($event)"></ecb-priceableItem-adjustments>
+                        </div>
+                        <div *ngIf="priceableItemsData?.childs.length > 0" class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-card-controller [type]="'PItemplate'" [templateId]="priceableItemsData?.templateId" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    [ChildPItemplate]="priceableItemsData">
+                              </ecb-card-controller>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                              <ecb-loader *ngIf="showPIRateTables" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-pt-ratetable [type]="'PItemplate'" [templateData]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"></ecb-pt-ratetable>
+                        </div>
+                  </div>
+                  <div *ngIf="priceableItemsData?.kindType == 'DISCOUNT'">
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-piproperties [PIType]="PIType" (isFormDirty)="displayNavoutDialog($event)" [isPItemplate]="true" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    [oneTimeCharges]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"></ecb-piproperties>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 " *ngIf="isExtendedPropertiesAvailable">
+                              <ecb-loader *ngIf="showExtProperties" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-extended-properties [type]="'PItemplate'" (isPITemplateUpdated)="updatePITemplate($event)" [extendedProperties]="priceableItemsData"></ecb-extended-properties>
+                        </div>
+                        <div *ngIf="showAdjustments" class="col-xs-12 col-sm-6 col-md-6 col-lg-3 ">
+                              <ecb-loader *ngIf="showPIAdjustments" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                              <ecb-priceableItem-adjustments [isPItemplate]="true" [piAdjustments]="priceableItemsData" (isPITemplateUpdated)="updatePITemplate($event)"
+                                    (isFormDirty)="displayNavoutDialog($event)"></ecb-priceableItem-adjustments>
+                        </div>
+                  </div>
+                  <ecb-localization *ngIf="showLocalizationPanel" (closeLocalisationAsidePanel)="hidelocalizationWidget($event)"></ecb-localization>
+            </div>
+      </div>
+</div>

@@ -1,0 +1,41 @@
+<div *ngIf='!isTicketLogin()'>
+    <ecb-systemBar></ecb-systemBar>
+</div>
+<div class="ecb-bodyContainer" [ngClass]="{'ecb-ticketBodyContent': isTicketLogin()}">
+    <div class="ebBreadcrumbs-container">
+        <div class="row">
+            <ecb-breadcrumb></ecb-breadcrumb>
+        </div>      
+    </div>
+    <div class="row">
+        <div class="col-md-12 hidden-xs hidden-sm control-bar visible-md-up" [ngClass]="{'ecb-hideContextBar': !isTicketLogin()}">
+            <ecb-contextBar></ecb-contextBar>
+        </div>
+    </div>
+    
+    <div class="container-fluid ecbPageContainer" [ngStyle]="getScrollData()">
+        <ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)" [defaultFooterButtons]="false" [contentType]="'info'" [primaryButtons] = "[1]" class="ecb-sessionTimeOutPending">
+            <dialog-header l10nTranslate>{{'TEXT_SESSION_TIMEOUT_PENDING'}}</dialog-header>
+            <dialog-body>
+                <div class="ecb-adjustmentPanel">
+                    <div l10nTranslate>{{'TEXT_SESSION_TIME_OUT_SECURITY_MEASURE'}}</div>
+                    <div l10nTranslate>{{'TEXT_SESSION_ENDS_AFTER_20_MINUTES_OF_INACTIVITY'}}</div>
+                </div>
+                <div class="ecb-adjustmentPanel">
+                    <div l10nTranslate>{{'TEXT_CLICK_CONTINUE_SESSION_ALIVE'}}</div>
+                    <div>
+                        <span l10nTranslate>{{'TEXT_YOU_HAVE'}}</span>
+                        <span>{{idleTimeObj?.minutes}}</span>
+                        <span l10nTranslate>{{'TEXT_MINUTES'}}</span>
+                        <span>{{idleTimeObj?.seconds}}</span>
+                        <span l10nTranslate>{{'TEXT_SECONDS'}}</span>
+                    </div>
+                </div>
+            </dialog-body>
+            <dialog-button-1 l10nTranslate>{{'TEXT_LOGOUT'}}</dialog-button-1>
+            <dialog-button-2 l10nTranslate>{{'TEXT_CONTINUE_SESSION'}}</dialog-button-2>
+        </ecb-modal-dialog>
+        <router-outlet></router-outlet>
+        <!-- <ecb-dialog></ecb-dialog> -->
+    </div>
+</div>

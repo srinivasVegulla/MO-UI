@@ -1,0 +1,244 @@
+<div class="panel panel-default ecb-sharedPricelist">
+  <div class="panel-heading">
+    <div class="ebCommands-placement ecbCommandsCenterAlign">
+      <span>
+        <em class="fa fa-refresh ecb-enableAlignIcon" title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+      </span>
+      <div class="ebLayout-HeadingCommands-separator"></div>
+      <a (click)="openTypesPopup()">
+        <span l10nTranslate>{{"TEXT_CREATE_PI_TEMPLATE"}}</span>
+      </a>
+    </div>
+    <h2>
+      <span l10nTranslate>{{"TEXT_PI_TEMPLATE_LIST"}}</span> ({{totalCount}})</h2>
+  </div>
+  <ecb-create-pitemplate (OpenCreatePanel)="openCreatePanel($event, CreateProperties)" (isCreatePopupClosed)="closeCreatePopup($event)"
+    *ngIf="isCreatePItemplate"></ecb-create-pitemplate>
+  <ecb-inuse-offerings-modal-dialog *ngIf="showInUseOfferings" [offeringsData]="inUseOfferingsData" [offeringsLocation]="inUseOfferingsLocation"
+    (inUseModalDialogClose)="hideInUseModalDialog($event)"></ecb-inuse-offerings-modal-dialog>
+  <ecb-inuse-shared-ratelist *ngIf="showInUseSharedRatelist" [sharedRatesData]="inUseOfferingsData" [sharedRatesLocation]="inUseOfferingsLocation"
+    (inUseSharedRatesClose)="hideInUseModalDialog($event)"></ecb-inuse-shared-ratelist>
+  <div class="ecb-positionRelative panel-body">
+    <div *ngIf="errorMessage">
+        <div class="row">
+            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger" role="alert"> 
+            <p>{{errorMessage}}</p>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="loadGridData" class="ecb-tableOverflow" [ngStyle]="calculateGridScrollHeight()" [scrollerContext]="'self'"
+      ecb-infinite-scroller (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+      <ecb-loader *ngIf="priceableItemFetching" mode="dot" fill="widget" backDropClassName="ecb-loaderposition"></ecb-loader>
+      <p-dataTable  #sharedPricelistDatatable [value]="piTemplatelist" scrollWidth="100%" [scrollable]="piTemplateColumns.scrollable"
+        [lazy]="piTemplateColumns.lazy" (onLazyLoad)="loadData($event)" sortField={{piTemplateColumns.defaultSortColumn}} sortOrder={{convertedDefaultSortOrder}}
+        [immutable]="false">
+        <p-column [style]="col.style" *ngFor="let col of piTemplateColumns.cols" [field]="col.field" [header]="col.key | translate:lang"
+          [sortable]="col.sortable" filter="col.filter" required="true">
+
+          <ng-template pTemplate="header" let-col let-rowData="rowData">
+            <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+          </ng-template>
+
+          <ng-template pTemplate="filter" let-col>
+            <div>
+              <input type="text" *ngIf="(col.field === 'name' || col.field === 'displayName' || col.field === 'description') else filterElseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}'
+               [(ngModel)]="filterFields[col.field]" pInputText (keyup)="filterDataKeys($event,col.field,filterFields[col.field])" class="ecb-filterInput" />
+              <ng-template #filterElseBlock>
+                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+              </ng-template>
+              <div class="ecb-clearFilterMain">
+                <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                  <em class="fa fa-times-circle fa-lg"></em>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template pTemplate="filter" let-col *ngIf="col.field === 'offeringsCount'">
+            <div>
+              <ecb-number-date-filter (selectedUserFilter)="fetchInUserOfferings($event)" [filterKind]="'number'" [selectedColumnToFilter]="'offeringsCount'"
+                [columnPlacement]="'middle'"></ecb-number-date-filter>
+            </div>
+          </ng-template>
+
+          <ng-template pTemplate="filter" let-col *ngIf="col.field === 'sharedRateListCount'">
+            <div>
+              <ecb-number-date-filter (selectedUserFilter)="fetchInUserOfferings($event)" [filterKind]="'number'" [selectedColumnToFilter]="'sharedRateListCount'"
+                [columnPlacement]="'last'"></ecb-number-date-filter>
+            </div>
+          </ng-template>
+
+          <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <a *ngIf="data?.kind !== 'USAGE'">
+              <em class="fa fa-times-circle fa-lg" title='{{"TEXT_DELETE"| translate:lang}}' [class.disable]="!isDeleteableTemplate(data)" (click)="deletePricelistRecord(data,i)"
+                aria-hidden="true"></em>
+            </a>
+            <span class="ecb-poListTooltip" *ngIf="errorTooltip && i == tooltipIndex">
+              <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="deletePItemplateError" (onClose)="OnTooltipClose($event)"></ecb-errortooltip>
+            </span>
+          </ng-template>
+          <ng-template *ngIf="col.field == 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <span>
+              <a (click)="redirectToDetailPage(data)">{{piTemplatelist[i]?.name}}
+                <span *ngIf="piTemplatelist[i]?.childs?.length >0">
+                  <span *ngFor="let child of piTemplatelist[i].childs; last as isLast; first as isFirst">
+                    <span *ngIf="isFirst">&#40;</span> {{child.displayName}}
+                    <span *ngIf="!isLast">&#44;</span>
+                    <span *ngIf="isLast">&#41;</span>
+                  </span>
+                </span>
+              </a>
+            </span>
+          </ng-template>
+          <ng-template *ngIf="col.field == 'chargeType'" pTemplate="filter" let-col>
+            <ecb-dropdown [options]='usageTypes' [modelValue]='usageFirstName' [primaryOption]='usageFirstName' (changeItem)="changeUsageType($event)">
+            </ecb-dropdown>
+          </ng-template>
+          <ng-template *ngIf="col.field === 'sharedRateListCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <div class="ecb-cursorPointer text-right" (click)="openInuseSharedRatelist(data)" *ngIf="piTemplatelist[i].sharedRateListCount !== 0">
+              <a>{{data[col.field]}}</a>
+            </div>
+          </ng-template>
+          <ng-template *ngIf="col.field === 'offeringsCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+            <div class="ecb-cursorPointer text-right" (click)="openInuseOfferings(data)" *ngIf="piTemplatelist[i].offeringsCount !== 0">
+              <a>{{data[col.field]}}</a>
+            </div>
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+      <div *ngIf="getErrorMessageType() !== 0">
+        <div class="ecb-infoStyling">
+          <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+            <p >{{piTemplatelistError}}</p>
+          </div>
+          <div  class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations" *ngIf="getErrorMessageType() === 2">
+              <div class="ebNotification-content ecb-infotext">           
+                  <span class="ebNotification-label">
+                      <span l10nTranslate>{{'TEXT_NO_PRICEABLE_ITEM_TEMPLATE_RECORDS'}} </span>
+                  </span>
+              </div>
+            </div>
+            <div  class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations" *ngIf="getErrorMessageType() === 3">
+                <div class="ebNotification-content ecb-infotext">           
+                    <span class="ebNotification-label">
+                        <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}">
+  </div>
+  <ngx-aside #CreateProperties [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+    class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel panel-default ecb-editpanelheight">
+        <div class="panel-heading ">
+          <div class="row">
+            <h2 class="col-xs-6 ecb-toggleFloat" l10nTranslate>
+              <span l10nTranslate>{{'TEXT_CREATE'}}</span> {{selectedPItemplate?.chargeType}}
+              <span l10nTranslate>{{'TEXT_CHARGE'}}</span>
+              <span l10nTranslate>{{'TEXT_TEMPLATE'}}</span>
+            </h2>
+            <div class="col-xs-6 ecb-editOverlayLink">
+              <button class="ebBtn ecbBtn-margin" [disabled]="!isSaveEnabled" [ngClass]="{'ebBtn-primary': isSaveEnabled}" (click)="createPItemplate()"
+                l10nTranslate>{{'TEXT_SAVE'}}</button>
+              <button class="ebBtn ebBtn-default" (click)="closeCreatePItemplatePanel()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div *ngIf="showDuplicateName" class="alert alert-danger" role="alert" l10nTranslate>
+            <button type="button" class="close" data-dismiss="alert">
+              <span aria-hidden="true" (click)="showDuplicateName = false">×</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <p>{{showDuplicateNameError}}</p>
+          </div>
+          <form form #f="ngForm" [formGroup]="createPItemplateForm" class="ngForm" (keydown)="onEnterCreatePItemplate($event)" novalidate>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+              <div class="input-group col-xs-12">
+                <input #defaultName type="text" tabindex="1" class="ebInput" name="name" formControlName="name" (keydown)="disableSpace($event)" (focusout)="removeSpace()" maxlength="255" [autofocus]="true"
+                  (blur)="checkNameAvailability()" [ngClass]="{'ecb-fieldEmptyValidator': (createPItemplateForm.controls.name.hasError('required') && createPItemplateForm.controls.name.touched)
+              || nameExist}" autofocus>
+                <span class="input-group-required"></span>
+              </div>
+              <div *ngIf="createPItemplateForm.controls.name.hasError('required') && createPItemplateForm.controls.name.touched" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_NAME_REQUIRED'}}</span>
+              </div>
+              <!-- Input name uniqueness error message -->
+              <div *ngIf="nameExist && !createPItemplateForm.controls.name.hasError('required') && createPItemplateForm.controls.name.touched" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_NAME_EXIST'}}</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DISPLAY_NAME'}}</label>
+              <div class="input-group col-xs-12">
+                <input type="text" tabindex="2" class="ebInput" name="displayName" formControlName="displayName"  (keydown)="disableSpace($event)" (focusout)="removeSpace()"  [ngClass]="{'ecb-fieldEmptyValidator': createPItemplateForm.controls.displayName.hasError('required') && createPItemplateForm.controls.displayName.touched}">
+                <span class="input-group-required"></span>
+              </div>
+              <div *ngIf="createPItemplateForm.controls.displayName.hasError('required') && createPItemplateForm.controls.displayName.touched" class="ebInputError">
+                <span class="statusError"></span>
+                <span l10nTranslate>{{'TEXT_DISPLAYNAME_REQUIRED'}}</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+              <div class="input-group col-xs-12">
+                <textarea class="form-control ecbTextArea"  tabindex="3" type="text" #textArea [ngClass]="autoGrow()" maxlength="4000" name="description" formControlName="description"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="simple-input" class="ebLabel" l10nTranslate>{{'TYPE_DISPLAY_NAME'}}</label>
+              <div class="input-group col-xs-12">
+                <div type="text" class="ebInput" readonly="readonly" l10nTranslate>{{selectedPItemplate?.displayName}}</div>
+              </div>
+            </div>
+            <div class="form-group" *ngIf="selectedPItemplate?.kind =='NON_RECURRING'">
+              <label for="radiobutton" class="ebLabel" l10nTranslate>{{'TEXT_APPLY_CHARGE_AT_SUBSCRIPTION'}}</label>
+              <div class="ebRadioBtn">
+                <label>
+                  <input type="radio" name="eventType" tabindex="4" [checked]="true" value="1" formControlName="eventType">
+                  <div class="text" l10nTranslate>{{'TEXT_ACTIVATION'}}</div>
+                </label>
+                <label>
+                  <input type="radio" name="eventType" tabindex="5" [checked]="" value="2" formControlName="eventType">
+                  <div class="text" l10nTranslate>{{'TEXT_TERMINATION'}}</div>
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="panel-footer"> 
+          <div class="row">
+            <div class="col-xs-12 col-sm-12">
+              <div class="input-group ecb-sidebarFooter">
+                <input type="text"  class="ebInput" placeholder="" readonly>
+                <span class="ecb-requriedIndicator" l10nTranslate> {{'TEXT_REQUIRED_FIELD'}}</span><span class="input-group-required"> </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ngx-aside>
+  <ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+  </ecb-modal-dialog>
+  <ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 2" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+    <dialog-header l10nTranslate>{{'TEXT_DELETE_PI_TEMPLATE'}}</dialog-header>
+    <dialog-body l10nTranslate>
+      <p>
+        <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deleteablePitemplateData?.name}}&#32; &#63;</p>
+      <p>{{deleteablePitemplateData?.description}}</p>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+  </ecb-modal-dialog>

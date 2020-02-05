@@ -1,0 +1,64 @@
+<div class="row" *ngIf="isDeletePOError">
+  <div class=" ecb-alertCreatePOEerrormsg col-xs-12 col-sm-6  col-md-6 col-lg-offset-4 col-lg-4 col-lg-offset-4  alert alert-danger "
+    role="alert">
+    <p l10nTranslate>
+      {{deletePOError}}
+    </p>
+    <span class="ebNotification-close" (click)="deleteErrorMessage()">
+      <i class="ebIcon ebIcon_close_red"></i>
+    </span>
+  </div>
+</div>
+
+<div class="row" *ngIf="showErrorMessage">
+  <div class="ecb-alertCreatePOEerrormsg col-xs-offset-3 col-xs-7 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-5 alert alert-danger" role="alert">
+    <p l10nTranslate>
+      {{errorMessage}}
+    </p>
+  </div>
+</div>
+<div class="row" *ngIf="showAprrovalMsg">
+    <div class="alert ecb-Warning ecb-WarningApproval col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-2 col-md-9" role="alert">
+        <p>{{showAprrovalWarningMsg}}</p>
+    </div>
+</div>
+<div *ngIf="!showErrorMessage && loadBundleData">
+  <div class="row ecb-rowContainer">
+    <div *ngIf="isCapableOf('Properties_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+      <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+      <ecb-loader *ngIf="showPropertiesSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+      <ecb-properties [properties]="bundleData" [approvalFlag]="approvalCheck" [productOfferId]="bundleId" [displayBundle]="true" (isOfferingUpdated)="updateOffering($event)"></ecb-properties>
+    </div>
+    <div *ngIf="isCapableOf('SubsSettings_View')"  class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+      <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+      <ecb-loader *ngIf="showSubSettingsSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+      <ecb-permissions [permissions]="bundleData" [approvalFlag]="approvalCheck" [productOfferId]="bundleId" [displayBundle]="true" (isOfferingUpdated)="updateOffering($event)"></ecb-permissions>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 " *ngIf="hideWidget == true && isCapableOf('SubsProps_View')">
+      <ecb-subscription-properties [productOfferId]="bundleId" [isBundle]="true"></ecb-subscription-properties>
+    </div>
+    <div *ngIf="isCapableOf('ExtProps_View')"  class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ">
+      <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+      <ecb-loader *ngIf="showExtPropertiesSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+      <ecb-extended-properties [type]="'Bundle'"  [approvalFlag]="approvalCheck" [extendedProperties]="bundleData" [productOfferId]="bundleId" [displayBundle]="true"
+        (isOfferingUpdated)="updateOffering($event)"></ecb-extended-properties>
+    </div>
+  </div>
+  <div class="row">
+    <div *ngIf="isCapableOf('POs_View')" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 ecb-POSkeletonLoader">
+      <ecb-productofferinbundle [selectedBundleData]="bundleData" [isBundle]="true" (isOfferingUpdated)="updateOffering($event)"></ecb-productofferinbundle>
+    </div>
+    <div *ngIf="isCapableOf('PIs_View')" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 ecb-POSkeletonLoader">
+      <ecb-priceable-items [productOfferId]="bundleId" [isBundle]="true"></ecb-priceable-items>
+    </div>
+  </div>
+  <ecb-localization *ngIf="showLocalizationPanel" (closeLocalisationAsidePanel)="hidelocalizationWidget($event)"></ecb-localization>
+  <ecb-approval *ngIf="showApprovalPanel" [isLoadedFrom]="currentView" (closeApprovalAsidePanel)="hideApprovalWidget($event)" (unsavedChanges)="updateDeactivationState($event)"></ecb-approval>
+</div>
+
+<div id="footer" class="ebPageFooter">
+  <div class="col-xs-12">
+    <div class="input-group">
+    </div>
+  </div>
+</div>

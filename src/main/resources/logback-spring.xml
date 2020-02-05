@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration>
+    <springProperty scope="context" name="LOGSTASH" source="ecb.log.stash.destination" defaultValue="localhost"/>
+    <springProperty scope="context" name="APPENDER-REF-1" source="ecb.log.stash.appender-1"
+                    defaultValue="STDOUT-APPENDER"/>
+    <springProperty scope="context" name="APPENDER-REF-2" source="ecb.log.stash.appender-2"
+                    defaultValue="STDOUT-APPENDER"/>
+
+
+    <springProfile name="develop">
+        <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+    </springProfile>
+
+    <!--RA-284 Temporarily remove references to logstash-logback-encoder for 17.0-->
+    <!--<springProfile name="develop">-->
+    <!--<appender name="LOGSTASH-APPENDER" class="net.logstash.logback.appender.LogstashTcpSocketAppender">-->
+    <!--<destination>${LOGSTASH}</destination>-->
+    <!--<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder" >-->
+    <!--<providers>-->
+    <!--<timestamp/>-->
+    <!--<version/>-->
+    <!--<loggerName/>-->
+    <!--<pattern>-->
+    <!--<pattern>-->
+    <!--{-->
+    <!--"custom_constant": "cfg-catalog",-->
+    <!--"level": "%level",-->
+    <!--"thread": "%thread",-->
+    <!--"message": "%message"-->
+    <!--}-->
+    <!--</pattern>-->
+    <!--</pattern>-->
+    <!--</providers>-->
+    <!--</encoder>-->
+    <!--<keepAliveDuration>5 minutes</keepAliveDuration>-->
+    <!--</appender>-->
+    <!--</springProfile>-->
+
+    <appender name="STDOUT-APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder
+          by default -->
+        <encoder>
+            <pattern>%d{MM-dd-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <property name="LOG_PATH" value="${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}"/>
+    <appender name="SAVE-TO-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/metraoffer.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>
+                %d{MM-dd-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n
+            </Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${LOG_PATH}/archived/metraoffer-log_%d{MM-dd-yyyy}_%i.log
+            </fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="com.ericsson" level="INFO"/>
+    <logger name="io.swagger.models.parameters.AbstractSerializableParameter" level="ERROR"/>
+    <logger name="org.springframework" level="ERROR"/>
+    <logger name="com.netflix.astyanax" level="INFO"/>
+
+    <root level="WARN">
+        <springProfile name="default, develop, test, prod">
+            <appender-ref ref="${APPENDER-REF-1}"/>
+            <appender-ref ref="${APPENDER-REF-2}"/>
+            <appender-ref ref="SAVE-TO-FILE"/>
+        </springProfile>
+    </root>
+</configuration>

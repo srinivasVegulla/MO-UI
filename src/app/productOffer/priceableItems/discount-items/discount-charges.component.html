@@ -1,0 +1,65 @@
+<div class="ecb-positionRelative">
+ <div *ngIf="!isDeletePOError">
+  <div *ngFor="let discount of discountChargeCardstype; let i = index">
+    <div class="ecbClickableCard" *ngIf="showPiCard(discount.itemInstanceId)" id="cardTotalHeightDiscount-{{i}}" >
+      <ecb-loader  *ngIf="showSkeleton" mode="skeleton" fill="widget" type="widget" backDropClassName="ecb-loaderMinHeight"></ecb-loader>       
+      <div (click)="redirectToPIDetailsPage(productOfferId,discount,PIType)">
+        <div class="ecbClickableCard-heading">
+          <div class="display_name" >
+            {{discount?.displayName}}
+          </div>
+        </div>
+        <div class="ecbClickableCard-body"  id="cardBodyDiscount-{{i}}">
+          <p>
+            <!---Requried for feature use  <img src="../../assets/images/ericssonIcons/products-750x423.jpg"> -->
+            {{discount?.description}}</p>
+          <div class="properties">
+              <label for="PIcard" class="ebLabel" l10nTranslate>{{'TEXT_RATE_TABLES'}}<span>&#58;</span>
+                </label>
+                <div *ngFor="let inputFieldString of discount.parameterTable">
+                    <p *ngIf="inputFieldString.displayName">{{inputFieldString.displayName}}</p>
+                    <p *ngIf="!inputFieldString.displayName">{{inputFieldString.name}}</p>
+        </div>
+          </div>
+        </div>
+      </div>
+      <div class="ecbClickableCard-footer">
+        <div class="actionIcons">
+          <span *ngIf="removePICapability" [class.disableEditLink]="disableDeletePi">
+            <a *ngIf="disableDeletePi">
+              <i class="fa fa-minus-circle" title='{{"TEXT_REMOVE_TEMPORARY"| translate:lang}}' aria-hidden="true" (click)="removePIInstanceIcon(discount.itemInstanceId, i)"></i>
+            </a>
+            <a *ngIf="!disableDeletePi">
+              <i class="fa fa-minus-circle" title='{{"TEXT_REMOVE_TEMPORARY"| translate:lang}}' [class.fa-disabled]="!disableDeletePi" aria-hidden="true"></i>
+            </a>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div  class="ecbClickableCard deletePopUp " [ngStyle]="{ 'min-height':height + 'px'}"
+     *ngIf="showConfirmationDialogue(discount.itemInstanceId)">
+      <div  class="ecbClickableCard-heading">
+        <div class="display_name">
+          <span l10nTranslate>{{'TEXT_REMOVE_PRICEABLE_ITEM'}}</span>
+        </div>
+      </div>
+      <div class="ecbClickableCard-body" [ngStyle]="{ 'min-height':bodyHeight + 'px'}">
+        <div><span l10nTranslate>{{'TEXT_REMOVE'}} </span>{{discount.displayName}} &#32; &#63;</div>
+        <p>{{discount.description}}</p>
+      </div>
+      <div  class="ecbClickableCard-footer ecb-height100percent ecb-buttons">
+        <button class="ebBtn ebBtn-primary" (click) = "removePIInstanceCard(discount.itemInstanceId)" l10nTranslate>{{'TEXT_REMOVE'}}</button>
+        <button class="ebBtn ebBtn-default"  (click) = "cancelPIInstanceCard()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="isDeletePOError">
+  <div class="col-xs-12 alert alert-danger " role="alert">
+    <p l10nTranslate><strong>{{deletePOError}}</strong></p>
+    <span class="ebNotification-close" (click)="deleteErrorMessage()">
+      <i class="ebIcon ebIcon_close_red"></i>
+    </span>
+  </div>
+</div>
+</div>

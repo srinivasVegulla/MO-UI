@@ -1,0 +1,183 @@
+<div class="modalDialog" tabindex="-1" [ngStyle]="{'display': visible ? 'block' : 'none'}">
+        <div class="modal-dialog ecb-addModal">
+          <div class="modal-content panel panel-default">
+            <div class="modal-header ecb-priceableItemModalHeader">
+                    <div class="panel-heading ecb-panelHeading">
+                            <div class="row">
+                              <h2 class="ecb-toggleFloat" l10nTranslate>{{'TEXT_ADD_PRODUCT_OFFERS'}}</h2>
+                              <div class="ecb-editOverlayLink">
+                                  <span>{{selectedPoCount}}</span> <span class="selectedItems" l10nTranslate>{{'TEXT_PRODUCTS_SELECTED'}}</span>
+                                <button class="ebBtn ecbBtn-margin ebBtn-primary" [disabled]="checkAnyPOSelected()" (click)="addPoToBundle()" l10nTranslate>{{"TEXT_ADD"}}</button>
+                                <button class="ebBtn" (click)="hide()" l10nTranslate>{{"TEXT_CLOSE"}}</button>
+                              </div>
+                            </div>   
+                    </div>
+                   
+                    <div class="ecb-toggleFloat">
+                            <h3>
+                              <span l10nTranslate>{{"TEXT_PRODUCT_OFFER_LIST"}}</span> ({{totalCount}})
+                           </h3>
+                    </div> 
+              </div>
+        
+              <div *ngIf="filterErrorMessage">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class=" col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+                        <span class="ebCloseIconAlignment" (click)="removeFilterFetchingError()">
+                                  <i class="ebIcon ebIcon_close_red "></i>
+                        </span>
+                            <p class="filterFetchingError" l10nTranslate><strong>{{"TEXT_FILTERED_DATA_FETCHING_ERROR"}}</strong></p>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            <!--error while Adding data -->
+            <div *ngIf="showErrorMessage">
+                <div class="row">
+                    <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger ecb-clearFix" role="alert">
+                    <button *ngIf="!loadError" type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                        <p class="ecb-unicodeBidi" l10nTranslate>{{errorMessageDisplay}}</p>
+                    </div>
+                </div>
+            </div>
+            <!--error while Adding data -->
+            
+            <div class="ecb-positionRelative panel-body ecb-loaderMinHeight">
+            <!--loader -->
+            <ecb-loader *ngIf="loading" mode="dot" fill="widget"></ecb-loader>
+            <!--loader -->
+            <!-- couldnot load pilist error message ends --> 
+            <div *ngIf="loadGridData" class="modal-body eb-adjustPanelBodyMargin ecb-tableOverflow ecb-gridInfiniteScroll" ecb-infinite-scroller [ngStyle]="calculateGridScrollHeight()" [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()"  [immutable]="false"> 
+                <p-dataTable  #datatable [value]="addProductOfferList" [scrollable]="columnDef.scrollable" [lazy]="columnDef.lazy" (onLazyLoad)="loadData($event)" scrollWidth="getDeviceWidth()" sortField={{columnDef.defaultSortColumn}}
+                sortOrder={{convertedDefaultSortOrder}} [immutable]="false">
+                 <p-column [style]="col.style" *ngFor="let col of cols" [field]="col.field" [header]="col.key | translate:lang" [sortable]="col.sortable" filter="col.filter" required="true">
+                <ng-template pTemplate="filter" let-col *ngIf="col.field !== 'currency' && col.field !== 'partitionName'">
+                 <div>
+            <input type="text" *ngIf="col.field !== 'select' && col.field !== 'bundle';else elseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                    <ng-template #elseBlock>
+                                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true"/>
+                    </ng-template>
+                     <div class="ecb-clearFilterMain">
+                       <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                          <i class="fa fa-times-circle-o fa-lg"></i>
+                        </div>
+                     </div>
+                 </div>
+                </ng-template>
+                <ng-template *ngIf="col.field == 'select'" let-col let-po="rowData" let-i="rowIndex" pTemplate="body">
+                  <input type="checkbox" [checked]="addProductOfferList[i]?.checkboxFlag"  class="ecb-alignPiSelect" (click)="selectPO(po.offerId,$event)"/>
+                </ng-template>
+                <ng-template pTemplate="header" let-col let-rowData="rowData">
+                    <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                </ng-template>
+                <ng-template  *ngIf="col.field == 'bundle'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <div class="tooltip ecb-rtlSubscribe">
+                        <img *ngIf="data['bundle']" class="ecb-subscribableItemType" src="../../../assets/images/ericssonIcons/Icon_Bundle.svg" alt="Offer Icon">
+                        <img *ngIf="!data['bundle']" class="ecb-subscribableItemType" src="../../../assets/images/ericssonIcons/Icon_ProductOffer.svg" alt="Offer Icon">
+                        <div class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                            <div class="ebInfoPopup-contentText">
+                                <span *ngIf="data['bundle']" class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_BUNDLE"}}</span>
+                                <span *ngIf="!data['bundle']" class="ecb-subscribePo" l10nTranslate>{{"TEXT_PRODUCT_OFFER"}}</span>
+                            </div>
+                            <div class="ebInfoPopup-arrowShadow"></div>
+                            <div class="ebInfoPopup-arrowBorder"></div>
+                        </div>
+                    </div>
+                </ng-template>
+        
+                <ng-template  *ngIf="col.field == 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                    <span style="word-wrap:break-word;">{{addProductOfferList[i].name}}</span>
+                </ng-template>
+        
+                <ng-template *ngIf="col.field == 'effStartDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <span style="word-wrap:break-word;">{{addProductOfferList[i].effStartDate | amDateFormat:amLocaleDateFormat }}</span>
+                </ng-template>
+        
+                <ng-template *ngIf="col.field == 'effEndDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <span style="word-wrap:break-word;">{{addProductOfferList[i].effEndDate | amDateFormat:amLocaleDateFormat }}</span>
+                </ng-template>
+        
+                <ng-template *ngIf="col.field == 'availStartDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <span style="word-wrap:break-word;">{{addProductOfferList[i].availStartDate | amDateFormat:amLocaleDateFormat }}</span>
+                </ng-template>
+        
+                <ng-template *ngIf="col.field == 'availEndDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <span style="word-wrap:break-word;">{{addProductOfferList[i].availEndDate | amDateFormat:amLocaleDateFormat }}</span>
+                </ng-template>
+        
+                <ng-template *ngIf="col.field == 'currency'" pTemplate="filter" let-col>                
+                    <ecb-dropdown [options]= 'currencies' [modelValue] = 'currencyFirstItem'  [primaryOption] = 'currencyFirstItem' (changeItem)="changeCurrencyItem($event)">                        
+                    </ecb-dropdown>
+                </ng-template>
+        
+                <ng-template *ngIf="col.field == 'poPartitionName'" pTemplate="filter" let-col>
+                    <ecb-dropdown [options]= 'partitions'  [modelValue] = 'partitionFirstItem' [primaryOption] = 'partitionFirstItem' (changeItem)="changePartitionItem($event)">                        
+                    </ecb-dropdown>
+                </ng-template>
+        
+                <ng-template appendTo="body" pTemplate="filter" let-col *ngIf="col.field === 'effStartDate'">
+                    <div>
+                      <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'startDate'" [columnPlacement]="'middle'">
+                      </ecb-number-date-filter>
+                   </div>
+                </ng-template>
+        
+                <ng-template appendTo="body" pTemplate="filter" let-col *ngIf="col.field === 'effEndDate'">
+                    <div>
+                        <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'endDate'" [columnPlacement]="'middle'">
+                        </ecb-number-date-filter>
+                    </div>
+                </ng-template>
+        
+                <ng-template appendTo="body" pTemplate="filter" let-col *ngIf="col.field === 'availStartDate'">
+                    <div>
+                        <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'availableStartDate'" [columnPlacement]="'middle'">
+                        </ecb-number-date-filter>
+                    </div>
+                </ng-template>
+        
+                <ng-template appendTo="body" pTemplate="filter" let-col *ngIf="col.field === 'availEndDate'">
+                    <div>
+                        <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'availableEndDate'" [columnPlacement]="'last'">
+                        </ecb-number-date-filter>
+                    </div>
+                </ng-template>
+              </p-column>
+             </p-dataTable>
+        
+              <!--No productsoffer message here -->
+                <div *ngIf="!errorMessage  && noTableData && bundlePartiotionName" class="alert alert-info" role="alert">
+                    <div class="row">
+                        <p class="col-xs-12 col-sm-12 col-md-12" l10nTranslate>{{"TEXT_NO_PRODUCT_OFFERS_AVAILABLE"}} <span>{{bundlePartiotionName}}</span></p>
+                    </div>
+                </div>
+                <!--No productsoffer message here -->
+        
+                <!--Error while fetching initial table data -->
+                <div *ngIf="errorMessage">
+                      <div class="alert alert-danger ecb-clearFix" role="alert">
+                          <p class="ecb-unicodeBidi">{{errorMessage}}</p>
+                      </div>
+                </div>
+                <!--Error while fetching initial table data -->
+        
+                <br>
+        
+                <!--No match found ,edit filter criteria-->
+                <div *ngIf="!filterErrorMessage  && noFilteredTableData" class="ebNotification ebNotification_color_paleBlue ">
+                        <div class="ebNotification-content ecb-infotext">               
+                                <span class="ebNotification-label">
+                                    <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                                </span>
+                        </div>
+                </div>
+                <!--No match found ,edit filter criteria-->
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>

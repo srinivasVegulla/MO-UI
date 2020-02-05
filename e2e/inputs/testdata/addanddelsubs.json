@@ -1,0 +1,7 @@
+{
+    "searchsubs": "s",
+    "subsbeforeadd" : "2",
+    "subsafteradd": "4",
+    "subsbeforedel": "4",
+    "subsafterdel": "3"
+}

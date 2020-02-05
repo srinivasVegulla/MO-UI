@@ -1,0 +1,8 @@
+<p-tree [value]="selectedOfferingsChildren" styleClass="ui-treenode-content-selected">
+   <ng-template let-node pTemplate="default">
+        <img *ngIf="node.typeName == 'PO'" class="ecb-treeHierarchyIcons" src="../../../assets/images/ericssonIcons/Icon_ProductOffer.svg" alt="Offer Icon">
+        <img *ngIf="node.typeName == 'BUNDLE'" class="ecb-treeHierarchyIcons" src="../../../assets/images/ericssonIcons/Icon_Bundle.svg" alt="Offer Icon">
+        <img *ngIf="node.typeName == 'PI'" class="ecb-treeHierarchyIcons" src="../../../assets/images/ericssonIcons/Icon_PriceableItem.svg" alt="Offer Icon">
+        <span type="text" style="width:100%">{{node.name}}</span>
+    </ng-template>
+ </p-tree>

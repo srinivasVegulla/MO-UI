@@ -1,0 +1,13 @@
+{
+    "heading": "Priceable Item : One time setup",
+    "properties": "Properties",
+    "displaynamesend": "One time setup",
+    "name": "Name",
+    "displayname": "Display Name",
+    "description": "Description",
+    "event": "Event",
+    "descriptionsend": "This will be charged once during setup.",
+    "extended": "Extended Properties",
+    "glcode": "extended"
+    
+}

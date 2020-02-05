@@ -1,0 +1,13 @@
+{
+    "addpisearch": "sample",
+    "pisbeforeadd": "1",
+    "pisafteradd": "2",
+    "pisafterdel": "6",
+    "pisbeforedel": "1",
+      "heading": "Priceable Items",
+      "discountheading": "Discount",
+      "onetimecharges": "One Time Charges",
+      "recurringcharges": "Recurring Charges",
+      "usagecharges": "Usage Charges"
+    
+}

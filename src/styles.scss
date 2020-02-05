@@ -1,0 +1,12 @@
+/* Importing Bootstrap styles, ericsson branded styles and project level style */
+$icon-font-path: '../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
+
+@import '../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap';
+@import 'styles/Ericssonmain.scss';
+@import 'styles/product-catalog.scss';
+
+@import '../node_modules/primeng/resources/primeng.css';
+@import '../node_modules/primeng/resources/themes/bootstrap/theme.css';
+@import '../node_modules/font-awesome/css/font-awesome.min.css';
+@import 'styles/styles-rtl.scss';
+

@@ -1,0 +1,140 @@
+<ngx-aside #createcalendar [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false" class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading ">
+                <div class="row">
+                    <h2 *ngIf="createCalendar" class="col-lg-6 col-md-6 col-sm-6 col-xs-6  ecb-toggleFloat" l10nTranslate>{{'TEXT_CREATE_CALENDAR'}}</h2>
+                    <h2 *ngIf="isCopyCalendar" class="col-lg-6 col-md-6 col-sm-6 col-xs-6  ecb-toggleFloat" l10nTranslate>{{'TEXT_COPYOF_CALENDAR'}}</h2>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ecb-editOverlayLink">
+                    <button class="ebBtn ecbBtn-margin" (click)="saveCalendar()" [disabled]="setSaveDisabled()" [ngClass]="{'ebBtn-primary': !isSaveDisabled}"
+                        l10nTranslate>{{'TEXT_SAVE'}}</button>
+                        <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true" (click)="showErrorMessage = false">×</span><span class="sr-only">Close</span>
+                    </button>
+                    <p>{{httpErrorMessage}}</p>
+                </div>
+                <form class="ecb-propertiesFormMain" [formGroup]="calendarProperties" (keydown)="onEnterSaveCalendarProperties($event)" novalidate>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="form-group">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+                                <div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12" l10nTranslate>
+                                    <input id="initFocus" #defaultName type="text" class="ebInput" maxlength="255" name="name" formControlName="name" (blur)="checkNameAvailability()" (keydown)="disableSpace($event)" (focusout)="removeSpace()" [ngClass]="{'ecb-fieldEmptyValidator': (calendarProperties.controls.name.hasError('required') && calendarProperties.controls.name.touched) || nameExist}" tabindex="1" autofocus>
+                                    <span class="input-group-required"></span>
+                                </div>
+                                <!-- Input name error message -->
+                                <div *ngIf="calendarProperties.controls.name.hasError('required') && calendarProperties.controls.name.touched" class="ebInputError">
+                                <span class="statusError"></span><span l10nTranslate>{{'TEXT_NAME_REQUIRED'}}</span>
+                                </div>
+                                <!-- Input name uniqueness error message -->
+                                <div *ngIf="nameExist && !calendarProperties.controls.name.hasError('required')" class="ebInputError">
+                                    <span class="statusError"></span><span l10nTranslate>{{'TEXT_NAME_EXIST'}}</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+                                <textarea class="form-control ecbTextArea" type="text" #textArea [ngClass]="autoGrow()" maxlength="4000" name="description" formControlName="description" tabindex="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="input-group ecb-sidebarFooter">
+                            <input type="text" class="ebInput" placeholder="" readonly>
+                            <span class="ecb-requriedIndicator" l10nTranslate> {{'TEXT_REQUIRED_FIELD'}} </span><span class="input-group-required"> </span>
+                        </div>
+                    </div>
+                </div>  
+            </div>    
+        </div>
+    </div>
+</ngx-aside>
+<ngx-aside #propertiesEdit [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+    class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading ">
+                <div class="row">
+                    <h2 class="col-lg-6 col-md-6 col-sm-6 col-xs-6  ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_PROPERTIES'}}</h2>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ecb-editOverlayLink">
+                        <button class="ebBtn ecbBtn-margin" (click)="saveProperties(viewPropertiesList)" [disabled]="isDisabled" [ngClass]="{'ebBtn-primary': !isDisabled}" l10nTranslate>{{'TEXT_SAVE'}}</button>
+                        <button class="ebBtn ebBtn-default" (click)="cancelPropCoverHandler()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <p>{{httpErrorMessage}}</p>
+                </div>
+                <form class="ecb-propertiesFormMain" (keydown)="onEnterSaveProperties(viewPropertiesList, $event)" novalidate>
+                    <div class="row">
+                        <div class=" col-sm-12 col-md-12 col-lg-12">
+                            <div class="form-group">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+                                <div class="input-group  ecb-inputReadOnly">
+                                    <span>{{viewPropertiesList?.name}}</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+                                <textarea id="desc" #description type="text" #textAreaEdit [ngClass]="autoGrowEdit()" class="form-control ecbTextArea" maxlength="4000" name="description" [value]="propDescription" (input)="enableSave(description)">
+                                    </textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</ngx-aside>
+<div class="panel panel-default" *ngIf="createView">
+    <div class="panel-heading ecb-panelHeading">
+		<div class="ecb-panelHeaderLink">
+            <a [title]="editTooltip" (click) = "openEditWidget(viewPropertiesList, propertiesEdit)"  l10nTranslate>{{'TEXT_EDIT'}}</a>
+        </div>
+        <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_PROPERTIES'}}</h2>       
+    </div>
+    <div class="panel-body">
+            <div *ngIf="POLoadError" class="alert alert-danger" role="alert">
+                    {{calenderLoadMessage}}
+                </div>
+    <div *ngIf="!POLoadError">
+        <form class="ecb-propertiesFormMain" [formGroup]="calendarProperties" (keydown)="onEnterSaveCalendarProperties($event)" novalidate>              
+                    <div class="form-group">
+                        <div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_NAME'}}</label>
+                            <div class="ecb-inputReadOnly">
+                                <div class="ecb-wordbreak" [ngClass]="{'ecb-wordBreakAll': isNoBreakString(viewPropertiesList?.name)}">{{viewPropertiesList?.name}}</div>
+                            </div>
+                        </div>    
+                    </div>
+                    <div class="form-group">
+                        <label for="simple-input" class="ebLabel" l10nTranslate>{{'TEXT_DESCRIPTION'}}</label>
+                        <div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-inputReadOnly">
+                            <div class="ecb-wordbreak" [ngClass]="{'ecb-wordBreakAll': isNoBreakString(viewPropertiesList?.description)}">{{viewPropertiesList?.description}}</div>
+                        </div>  
+                    </div>              
+        </form>
+    </div>
+    </div>
+   
+</div>
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}">
+</div>

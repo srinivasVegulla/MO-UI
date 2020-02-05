@@ -1,0 +1,163 @@
+<ngx-aside #permissions [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+class="ecb-asideContent" [ngClass]="{'ecb-showEditDialog':showCover}" (keyup.enter)="savePOPermissions(permissions)">
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="panel panel-default">
+    <div class="panel-heading ecb-panelHeading">
+           <h2 class="ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_SUBSCRIPTION_SETTINGS'}}</h2>
+            <div class="ecb-editOverlayLink">
+                <button class="ebBtn ecbBtn-margin" (click)="savePOPermissions(permissions)" [disabled]="setSaveDisabled()" [ngClass]="{'ebBtn-primary': isSaveEnabled}" l10nTranslate>{{'TEXT_SAVE'}}</button>
+                <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler(permissions)" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+            </div>
+    </div>
+    <div class="panel-body">
+    <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+        <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <p>{{httpErrorMessage}}</p>
+    </div>
+    <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"></ecb-loader>
+    <div *ngIf="!errorMessage" class="form-group">
+        <form class="ngForm ecb-permissionsFormMain" form #f="ngForm" [formGroup]="POPermissions" novalidate>
+            <div>
+                <label class="ebLabel" l10nTranslate>{{'TEXT_SELF_SERVICES'}}</label>
+            </div>
+            <div class="ebCheckbox">
+                <label>
+                    <input id="initFocus" type="checkbox" name="userSubscribe" tabindex="1" formControlName="userSubscribe" (change)="onFormFieldChange()" autofocus/>
+                    <div class="text" id="ecb-subscribe" l10nTranslate>{{'TEXT_SUBSCRIBE'}}</div>
+                </label>
+            </div>
+            <div class="ebCheckbox">
+                <label>
+                    <input type="checkbox" name="userUnsubscribe" tabindex="2" formControlName="userUnsubscribe" (change)="onFormFieldChange()">
+                    <div class="text" id="ecb-subscribe" l10nTranslate>{{'TEXT_UNSUBSCRIBE'}}</div>
+                </label>
+            </div>
+            <div *ngIf="!errorMessage" class="form-group">
+                <label for="datetime-input" class="ebLabel" l10nTranslate>{{'TEXT_AVAILABLE_START_DATE'}}</label>
+                <div>
+                    <p-calendar name="availableStartDate" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput" formControlName="availableStartDate"
+                        [placeholder]="calenderLocale.placeHolder" [locale]="calenderLocale" [disabled]="setAvailableDates"
+                        (onSelect)="onFormFieldChange('startDate')" (onBlur)="onFormFieldChange('startDate')" tabindex="3" [showIcon]="true">
+                    </p-calendar>                                                       
+                    <div [hidden]="!startDateError" class="ebInputError">
+                        <span class="statusError"></span>
+                        <span l10nTranslate>{{'TEXT_AVALSTRTDATE_MORE_THAN_AVALENDDATE'}}</span>
+                    </div>
+                </div>
+                <div class="ecb-usageChildPI" [hidden]="!setAvailableDates">
+                    <span l10nTranslate>{{'TEXT_AVALDATE_DISABLE_INFO_MESSAGE'}}</span>
+                </div>
+            </div>
+            <div *ngIf="!errorMessage" class="form-group">
+                <label for="datetime-input" class="ebLabel" l10nTranslate>{{'TEXT_AVAILABLE_END_DATE'}}</label>
+                <div>
+                    <p-calendar name="availableEndDate" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput"
+                        formControlName="availableEndDate"
+                        [placeholder]="calenderLocale.placeHolder" [locale]="calenderLocale" [disabled]="setAvailableDates"
+                        (onSelect)="onFormFieldChange('endDate')" (onBlur)="onFormFieldChange('endDate')" tabindex="4" [showIcon]="true">
+                    </p-calendar>
+                    <div [hidden]="!endDateError" class="ebInputError">
+                        <span class="statusError"></span>
+                        <span l10nTranslate>{{'TEXT_AVALENDDATE_LESS_THAN_AVALSTRTDATE'}}</span>
+                    </div>
+                </div>
+                <div class="ecb-usageChildPI" [hidden]="!setAvailableDates">
+                    <span l10nTranslate>{{'TEXT_AVALDATE_DISABLE_INFO_MESSAGE'}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="eligibility" class="ebLabel" l10nTranslate>{{'TEXT_ACCOUNT_TYPE_ELIGIBILITY'}}</label>
+                <div class="ecb-accountTypes">
+                    <!-- <p-multiSelect [options]="accountTypeEligibilityList" formControlName="selectedAccountTypeEligibility"></p-multiSelect> -->
+                    <p-multiSelect [options]="accountTypeEligibilityList" [(ngModel)]="selectedAccountTypesForm" [ngModelOptions]="{standalone: true}"
+                        (onChange)="accEligibilityChange($event)" tabindex="5"></p-multiSelect>
+                </div>
+            </div>
+            <div class="form-group ecb-poOptionalField" *ngIf="displayBundle" formGroupName="poBundleOptionality">
+                <label for="poBundleOptionality" class="ebLabel" l10nTranslate>{{'TEXT_OPTIONALITY'}}</label>
+                <div class="input-group">
+                    <div class="ecb-optionality" *ngFor="let offer of poNames">
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 ecb-polabel">
+                            <span>{{offer}}</span>
+                        </div>
+                        <p-selectButton (onChange)="onFormFieldChange()" class="col-xs-12 col-sm-12 col-md-6 col-lg-6 ecb-optionalbuttons" [options]="types"
+                            formControlName="{{offer}}" [disabled]="!(viewPermissionsData?.editOptionality)"></p-selectButton>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    </div>
+</div>
+</div>
+</ngx-aside>
+<div class="panel panel-default">
+    <div class="panel-heading ecb-panelHeading">
+			<div *ngIf="editSubSettingsCapability" class="ecb-panelHeaderLink">
+                <a title="{{editTooltip}}" [class.disable]="showAprrovalEditBtn" (click)="displayCoverHandler(permissions)" l10nTranslate>{{'TEXT_EDIT'}}</a>
+            </div>
+            <h2 class="ecb-priceableItemText" l10nTranslate>{{'TEXT_SUBSCRIPTION_SETTINGS'}}</h2>           
+    </div>
+    <div class="panel-body">
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert" l10nTranslate>
+        {{'TEXT_ERROR_MESSAGE'}}
+    </div>
+    <div *ngIf="!errorMessage" class="form-group">
+        <div class="input-group col-xs-12 col-sm-12 input-paddingTop">
+            <label class="ebLabel" l10nTranslate>{{'TEXT_SELF_SERVICES'}}</label>
+            <form class="ecb-propertiesFormMain" form #f="ngForm" class="ngForm" novalidate>
+            <div class="ebCheckbox ecb-RTLCheckbox">
+                <label>
+                    <input type="checkbox" [ngClass]="{'readonly-checkbox' : viewPermissionsData?.userSubscribe}" name="userSubscribe" [checked]="viewPermissionsData?.userSubscribe" disabled="disabled" />
+                    <div class="text" [ngClass]="{'readonly' : viewPermissionsData?.userSubscribe}" id="ecb-subscribe" l10nTranslate>
+                        <em *ngIf="viewPermissionsData?.userSubscribe" class="fa fa-check" aria-hidden="true"></em>{{'TEXT_SUBSCRIBE'}}</div>
+                </label>
+            </div>
+            <div class="ebCheckbox">
+                <label>
+                    <input type="checkbox" [ngClass]="{'readonly-checkbox' : viewPermissionsData?.userUnsubscribe}" name="userUnsubscribe" [checked]="viewPermissionsData?.userUnsubscribe"
+                        disabled="disabled">
+                    <div class="text" [ngClass]="{'readonly' : viewPermissionsData?.userUnsubscribe}" id="ecb-subscribe" l10nTranslate>
+                        <em *ngIf="viewPermissionsData?.userUnsubscribe" class="fa fa-check" aria-hidden="true"></em>{{'TEXT_UNSUBSCRIBE'}}</div>
+                </label>
+            </div>
+            <div *ngIf="!errorMessage" class="form-group">
+                <label for="datetime-input" class="ebLabel" l10nTranslate>{{'TEXT_AVAILABLE_START_DATE'}}</label>
+                <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                    <span>{{viewPermissionsData?.availStartDate | amDateFormat:calenderLocale.amLocaleDateFormat}}</span>
+                </div>
+            </div>
+            <div *ngIf="!errorMessage" class="form-group">
+                <label for="datetime-input" class="ebLabel" l10nTranslate>{{'TEXT_AVAILABLE_END_DATE'}}</label>
+                <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                    <span>{{viewPermissionsData?.availEndDate | amDateFormat:calenderLocale.amLocaleDateFormat}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="optionality" class="ebLabel" l10nTranslate>{{'TEXT_ACCOUNT_TYPE_ELIGIBILITY'}}</label>
+                <div class="ecb-selectedaccounttypes">
+                    <span *ngFor="let type of selectedAccountTypes">
+                        <div class="accountTypeButton">{{viewPermissionsData?.selectedAccountTypeEligibility[type]}}</div>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group" *ngIf="displayBundle">
+                <label for="optionality" class="ebLabel" l10nTranslate>{{'TEXT_OPTIONALITY'}}</label>
+                <div class="input-group col-xs-12 col-sm-12 ecb-inputReadOnly">
+                    <div>{{optionalityMsg}}</div>
+                </div>
+            </div>
+            </form>
+     </div>
+    </div> 
+    </div>
+ </div>
+
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>

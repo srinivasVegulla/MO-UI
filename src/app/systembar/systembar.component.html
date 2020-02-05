@@ -1,0 +1,49 @@
+<nav class="systemBar">
+    <div class="ebSystemBar">
+        <div class="ebSystemBar-logo">
+            <div class="ecb-companyIogo ebIcon company-logo ebIcon_eLogo hidden-xs hidden-sm visible-md-up" alt="Ericsson Enterprise and Cloud Billing"></div>
+            <div class="ecb-companyIogo ebIcon visible-xs visible-sm ecb-navIcon" (click)="showbreadcrumbNavbar()">
+                <i id="mobileNavIcon" class="glyphicon glyphicon-menu-hamburger ecb-navigationHamIcon" aria-hidden="true"></i>
+            </div>
+
+            <h1 class="hidden-xs hidden-sm visible-md-up">Ericsson Enterprise and Cloud Billing</h1>
+            <h1 *ngIf="isTranslateText(pageTitle)" class="visible-xs visible-sm hidden-md-up text-right ecb-pageTitleWordwrap" [ngStyle]="calculateBreadCrumbEllipsisWidth()"
+                l10nTranslate>{{pageTitle}}</h1>
+            <h1 *ngIf="!isTranslateText(pageTitle)" class="visible-xs visible-sm hidden-md-up ecb-pageTitleWordwrap" [ngStyle]="calculateBreadCrumbEllipsisWidth()"
+                l10nTranslate>{{pageTitle}}</h1>
+        </div>
+        <div class="ecb-pullItems">
+            <!-- This div is visible always in desktop and large devices without any condition -->
+            <ul class="systemBar-topMenuList hidden-xs hidden-sm">
+                <li role="button" class="ecb-systemBarIconPadding">
+                    <a class="systemBar-item">
+                        <i class="fa fa-user"></i>
+                        <span class="ebText ebLightBlue hidden-xs visible-sm-up">{{userName}}</span>
+                    </a>
+                </li>
+                <li role="button" class="ecb-systemBarIconPadding" (click)="logout()">
+                    <a class="systemBar-item">
+                        <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        <span class="ebText ebLightBlue hidden-xs visible-sm-up" l10nTranslate>{{'TEXT_LOGOUT'}}</span>
+                    </a>
+                </li>
+            </ul>
+            <!-- This div is visible only in mobile devices based on  condition (based on context bar visibility) -->
+            <ul class="systemBar-topMenuList visible-xs visible-sm" *ngIf="menuType === 1">
+                <li role="button" class="ecb-systemBarIconPadding">
+                    <a class="systemBar-item">
+                        <i class="fa fa-user"></i>
+                        <span class="ebText ebLightBlue hidden-xs visible-sm-up">{{userName}}</span>
+                    </a>
+                </li>
+                <li role="button" class="ecb-systemBarIconPadding" (click)="logout()">
+                    <a class="systemBar-item">
+                        <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        <span class="ebText ebLightBlue hidden-xs visible-sm-up" l10nTranslate>{{'TEXT_LOGOUT'}}</span>
+                    </a>
+                </li>
+            </ul>
+            <ecb-contextBar class="ecb-toggleContextBar" *ngIf="menuType === 2"></ecb-contextBar>
+        </div>
+    </div>
+</nav>

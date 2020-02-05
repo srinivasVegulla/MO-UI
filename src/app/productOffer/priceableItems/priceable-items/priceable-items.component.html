@@ -1,0 +1,135 @@
+<div class="panel panel-default">
+    <ecb-addpriceableitem *ngIf="initializeAddPriceableItem" [productOfferId]="productOfferId" [isBundle]="isBundle">
+    </ecb-addpriceableitem>
+    <div class="panel-heading">
+        <a *ngIf="addPICapability" class="ecb-addPriceableItem" [ngClass]="(disableAddPi== true)?'ecb-enablePiAdd':'ecb-disablePiAdd'" (click)="openAddPriceableItem()" l10nTranslate>{{ "TEXT_ADD" }}</a>
+        <h2 class="ecb-priceableItemText" l10nTranslate>
+            <img [ngClass]="[isBundle ? 'ecb-productOfferIcon' : 'ecb-priceableItemIcon']" class="ecb-productOfferIcon" title='{{"TEXT_PRICEABLE_ITEM"| translate:lang}}' src="../../../../assets/images/ericssonIcons/Icon_PriceableItem.svg" alt="Offer Icon"> {{'TEXT_PI'}}
+        </h2>
+    </div>
+    <div class="panel-body row">
+        <div>
+            <ecb-loader *ngIf="showLoader" mode="dot" fill="widget" backDropClassName="ecb-loaderMinHeight"></ecb-loader>
+            <ecb-loader *ngIf="showSkeleton" mode="skeleton" fill="widget" type="widget" backDropClassName=""></ecb-loader>
+
+            <div [ngClass]="[isBundle ? 'col-lg-6' : 'col-lg-3']" class="col-xs-12 col-sm-6 col-md-6 ebPadding_bothNone">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 l10nTranslate>{{'TEXT_OTC'}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div *ngIf="showNonRecurringError">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12 alert alert-danger ecb-piErrorAlignment" role="alert">
+                                        <span class="ebCloseIconAlignment" (click)="removeNonRecurring()">
+                                            <i class="ebIcon ebIcon_close_red "></i>
+                                        </span>
+                                        <p class="filterFetchingError">
+                                            <strong l10nTranslate>{{nonRecurringName}} cannot be added.</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ecb-onetime-charges (isCardDeleted)="updatePIItems($event)" [PIType]="'One Time'" [productOfferId]="productOfferId" [oneTimeChargeCards]="cards?.pricelistMappingVO?.NON_RECURRING"></ecb-onetime-charges>
+                    </div>
+                </div>
+            </div>
+            <div [ngClass]="[isBundle ? 'col-lg-6' : 'col-lg-3']" class="col-xs-12 col-sm-6 col-md-6 ebPadding_bothNone">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 l10nTranslate>{{'TEXT_RC'}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div *ngIf="showRecurringError">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12 alert alert-danger ecb-piErrorAlignment" role="alert">
+                                        <span class="ebCloseIconAlignment" (click)="removeRecurring()">
+                                            <i class="ebIcon ebIcon_close_red "></i>
+                                        </span>
+                                        <p class="filterFetchingError" l10nTranslate>
+                                            <strong>{{recurringName || udrName}} cannot be added.</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ecb-recurring-charges (isCardDeleted)="updatePIItems($event)" [PIType]="'Recurring'" [productOfferId]="productOfferId" [recurringChargeCards]="cards?.pricelistMappingVO">
+                        </ecb-recurring-charges>
+                    </div>
+                </div>
+            </div>
+            <div [ngClass]="[isBundle ? 'col-lg-6' : 'col-lg-3']" class="col-xs-12 col-sm-6 col-md-6 ebPadding_bothNone">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 l10nTranslate>{{'TEXT_UC'}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div *ngIf="showUsageError">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12 alert alert-danger ecb-piErrorAlignment" role="alert">
+                                        <span class="ebCloseIconAlignment" (click)="removeUsage()">
+                                            <i class="ebIcon ebIcon_close_red "></i>
+                                        </span>
+                                        <p class="filterFetchingError" l10nTranslate>
+                                            <strong>{{usageName}} cannot be added.</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ecb-usage-charges (isCardDeleted)="updatePIItems($event)" [PIType]="'Usage'" [productOfferId]="productOfferId" [usageChargeCards]="cards?.pricelistMappingVO?.USAGE">
+                        </ecb-usage-charges>
+                    </div>
+                </div>
+            </div>
+            <div [ngClass]="[isBundle ? 'col-lg-6' : 'col-lg-3']" class="col-xs-12 col-sm-6 col-md-6 ebPadding_bothNone">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 l10nTranslate>{{'TEXT_DC'}}</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div *ngIf="showDiscountError">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-12 alert alert-danger ecb-piErrorAlignment" role="alert">
+                                        <span class="ebCloseIconAlignment" (click)="removeDiscount()">
+                                            <i class="ebIcon ebIcon_close_red "></i>
+                                        </span>
+                                        <p class="filterFetchingError" l10nTranslate>
+                                            <strong>{{discountName}} cannot be added.</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ecb-discount-charges (isCardDeleted)="updatePIItems($event)" [PIType]="'Discount'" [productOfferId]="productOfferId" [discountChargeCards]="cards?.pricelistMappingVO?.DISCOUNT">
+                        </ecb-discount-charges>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div *ngIf="errorMessage" class="alert alert-danger col-xs-12 col-sm-12 col-md-12 col-lg-12" role="alert" l10nTranslate>
+            {{'TEXT_ERROR_PI'}}
+        </div>
+        <div *ngIf="noPriceableItems && !isBundle" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="ebNotification-content ecb-infotext ">
+                <span class="ebNotification-label">
+                    <span l10nTranslate>{{'TEXT_NO_PRICEABLE_ITEMS_MESSAGE'}} </span>
+                </span>
+            </div>
+        </div>
+        <div *ngIf="noPriceableItems && isBundle" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="ebNotification-content ecb-infotext ">
+                <span class="ebNotification-label">
+                    <span l10nTranslate>{{'TEXT_NO_PRICEABLE_ITEMS_MESSAGE_2'}} </span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

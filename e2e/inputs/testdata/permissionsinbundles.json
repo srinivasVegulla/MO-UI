@@ -1,0 +1,21 @@
+{
+ "editname": "sample testing",
+ "displayname": "sample testing",
+ "description": "sample testing",
+ "discardtext": "Cancelling Discards Unsaved Edits",
+ "addpisearch": "OrderCookies",
+ "glcode": "sample",
+ "extinfourl": "sample url",
+ "intinfourl": "sample url",
+ "searchsubs": "s",
+ "selfservicetext": "Self-Service",
+ "propertiesheading": "Properties",
+ "name": "Name",
+ "displaynametext": "Display Name",
+ "descriptiontext": "Description",
+ "currency": "Currency",
+ "effstartdate": "Effective Start Date",
+ "effenddate": "Effective End Date",
+ "searchaccounttype": "account"
+
+  }

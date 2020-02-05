@@ -1,0 +1,97 @@
+<ecb-modal-dialog [styleClass]="'ecb-addRateTableDialog'" [open]="widgetDialog == 1" (onClose)="onAddRateTableClose()"
+    [header]="false" [body]="false" [footer]="false" [closeIcon]="false" (keyup.enter)="addRateTables()">
+    <dialog-header-template>
+        <div class="row">
+          <h2 class="col-xs-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_ADD_RATE_TABLE_PI'}}</h2>
+          <div class="col-xs-6 ecb-editOverlayLink">
+            <button class="ebBtn ecbBtn-margin ebBtn-primary" [disabled]="isAddDisable()" (click)="addRateTables()" l10nTranslate>{{"TEXT_ADD"}}</button>
+            <button class="ebBtn ebBtn-default" (click)="onAddRateTableClose()" l10nTranslate>{{"TEXT_CLOSE"}}</button>
+          </div>
+        </div>
+        <!--error while Adding data -->
+        <div *ngIf="showErrorMessage">
+            <div class="row">
+                <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 alert alert-danger ecb-clearFix" role="alert">
+                    <button *ngIf="loadError" type="button" class="close" data-dismiss="alert">
+                    <span aria-hidden="true" (click)="showErrorMessage = false">×</span>
+                    <span class="sr-only">Close</span>
+                    </button>
+                    <p class="ecb-unicodeBidi">{{errorMessageDisplay}}</p>
+                </div>
+            </div>
+        </div>
+        <!--error while Adding data -->
+      <div>
+        <h3 l10nTranslate>
+          <span l10nTranslate>{{"TEXT_RATE_TABLE_LIST"}}</span> ({{totalCount}})
+          <span *ngIf="piDisplayName != undefined">: {{piDisplayName}}</span>
+       </h3>
+      </div>
+    </dialog-header-template>
+    <dialog-body-template>
+        <div *ngIf="loadGridData" class="ecb-addRateTableBody" ecb-infinite-scroller [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()">
+            <div class="ecb-positionRelative">
+                    <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"></ecb-loader>                  
+                    <p-dataTable #addRateTable [value]="ptMappings" (onLazyLoad)="loadData($event)" [scrollable]="ratelistAddptMappingsColDef.scrollable" [lazy]="ratelistAddptMappingsColDef.lazy" scrollWidth="getDeviceWidth()" sortField={{ratelistAddptMappingsColDef.defaultSortColumn}}
+                    sortOrder={{convertedDefaultSortOrder}} [immutable]="false">
+                <p-column [style]="col.style" *ngFor="let col of ptMappingsCols" [field]="col.field" [header]="col.key | translate:lang" [sortable]="col.sortable"
+                filter="col.filter" required="true">
+                <ng-template pTemplate="header" let-col let-rowData="rowData">
+                        <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                    </ng-template>
+                <ng-template pTemplate="filter" let-col>
+                  <div *ngIf="(col.field != 'select' && col.field != 'piKind')">
+                    <input type="text" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterFields[col.field]" pInputText (keyup)="filterDataKeys($event, col.field, filterFields[col.field])" class="ecb-filterInput" />
+                  </div>
+                  <div *ngIf="(col.field === 'select')">
+                    <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                  </div>
+                  <div class="ecb-clearFilterMain">
+                      <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                          <em class="fa fa-times-circle-o fa-lg"></em>
+                      </div>
+                  </div>
+                </ng-template>
+                <ng-template *ngIf="col.field == 'select'" let-col let-i="rowIndex" let-record="rowData" pTemplate="body">
+                  <div class="ecb-addRateCheckBoxMain">
+                    <input type="checkbox" [checked]="ptMappings[i].checkboxFlag" (click)="addPt(record ,$event)">
+                  </div>
+                </ng-template>
+                <ng-template *ngIf="col.field == 'piKind'" pTemplate="filter" let-col>
+                    <ecb-dropdown [options]= 'usageTypes' [primaryOption] = 'usageDefault' 
+                    [modelValue] = 'usageDefault'
+                    (changeItem)="changeUsageType($event)">                        
+                    </ecb-dropdown>                 
+                </ng-template>
+                </p-column>
+                </p-dataTable>
+            </div>
+              <div *ngIf="getErrorMessageType() !== 0">
+                        <div class="ecb-infoStyling">
+                                <div class="alert alert-danger ecb-calInfoMessage" role="alert"
+                                    *ngIf="getErrorMessageType() === 1">
+                                    <p>{{ptMappingsError}}</p>
+                                </div>
+                                <div  *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                    <div class="ebNotification-content ecb-infotext">           
+                                        <span class="ebNotification-label">
+                                            <span l10nTranslate>{{'TEXT_NO_RATE_TABLE'}}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div  *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+                                    <div class="ebNotification-content ecb-infotext">           
+                                        <span class="ebNotification-label">
+                                            <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+        </div>
+    </dialog-body-template>
+</ecb-modal-dialog>
+<ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onConfirmDialogClose($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>

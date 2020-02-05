@@ -1,0 +1,8 @@
+{
+    "udrcheading": "UDRC_60M3_DailyAdvTapNoProPart (Unit Dependent Recurring)",
+     "heading": "Priceable Item Template List",
+    "numoftemplates": "1Priceable Item Template 1 (Unit Dependent Recurring)",
+    "text": "Changes to this Priceable Item template will only impact new Priceable Item instances. Existing ones will not be changed.",
+    "displayname": "1",
+    "glcodeinput": "1"
+}

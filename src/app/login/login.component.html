@@ -1,0 +1,75 @@
+<div class="security-login-view container-fluid">
+     <div class="row ecb-loginConatiner">
+        <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4"> 
+            <ecb-loader *ngIf="displayLoader" mode="dot" fill="widget"></ecb-loader> 
+            <div class="login-content">              
+                <div class="login-logo"></div>
+                <h1 class="login-title" tabindex="-1">
+                  {{ "ENTERPRISE & CLOUD BILLING" }}
+                </h1>
+                <form name="form" class="form-horizontal" (ngSubmit)="loginForm.form.valid && login(loginForm)" #loginForm="ngForm" novalidate>
+                    <div class="form-group" [ngClass]="{ 'has-error': loginForm.submitted && !username.valid }">
+                        <div class="col-md-12">
+                            <input tabindex="1" id="autoFocus" type="text" class="input input-lg ecb-formControl" name="username" [(ngModel)]="model.username" #username="ngModel"
+                             placeholder="{{ 'TEXT_LOGIN_INPUT_USERNAME' | translate:language}}" [ngClass]="{'ecb-fieldEmptyValidator': username.invalid && username.touched}" required/>
+                            <div *ngIf="username.invalid && username.touched" class="ebInputError">
+                               <span class="statusError"></span>
+                               <span l10nTranslate>{{'TEXT_LOGIN_VALIDATION_REQUIRED_USERNAME'}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" [ngClass]="{ 'has-error': loginForm.submitted && !password.valid }">
+                        <div class="col-md-12">
+                            <input tabindex="2" type="password" class="input input-lg ecb-formControl" name="password" [(ngModel)]="model.password" #password="ngModel" 
+                            placeholder="{{ 'TEXT_LOGIN_INPUT_PASSWORD' | translate:language}}" [ngClass]="{'ecb-fieldEmptyValidator': password.invalid && password.touched}" required (keypress)="onKeyPressEvent($event)" (keydown)="onKeyDownEvent($event)" />
+                            <div *ngIf="password.invalid && password.touched" class="ebInputError">
+                                <span class="statusError"></span>
+                                <span l10nTranslate>{{'TEXT_LOGIN_VALIDATION_REQUIRED_PASSWORD'}}</span>
+                            </div>
+                            <div *ngIf="IsCapsOn" class="ebInputError">
+                                <span class="statusError"></span>
+                                <span>Caps Lock is on</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="showErrorMessage">
+                        <div class="alert alert-danger alert-dismissible ng-binding" role="alert">
+                            <span l10nTranslate>{{httpErrorDescription}}</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                            <button type="submit" [disabled]="loginForm.invalid" class="btn btn-primary btn-lg ecb-loginBtn" tabindex="3" l10nTranslate>
+                                {{'TEXT_LOGIN_INPUT_SUBMIT'}}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-md-12">
+                        <ecb-locale-selector (langCode)="changeLocale($event)"></ecb-locale-selector>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="login-copyright">
+                          {{copyRightsInfo}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-7 col-lg-8 hidden-xs" tabindex="-1">
+            <ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseCancel($event)" [defaultFooterButtons]="false" [contentType]="'info'" [primaryButtons]="[1]" [noOfFooterButton]="1">
+                <dialog-header l10nTranslate>{{'TEXT_SESSION_TIMEDOUT'}}</dialog-header>
+                <dialog-body>
+                    <div class="ecb-adjustmentPanel">
+                        <div l10nTranslate>{{'TEXT_SESSION_TIMED_OUT_LOGIN_AGAIN'}}</div>
+                    </div>
+                </dialog-body>
+                <dialog-button-1 l10nTranslate>{{'TEXT_OK'}}</dialog-button-1>
+            </ecb-modal-dialog>
+            <div class="login-background"></div>
+        </div>
+    </div>
+</div>

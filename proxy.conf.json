@@ -1,0 +1,38 @@
+{
+    "/uaa/*": {
+        "target": "https://localhost:8074",
+        "secure": false,
+        "changeOrigin": false,
+        "logLevel": "debug",
+        "pathRewrite": {
+            "^/uaa": "https://localhost:8074/uaa"
+        }
+    },
+    "/api/*": {
+        "target": "https://localhost:8074",
+        "secure": false,
+        "changeOrigin": false,
+        "logLevel": "debug",
+        "pathRewrite": {
+            "^/api": "https://localhost:8074/api"
+        }
+    },
+    "/ext/*": {
+        "target": "https://localhost:8074",
+        "secure": false,
+        "changeOrigin": false,
+        "logLevel": "debug",
+        "pathRewrite": {
+            "^/ext": "https://localhost:8074/ext"
+        }
+    },
+    "/static/*": {
+        "target": "https://localhost:8074",
+        "secure": false,
+        "changeOrigin": false,
+        "logLevel": "debug",
+        "pathRewrite": {
+            "^/static": "https://localhost:8074/static"
+            }
+        }
+}

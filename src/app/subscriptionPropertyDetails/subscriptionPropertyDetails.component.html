@@ -1,0 +1,193 @@
+<!--panel starts from here -->
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="panel panel-default">
+  <div #subscriptionHeaderCount>
+    <!--panel header -->
+    <div class="panel-heading ecb-subscriptionPropertyDetails">
+      <div class="ebCommands-placement ecbCommandsCenterAlign">
+        <span>
+          <em class="fa fa-refresh ecb-enableAlignIcon" title='{{"TEXT_REFRESH"| translate:lang}}' (click)="refreshData()"></em>
+        </span>
+        <div *ngIf="createSubscriptionPropertyCapability" class="ebLayout-HeadingCommands-separator"></div>
+        <a *ngIf="createSubscriptionPropertyCapability">
+          <span (click)="showCreateSubscriptionProperty(false, categoryName)" l10nTranslate>{{"TEXT_CREATE_SUBSCRIPTION_PROPERTY"}}</span>
+        </a>
+      </div>
+      <h2 l10nTranslate>{{ "TEXT_SUBSCRIPTION_PROPERTIES_LIST" }}
+        <span>({{subscriptionDetailsLength}})</span>
+      </h2>
+    </div>
+  </div>
+  <!--panel header -->
+  <br>
+  <!--Error while fetching initial table data -->
+  <div *ngIf="localeErrorMessage">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert">
+            <p class="filterFetchingError">
+             {{localeErrorMessage}}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+<!--Error while fetching initial table data -->
+  <ecb-inuse-offerings-modal-dialog *ngIf="showInUseOfferings" [offeringsData]="inUseOfferingsData" [offeringsLocation]="inUseOfferingsLocation" (inUseModalDialogClose)="hideInUseModalDialog($event)"></ecb-inuse-offerings-modal-dialog>
+  <div class="panel-body ecb-positionRelative">
+    <div class="eb-adjustPanelBodyPadding eb-adjustPanelBodyMargin ecb-viewList ebTable_flushPanelHeader ecb-tableOverflow" [ngStyle]="calculateGridScrollHeight()" [scrollerContext]="'self'" [ngClass]="{'eb-panelBodyTopBorder' : filterErrorMessage}" ecb-infinite-scroller (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()" *ngIf="loadGridData">
+      <!--table strats from here -->
+      <ecb-loader *ngIf="subscriptionListFetching" mode="dot" fill="widget"></ecb-loader>
+      <ecb-loader *ngIf="showSubPropSkeleton" mode="skeleton" fill="grid" type="grid"></ecb-loader>
+      <p-dataTable #datatable [value]="_subscriptionList" [scrollable]="columnDef.scrollable" [lazy]="columnDef.lazy"
+      [rowStyleClass]="getRowClass" (onLazyLoad)="loadData($event)" scrollWidth="getDeviceWidth()" sortField={{columnDef.defaultSortColumn}} sortOrder={{convertedDefaultSortOrder}}>
+        <p-column [style]="col.style" *ngFor="let col of cols" [field]="col.field" [header]="col.key | translate:lang" [sortable]="col.sortable"
+          filter="col.filter" required="true">
+          <ng-template pTemplate="header" let-col let-rowData="rowData">
+              <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+          </ng-template>
+          <ng-template pTemplate="filter" let-col *ngIf="col.field !== 'specType' && col.field !== 'editingForSubscription' && col.field !== 'userVisible'">
+            <div>
+              <input type="text" *ngIf="(col.field !== 'actions');else elseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}'
+            [(ngModel)]="filterFields[col.field]" pInputText (keyup)="filterDataKeys($event,col.field,filterFields[col.field])" class="ecb-filterInput" />
+              <ng-template #elseBlock>
+                <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+              </ng-template>
+              <div class="ecb-clearFilterMain">
+                <div class="ecb-clearFilter" *ngIf="isFilterText(col.field)" (click)="clearFilters(col.field)">
+                  <em class="fa fa-times-circle fa-lg"></em>
+                </div>
+              </div>
+            </div>
+        </ng-template>
+  
+        <ng-template pTemplate="filter" let-col *ngIf="col.field === 'entityCount'">
+          <div>
+            <ecb-number-date-filter (selectedUserFilter)="fetchEntityCount($event)" [filterKind]="'number'" [selectedColumnToFilter]="'entityCount'" [columnPlacement]="'last'">
+            </ecb-number-date-filter>
+         </div>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'actions'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <a *ngIf="createSubscriptionPropertyCapability" (click)="showCreateSubscriptionProperty(true, _subscriptionList[i]?.category)">
+            <em class="fa fa-plus" title='{{"TEXT_ADD"| translate:lang}}' aria-hidden="true"> </em>
+          </a>
+          <a *ngIf="editSubscriptionPropertyCapability" (click)="editSubscriptionProperty(_subscriptionList[i]?.specId)">
+            <em class="fa fa-pencil" title='{{"TEXT_EDIT_VIEW"| translate:lang}}' aria-hidden="true"> </em>
+          </a>
+          <a *ngIf="editSubscriptionPropertyCapability" (click)="loadSubpropertiesLocalization(_subscriptionList[i])">
+            <em class="fa fa-language" title='{{"TEXT_TRANSLATE"| translate:lang}}' aria-hidden="true"> </em>
+          </a>
+          <a *ngIf="deleteSubscriptionPropertyCapability" [class.disable]="_subscriptionList[i]?.entityCount !== 0 " (click)="openDeleteConfirmation(_subscriptionList[i],i)">
+            <em class="fa fa-times-circle" title='{{"TEXT_DELETE"| translate:lang}}' aria-hidden="true"> </em>
+          </a>
+          <span *ngIf="errorTooltip && i == tooltipIndex">
+            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="deleteErrorMessage" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+          </span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'category'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;">{{_subscriptionList[i]?.category}}</span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'name'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;">{{_subscriptionList[i]?.name}}</span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'description'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;">{{_subscriptionList[i]?.description}}</span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'specType'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;">{{_subscriptionList[i]?.specTypeName}}</span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'userVisible'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;" *ngIf="_subscriptionList[i]?.userVisible">Shown</span>
+          <span style="word-wrap:break-word;" *ngIf="!_subscriptionList[i]?.userVisible">Hidden</span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'editingForSubscription'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+          <span style="word-wrap:break-word;">{{_subscriptionList[i]?.editingForSubscription}}</span>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'entityCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+              <div class="text-right ecb-cursorPointer" (click)="openInUseOfferings(_subscriptionList[i])" *ngIf="_subscriptionList[i]?.entityCount !== 0">
+                <a>{{_subscriptionList[i]?.entityCount}}</a>
+              </div>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'specType'" pTemplate="filter" let-col>
+            <ecb-dropdown [options]= 'subscriptionTypesList' 
+            [modelValue] = 'subscriptionDefault' [primaryOption] = 'subscriptionDefault' 
+            (changeItem)="changeSubScriptionType($event)">
+            </ecb-dropdown>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'editingForSubscription'" pTemplate="filter" let-col>
+            <ecb-dropdown [options]= 'editingForSubscriptionList' [modelValue] = 'editSubscriptionDefault' [primaryOption] = 'editSubscriptionDefault' 
+            (changeItem)="changeEditSubScriptionType($event)">
+            </ecb-dropdown>
+        </ng-template>
+  
+        <ng-template *ngIf="col.field == 'userVisible'" pTemplate="filter" let-col>
+            <ecb-dropdown [options]= 'visibleTypesList' [modelValue] = 'visibleTypeDefault' [primaryOption] = 'visibleTypeDefault' 
+            (changeItem)="changeVisibleType($event)">
+            </ecb-dropdown>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+    <div *ngIf="getErrorMessageType() !== 0">
+        <div class="ecb-infoStyling">
+          <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+              <p>{{errorMessage}}</p>
+          </div>
+          <div *ngIf="getErrorMessageType() === 2" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+              <div class="ebNotification-content ecb-infotext"> 
+                  <span class="ebNotification-label">
+                      <span l10nTranslate>{{'TEXT_NO_SUBSCRITPION_PROPERTIES_RECORDS'}} </span>
+                  </span>
+              </div>
+          </div>
+          <div *ngIf="getErrorMessageType() === 3" class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations">
+              <div class="ebNotification-content ecb-infotext"> 
+                  <span class="ebNotification-label">
+                      <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                  </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    <!--table ends here -->
+    <!---localtion from context bar---->
+    </div>
+  </div>
+  </div>
+</div>
+</div>
+
+<ecb-localization *ngIf="showLocalizationPanel" (closeLocalisationAsidePanel)="hidelocalizationWidget($event)"></ecb-localization>
+    <br/>
+    <ecb-modal-dialog [open]="confirmDialog == 1" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+              <dialog-header l10nTranslate>{{'TEXT_DELETE_SUBSCRIPTION'}}</dialog-header>
+      <dialog-body l10nTranslate>
+        <p>
+                      <span l10nTranslate>{{'TEXT_DELETE'}}</span> &#32;{{deletingSubscriptionDetails?.name}}, {{deletingSubscriptionDetails?.specTypeName}} &#32; &#63;</p>
+        <p>{{deletingSubscriptionDetails?.description}}</p>
+      </dialog-body>
+              <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+      <dialog-button-2 l10nTranslate>{{'TEXT_CANCEL'}}</dialog-button-2>
+    </ecb-modal-dialog>
+  
+  <div class="ecb-subscription-properties">
+    <ngx-aside #createSubscriptionProperties [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false"
+      [showOverlay]="false" class="ecb-asideContent ecb-subscriptionproperties" [ngClass]="{'ecb-showEditDialog':showCover}">
+      <ecb-loader *ngIf="loadingDots" mode="dot" fill="widget" type="widget"></ecb-loader>
+      <ecb-create-subscription-property *ngIf="loadCreateSubProperty" [clickedOnPlusLink]="isFAPlusClicked" [pickCategory]="selectedCategory"
+        [createSubscriptionProperty]="createProperty" [selectedEntityCount]="selectedEntityCount" [createInputData]="subscriptionPropertiesInput" (asidePanelOff)="fadeAsidePanel($event)"
+        (isSubscriptionPropertyUpdated)="refreshPropertiesList($event)" (isFormDirty)="setSubPropertiesFormDirty($event)" [subscriptionPropertyDetails]="subscriptionPropertyDetails" (displayInUseOfferings)="displayInUseOfferingsDialog($event)"></ecb-create-subscription-property>
+    </ngx-aside>
+  </div>
+  <div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>
+  

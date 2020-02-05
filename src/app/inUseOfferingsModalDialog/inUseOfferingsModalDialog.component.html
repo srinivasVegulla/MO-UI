@@ -1,0 +1,137 @@
+<ecb-modal-dialog [closeOnEscape]="false" [styleClass]="'ecb-inuseofferings'" [open]="confirmDialog == 1" (onClose)="onModalDialogClose($event)" [header]="false" [body]="false"
+            [footer]="false" >
+            <dialog-body-template>
+            <div class="panel-heading">
+                <h2 l10nTranslate>{{"TEXT_INUSE_OFFERINGS"}} <span>: {{offeringsData.name}}</span><span *ngIf="offeringsData.chargeType !== undefined"> - {{offeringsData.chargeType}}</span>
+                </h2>
+            </div>
+            <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12">
+                <h3 l10nTranslate>{{"TEXT_OFFERINGS_LIST"}}<span> ({{ inUseOfferingsCount }}) </span></h3>
+            </div>
+                <!--error while fetching data -->
+                <div *ngIf="loadGridError">
+                    <div class="row">
+                        <div class=" col-xs-12  col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 col-lg-6 alert alert-danger" role="alert"> 
+                            <p class="filterFetchingError">{{loadGridError}}</p>
+                        </div>
+                    </div>
+                </div> 
+                <!--error while fetching data -->
+                <div class="ecb-positionRelative">                          
+                <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"></ecb-loader>
+                <div *ngIf="loadGridData" class="panel-body ecb-gridInfiniteScroll ecb-inUseSharedRate  " [ngStyle]="calculateGridScrollHeight()" ecb-infinite-scroller [scrollerContext]="'self'" (scrollOnInit)="scrollInitialize($event)" (scrollGetMore)="getMoreData()" (scrollGetLess)="getLessData()" [ngClass]="{'eb-panelBodyTopBorder' : filterInUseErrorMessage}">
+                  <p-dataTable #datatable [ngClass]="[isProductOffer ? 'ecb-usedofferings' : '']" [value]="inUseOfferingsList" [scrollable]="inUseColumnDef.scrollable" [lazy]="inUseColumnDef.lazy"
+                    (onLazyLoad)="loadInUseData($event)" scrollWidth="getDeviceWidth()" sortField={{inUseColumnDef.defaultSortColumn}} sortOrder={{convertedInUseDefaultSortOrder}} [immutable]="false">
+                    <p-column [style]="cols.style" *ngFor="let cols of inUseCols" [field]="cols.field" [header]="cols.key | translate:lang" [sortable]="cols.sortable"
+                        filter="cols.filter" required="true">
+                        <ng-template pTemplate="filter" let-col *ngIf="cols.field !== 'poPartitionId' && cols.field !== 'bundle'">
+                            <div>
+                            <input type="text" *ngIf="(cols.field !== 'availStartDate' && cols.field !== 'availEndDate');else elseBlock" placeholder='{{"TEXT_ENTER_FILTER_CRITERIA"| translate:lang}}' [(ngModel)]="filterInUseFields[cols.field]" pInputText (keyup)="filterDataKeys($event, cols.field, filterInUseFields[cols.field])" class="ecb-filterInput" />
+                                <ng-template #elseBlock>
+                                    <input type="text" class="ecb-filterInput ecb-disabledFliter" [disabled]="true" />
+                                </ng-template>    
+                                <div class="ecb-clearFilterMain">
+                                    <div class="ecb-clearFilter" *ngIf="isInUseFilterText(cols.field)" (click)="clearInUseFilters(cols.field)">
+                                        <em class="fa fa-times-circle-o fa-lg"></em>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+
+                        <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                            </ng-template>
+
+                        <ng-template *ngIf="cols.field == 'bundle'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                          <div class="tooltip ecb-rtlSubscribe">
+                              <img *ngIf="data['bundle']" class="ecb-subscribableItemType" src="../../../assets/images/ericssonIcons/Icon_Bundle.svg" alt="Offer Icon">
+                              <img *ngIf="!data['bundle']" class="ecb-subscribableItemType" src="../../../assets/images/ericssonIcons/Icon_ProductOffer.svg"
+                                  alt="Offer Icon">
+                              <div class="ebInfoPopup-content ebInfoPopup-content_corner_default tooltiptext">
+                                  <div class="ebInfoPopup-contentText">
+                                      <span *ngIf="data['bundle']" class="ecb-subscribeBundle" l10nTranslate>{{"TEXT_BUNDLE"}}</span>
+                                      <span *ngIf="!data['bundle']" class="ecb-subscribePo" l10nTranslate>{{"TEXT_PRODUCT_OFFER"}}</span>
+                                  </div>
+                                  <div class="ebInfoPopup-arrowShadow"></div>
+                                  <div class="ebInfoPopup-arrowBorder"></div>
+                              </div>
+                          </div>
+                        </ng-template>
+
+                        <ng-template *ngIf="cols.field == 'displayName'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                            <span class="ecb-offeringsWordWrap">{{inUseOfferingsList[i].displayName}}</span>
+                        </ng-template>
+
+                        <ng-template *ngIf="cols.field == 'popartitionid'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                            <span class="ecb-offeringsWordWrap">{{inUseOfferingsList[i].poPartitionName}}</span>
+                        </ng-template>
+
+                        <ng-template pTemplate="filter" let-col *ngIf="cols.field === 'availStartDate'">
+                            <div>
+                              <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'availableStartDate'" [columnPlacement]="'middle'">
+                              </ecb-number-date-filter>
+                           </div>
+                        </ng-template>
+
+                        <ng-template *ngIf="cols.field == 'availStartDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                            <span>{{inUseOfferingsList[i].availStartDate | amDateFormat:amLocaleDateFormat }}</span>
+                        </ng-template>
+        
+                        <ng-template pTemplate="filter" let-col *ngIf="cols.field === 'availEndDate'">
+                            <div>
+                              <ecb-number-date-filter (selectedUserFilter)="fetchDateValues($event)" [filterKind]="'date'" [selectedColumnToFilter]="'availableEndDate'" [columnPlacement]="'last'">
+                              </ecb-number-date-filter>
+                           </div>
+                        </ng-template>
+
+                        <ng-template *ngIf="cols.field == 'availEndDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                            <span>{{inUseOfferingsList[i].availEndDate | amDateFormat:amLocaleDateFormat }}</span>
+                        </ng-template>
+
+                        <ng-template *ngIf="cols.field == 'popartitionid'" pTemplate="filter" let-col>
+                            <ecb-dropdown [options]= 'partitions' [primaryOption] = 'partitionFirstItem' 
+                            [modelValue] = 'partitionFirstItem' (changeItem)="changePartitionItem($event)">                        
+                            </ecb-dropdown>
+                        </ng-template>
+
+                        <ng-template *ngIf="cols.field == 'bundle'" pTemplate="filter" let-col>
+                            <ecb-dropdown [options]= 'offeringsTypesList' [modelValue] = 'offeringFirstItem' [primaryOption] = 'offeringFirstItem' (changeItem)="changeOfferingType($event)">                        
+                            </ecb-dropdown>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+
+                <div *ngIf="getErrorMessageType() !== 0">
+                        <div class="ecb-infoStyling">
+                                <div class="alert alert-danger ecb-calInfoMessage" role="alert" *ngIf="getErrorMessageType() === 1">
+                                    <p>{{inUseErrorMessage}}</p>
+                                </div>
+                                <div  class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations" *ngIf="getErrorMessageType() === 3">
+                                    <div class="ebNotification-content ecb-infotext">           
+                                        <span class="ebNotification-label">
+                                            <span l10nTranslate>{{'TEXT_NO_MATCH_FOUND_EDIT_FILTER'}} </span>
+                                        </span>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+
+                <!--No productsoffer message here -->
+                <div  class="ebNotification ebNotification_color_paleBlue ecb-offeringlocations" *ngIf="!inUseErrorMessage  && noInUseTableData">
+                    <div class="ebNotification-content ecb-infotext">        
+                            <span *ngIf="isSubscription" class="ebNotification-label">
+                                <span l10nTranslate>{{'TEXT_NO_INUSE_OFFERINGS_SUBSCRIPTION'}} </span>
+                            </span>
+                            <span *ngIf="isProductOffer" class="ebNotification-label">
+                                <span l10nTranslate>{{'TEXT_NO_INUSE_OFFERINGS_PRODUCT'}} </span>
+                            </span>
+                            <span *ngIf="isPItemplate" class="ebNotification-label">
+                                <span l10nTranslate>{{'TEXT_NO_IN_USE_OFFER_PI'}} </span>
+                            </span>   
+                    </div>
+                </div>
+                <br/>
+                    </div>
+                    </div>
+            </dialog-body-template>
+        </ecb-modal-dialog>

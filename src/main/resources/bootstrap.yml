@@ -1,0 +1,32 @@
+security:
+  basic:
+    enabled: false
+  oauth2:
+    role: RP
+    resource:
+      filter-order: 3
+
+spring:
+  profiles: default,vagrant,develop,test,prod
+  application:
+    name: ecb-metraoffer
+  main:
+    show_banner: false
+  cloud:
+    config:
+      enabled: true
+      fail-fast: true
+      uri: https://localhost:8888
+
+zuul:
+  routes:
+    ecb-security:
+      sensitiveHeaders:
+      path: /uaa/**
+      serviceId: ecb-security
+      stripPrefix: false
+  add-proxy-headers: true
+
+endpoints:
+  refresh:
+    sensitive : false

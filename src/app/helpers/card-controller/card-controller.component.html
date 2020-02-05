@@ -1,0 +1,49 @@
+<div class="panel panel-default">
+<div *ngIf="childPriceableItemsDataType?.pricelistMappingVO?.USAGE" class="panel-heading">
+		<h2 l10nTranslate >{{'TEXT_CHILD_PRICEABLE_ITEMS'}}</h2>		
+</div>
+<div class="panel-body">
+<div class="ecbClickableCard" *ngFor="let info of childPriceableItemsDataType?.pricelistMappingVO?.USAGE" >
+	<div (click)="redirectToPIDetailsPage(info)" >
+		<div class="ecbClickableCard-heading">
+					<div class="display_name" > 
+			 {{info?.displayName}}
+			</div>
+		</div>
+		<div class="ecbClickableCard-body">
+			<p><!-- <img src="../../assets/images/ericssonIcons/products-750x423.jpg"> -->
+			{{info?.description}} 
+				</p>
+			 <div class="properties">
+			 		<label for="PIcard" class="ebLabel" l10nTranslate>{{'TEXT_RATE_TABLES'}}<span>&#58;</span>
+			    	</label>
+			 		<p *ngFor="let inputFieldString of info?.childs">
+		  			   {{inputFieldString?.displayName}}</p>	
+			 </div>
+		</div>
+	 </div>
+</div>
+</div>
+
+	<div  *ngIf="ChildPItemplateInfo" class="panel-heading">
+		<h2 l10nTranslate>{{'TEXT_CHILD_PRICEABLE_ITEMS'}}</h2>
+	</div>
+	<div class="panel-body">
+<div class="ecbClickableCard" *ngFor="let info of ChildPItemplateInfo?.childs; let i = index">
+  <div (click)="openChildPItemplate(info, i)">
+    <div class="ecbClickableCard-heading">
+      <div class="display_name">
+        {{info?.displayName}}
+      </div>
+    </div>
+    <div class="ecbClickableCard-body">
+      <p>
+        <!-- <img src="../../assets/images/ericssonIcons/products-750x423.jpg"> -->
+        {{info?.description}}
+      </p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+	 

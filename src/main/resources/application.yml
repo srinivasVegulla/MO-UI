@@ -1,0 +1,107 @@
+# server:
+#   address: 0.0.0.0
+#   port: 8074
+#   ssl:
+#     key-store: ../devKeyStore.jks
+#     key-store-password: devPassword1^3
+#     keyStoreType: JKS
+#     keyAlias: selfsigned
+#     trustStoreType: JKS
+#   session:
+#     cookie:
+#       http-only: true
+# 
+# eureka:
+#   client:
+#     registerWithEureka: true
+#     fetchRegistry: true
+#     eurekaServerPort: 8078 #8761
+#     eurekaServerURLContext: eureka
+#     healthcheck:
+#       enabled: true
+#     initialInstanceInfoReplicationIntervalSeconds: 5
+#     serviceUrl:
+#       defaultZone: https://localhost:8078/eureka/
+#     sslTrust:
+#       keyStore: ../devKeyStore.jks
+#       keyStorePassword: devPassword1^3
+#       keyStoreType: JKS
+# 
+# ribbon:
+#   eureka:
+#     enabled: true
+#   IsSecure: true
+#   TrustStore: ../devKeyStore.jks
+#   TrustStorePassword: devPassword1^3
+# 
+# spring:
+#   datasource:
+#     dataSourceClassName: com.microsoft.sqlserver.jdbc.SQLServerDataSource
+#     username: sa
+#     password: MetraTech1
+#     dataSourceProperties:
+#       serverName: localhost #saltelematics.metratech.com #jdev-ak-90.metratech.com
+#       databaseName: NetMeter
+#     maximumPoolSize: 5
+#   jackson:
+#     serialization:
+#       write_dates_as_timestamps: false
+# 
+# zuul:
+#   host:
+#     connect-timeout-millis: 5000
+#     socket-timeout-millis: 10000
+# 
+# liquibase:
+#   enabled: false
+# 
+#   jws:
+#     algorithm:
+#       name: RS256
+#   jwe:
+#     algorithm:
+#       name: RSA-OAEP-256
+#   dbms: sqlserver
+#   auth:
+#     db:
+#       config: config
+#     hash:
+#       config: config
+#       keys:
+#         1095ffa1-8cfb-46cc-b30e-2d5d32c0e848: Dm0+oShAF+am4OmIbVGnI4AMGMnpo8ClY6wdCritdhU=
+#   rmp:
+#     config:
+#       resolver: config
+#       path: C:\Dev\MetraNetDev\RMP\Config
+# 
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 60000
+ 
+
+metranet:
+  ticket:
+    auth:
+      request:
+         assertionParam: assertion
+         signerKey: qwertyuiopasdfghjklzxcvbnm123456
+         appName: ecb-metraoffer
+         jwtAssertionTimeToLive: 300  
+
+                    
+spring:
+  http:
+    multipart:
+      max-file-size: 250MB
+      max-request-size: 250MB
+      
+ecb:
+  static:
+    resource:
+      location: ${metraoffer-ext-data:file:///C:/ECB/METRAOFFER-EXT-DATA/}
+      handler: /static/**        

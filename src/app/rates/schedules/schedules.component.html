@@ -1,0 +1,349 @@
+<div class="ecb-removeAsidePanelScroll">
+    <ngx-aside #schedules [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+        class="ecb-asideScheduleContent" (keyup.enter)="processSchedules(schedules)">
+        <div class="ecb-autoScroll ecb-editRateMain">
+            <div class="panel panel-default">
+                <div class="panel-heading ecb-panelHeading">
+                    <br>
+                    <div class="row">
+                        <h2 class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_EDIT_SCHEDULES'}}</h2>
+                        <div class="col-lg-6 ecb-editOverlayLink">
+                            <button class="ecbBtn-margin" [ngClass]="saveBtnCls" l10nTranslate [disabled]="isdisabled" (click)="processSchedules(schedules)">{{'TEXT_SAVE'}}</button>
+                            <button class="ebBtn ebBtn-default" (click)="cancelCoverHandler()">
+                                <span l10nTranslate>{{'TEXT_CANCEL'}} </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="ecb-scheduleWidgetError">
+                        <div *ngIf="showErrorMessage" class="alert alert-danger ecb-errorMessage">
+                                <button type="button" class="close" data-dismiss="alert">
+                                        <span aria-hidden="true" (click)="showErrorMessage=false">×</span>
+                                        <span class="sr-only">Close</span>
+                                 </button>
+                            <p>{{errorMessage}}</p>
+                        </div>
+                    </div>
+                    <div *ngIf="noOfSubscriber !== 0" class="">
+                        <h3 class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ecb-toggleFloat ecb-schedules">{{rateDispName}} </h3>
+                        <div class="ebNotification ebNotification_color_paleBlue">
+                            <div class="ebNotification-content ecb-infotext">
+                                <span class="ebNotification-label ecb-NotificationBlue">
+                                    <span l10nTranslate>{{'TEXT_SUBSCRIPTION_INFO'}}</span> {{noOfSubscriber}}
+                                    <span l10nTranslate>{{'TEXT_SUBSCRIBERS'}}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="ebTable_autoScroll ecb-gridPopUpScroll ecb-positionRelative" id="ecb-schedulesTableEdit">
+                        <form form #f="ngForm" class="ngForm scheduleForm" novalidate>
+                            <p-dataTable *ngIf="!schedulesLoading && loadGridData" [value]="rateSchedules" [scrollable]="true" selectionMode="single"
+                                [rowStyleClass]="getRowClass">
+                                <p-column styleClass="col-button ecb-primeNgColumn ecb-viewListSchedule" *ngFor="let col of scheduleCols" [field]="col.field"
+                                    [header]='col.key | translate:lang' [sortable]="col.sortable" [editable]=col.editableField
+                                    [style]="col.Style">
+                                    <ng-template *ngIf="col.field === 'actions'" let-col let-data="rowData" let-idx="rowIndex" pTemplate="body">
+                                        <span [class.disableActions]="disableEdit">
+                                            <span *ngIf="editSchedulesCapability">
+                                                <a [title]="addTooltip" (click)="addNewSchedule(schedules, idx, false, false)">
+                                                    <em class="fa fa-plus" tabindex="0" aria-hidden="true" id={{idx}}></em>
+                                                </a>
+                                                <a [title]="copyTooltip" (click)="addNewSchedule(schedules, idx, false, true)">
+                                                    <em class="fa fa-clone" tabindex="0" aria-hidden="true" id={{idx}}></em>
+                                                </a>
+                                            </span>
+                                            <a *ngIf="deleteSchedulesCapability " [title]="deleteTooltip" (click)="deleteSchedule(data, idx, true)" [class.disable]="disableDeleteIcon()">
+                                                <em class="fa fa-times-circle" [tabindex]="deleteTabIndex" aria-hidden="true" id={{idx}}></em>
+                                            </a>
+                                            <a *ngIf="!deleteSchedulesCapability && rateSchedules[idx]['removeScheduleCapability']" (click)="deleteSchedule(data, idx, true)"
+                                                [class.disableAction]="disableDeleteIcon()">
+                                                <em class="fa fa-times-circle" [tabindex]="deleteTabIndex" aria-hidden="true" id={{idx}}></em>
+                                            </a>
+                                            <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="dataSaveError !== true && idx === errorColumn">
+                                                <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="'TEXT_CANNOT_SAVE_SCHED' | translate:lang" (onClose)="onToolTipClose($event)">
+                                                </ecb-errortooltip>
+                                            </span>
+                                        </span>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field === 'description'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <input type="text" maxlength="255" id="des-{{i}}" class="ecb-primeNgEditableInput" name="description" [value]="rateSchedules[i][col.field]"
+                                            (input)="setDesc($event.target.value,data, i)" />
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field === 'rulesCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <p [innerHTML]="rateSchedules[i][col.field]" class="ScheduleNumericals"></p>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field === 'startDateType'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <ecb-dropdown [options]='rateSchedulesStartDateOptions' [modelValue]="rateSchedules[i][col.field]" (changeItem)="changeStartDatetype($event, i)">
+                                        </ecb-dropdown>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field === 'startDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <div *ngIf="rateSchedules[i]['startDateType'] === 'EXPLICIT_DATE'">
+                                        <p-calendar #startDateCal [dateFormat]="calenderLocale.dateFormat" name="startDateExplicit" [placeholder]="rateSchedules[i][col.field]? (rateSchedules[i][col.field] | amParse:'MM/DD/YYYY' | amDateFormat: amLocaleDateFormat) : ''" inputStyleClass="ebInput" [locale]="calenderLocale" [inputId]="i" appendTo="body" [monthNavigator]="true" styleClass="ecb-calendar" (onBlur)="closeWarningTooltip($event, i)" (onSelect)="startDateValidations(startDateCal['value'],data,i, false)">
+                                        </p-calendar>
+                                        </div>
+                                        <div *ngIf="rateSchedules[i]['startDateType'] === 'NOT_SET'">
+                                            <input type="text" name="NostartDate" [value]="'TEXT_NO_START' | translate:lang" readonly />
+                                        </div>
+                                        <div *ngIf="rateSchedules[i]['startDateType'] === 'SUBSCRIPTION_RELATIVE'">
+                                            <input type="text" class="ecb-primeNgEditableInput ScheduleNumericals" name="startDateSubscription" [value]="rateSchedules[i]['startDateOffset']"
+                                                (input)="setStartDateOffset($event.target.value,i, false)" maxlength="10" />
+                                        </div>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="startOffsetFormatError !== true && i === errorColumn && isSaveClicked">
+                                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="'TEXT_INCORRECT_FORMAT_ERROR' | translate:lang" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                                        </span>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="startOffsetError === true && i === errorColumn && isSaveClicked">
+                                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="'TEXT_SUB_REL_ERROR' | translate:lang" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                                        </span>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="endOffsetFormatError !== true && i === errorColumn && isSaveClicked">
+                                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="'TEXT_INCORRECT_FORMAT_ERROR' | translate:lang" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                                        </span>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="endOffsetError === true && i === errorColumn && isSaveClicked">
+                                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="'TEXT_SUB_REL_ERROR' | translate:lang" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                                        </span>
+                                        <div *ngIf="rateSchedules[i]['startDateType'] === 'NEXT_BILL_PERIOD'">
+                                            <p-calendar #startDateCal [dateFormat]="calenderLocale.dateFormat" name="startDateNextBill" inputStyleClass="ebInput" [placeholder]="rateSchedules[i][col.field]? (rateSchedules[i][col.field] | amParse:'MM/DD/YYYY' | amDateFormat: amLocaleDateFormat) : ''" [locale]="calenderLocale" [inputId]="i" appendTo="body" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2038" styleClass="ecb-calendar" (onBlur)="closeWarningTooltip($event, i)" (onSelect)="startDateValidations(startDateCal['value'],data,i, false)">
+                                            </p-calendar>
+                                        </div>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="startDateFieldError !== true && i === errorColumn && isSaveClicked">
+                                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="'TEXT_DATE_VALIDATION_ERROR' | translate:lang" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                                        </span>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="dateRangeError === true && i === errorColumn && isSaveClicked">
+                                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="'TEXT_DATE_RANGE_ERROR' | translate:lang" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                                        </span>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="startDateFuture !== true && i === errorColumn">
+                                        <ecb-errortooltip class="ecb-errorTooltipPosition" [isWarning]="true" [isColumnPosition]="'left'"             [text]="'TEXT_START_DATE_WARNING' | translate:lang"> 
+                                        </ecb-errortooltip>
+                                        </span>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field === 'timeLines'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <span class="ecbRateScheduleTimeLine"></span>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field === 'endDateType'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <ecb-dropdown [options]='rateSchedulesEndDateOptions' [modelValue]="rateSchedules[i][col.field]" (changeItem)="changeEndDateType($event, i)">
+                                        </ecb-dropdown>
+                                    </ng-template>
+                                    <ng-template *ngIf="col.field === 'endDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                        <div *ngIf="rateSchedules[i]['endDateType'] === 'EXPLICIT_DATE'">
+                                            <p-calendar #endDateCal [dateFormat]="calenderLocale.dateFormat" name="endDateExplicit" [placeholder]="rateSchedules[i][col.field]? (rateSchedules[i][col.field] | amParse:'MM/DD/YYYY' | amDateFormat: amLocaleDateFormat) : ''" inputStyleClass="ebInput" [locale]="calenderLocale" [inputId]="i" appendTo="body"  [monthNavigator]="true" yearRange="1900:2038" styleClass="ecb-calendar" (onBlur)="closeWarningTooltip($event, i)" (onSelect)="endDateValidations(endDateCal['value'],data,i, false)">
+                                            </p-calendar>
+                                        </div>
+                                        <div *ngIf="rateSchedules[i]['endDateType'] === 'NOT_SET'">
+                                            <input type="text" name="NostartDate" [value]="'TEXT_NO_END' | translate:lang" readonly />
+                                        </div>
+                                        <div *ngIf="rateSchedules[i]['endDateType'] === 'SUBSCRIPTION_RELATIVE'">
+                                            <input type="text" class="ecb-primeNgEditableInput ScheduleNumericals" name="endDateSubscription" [value]="rateSchedules[i]['endDateOffset']"
+                                                (input)="setEndDateOffset($event.target.value,i, false)" maxlength="10" />
+                                        </div>
+                                        <div *ngIf="rateSchedules[i]['endDateType'] === 'NEXT_BILL_PERIOD'">
+                                            <p-calendar #endDateCal [dateFormat]="calenderLocale.dateFormat" name="endDateNextBill" [placeholder]="rateSchedules[i][col.field]? (rateSchedules[i][col.field] | amParse:'MM/DD/YYYY' | amDateFormat: amLocaleDateFormat) : ''" inputStyleClass="ebInput" [locale]="calenderLocale" [inputId]="i" appendTo="body" [monthNavigator]="true" yearRange="1900:2038" styleClass="ecb-calendar" (onBlur)="closeWarningTooltip($event, i)" (onSelect)="endDateValidations(endDateCal['value'],data,i, false)">
+                                            </p-calendar>
+                                        </div>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="
+                                        EndDateFieldError !== true && i === errorColum && isSaveClicked">
+                                            <ecb-errortooltip class="ecb-errorTooltipPosition" [text]="'TEXT_DATE_VALIDATION_ERROR' | translate:lang" (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                                        </span>
+                                        <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedules.length-1))}" *ngIf="endDateFuture !== true && i === errorColumn">
+                                                <ecb-errortooltip  [isWarning]="true" class="ecb-errorTooltipPosition" [isColumnPosition]="'right'" [text]="'TEXT_END_DATE_WARNING' | translate:lang" ></ecb-errortooltip>
+                                            </span>
+                                    </ng-template>
+                                    <ng-template pTemplate="header" let-col let-rowData="rowData">
+                                        <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ngx-aside>
+    <ngx-aside #auditlogAside [showDefaultFooter]="false" [showDefaultHeader]="false" [closeOnEscape]="false" [showOverlay]="false"
+        class="ecb-asideScheduleContent">
+        <div>
+            <div class="panel-heading ecb-panelHeading">
+                <br>
+                <div class="row">
+                    <h2 class="col-lg-6 ecb-toggleFloat" l10nTranslate>{{'TEXT_RATE_SCHEDULE_HISTORY'}}</h2>
+                    <div class="col-lg-6 ecb-editOverlayLink">
+                        <button class="ebBtn ebBtn-default" (click)="closeAduitLogAside()">
+                            <span l10nTranslate>{{'TEXT_CLOSE'}} </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="toggleAuditlog">
+            <ecb-auditLog [isRateHistory]="true" [rateParamsInfo]="rateParamsInfo"></ecb-auditLog>
+        </div>
+    </ngx-aside>
+</div>
+<div class="panel panel-default">
+    <div class="ecb-rateHeader">
+        <div>
+            <span class="ecb-schedulesEditLink">
+                <a [class.disableAction]="disableHistory" (click)="launchAuditLogWidget(auditlogAside)" l10nTranslate>
+                    <i class="fa fa-history" title='{{"TEXT_VIEW_RATE_HISTORY"| translate:lang}}' aria-hidden="true"></i>
+                </a>
+                <span *ngIf="editSchedulesCapability">
+                    <span class="ebLayout-HeadingCommands-separator"></span>
+                    <span [class.disableAction]="disableEdit">
+                        <a [title]="editTooltip" (click)="displayCoverHandler(schedules)" l10nTranslate>{{'TEXT_EDIT'}}</a>
+                    </span>
+                </span>
+            </span>
+            <h3>
+                <span l10nTranslate>{{'TEXT_SCHEDULE'}}</span>
+            </h3>
+        </div>
+
+        <div *ngIf="!disableHistory" class="ebNotification ebNotification_color_paleBlue ecb-leftAlign">
+            <div class="ebNotification-content ecb-infotext">
+                <span class="ebNotification-label ecb-NotificationBlue">
+                    <span l10nTranslate>{{'TEXT_SUBSCRIPTION_INFO'}}</span> {{noOfSubscriber}}
+                    <span l10nTranslate>{{'TEXT_SUBSCRIBERS'}}</span>
+                </span>
+            </div>
+        </div>
+        <div *ngIf="disableHistory" class="ebNotification ebNotification_color_paleBlue ecb-leftAlign">
+            <div class="ebNotification-content ecb-infotext">
+                <span class="ebNotification-label ecb-NotificationBlue">
+                    <span l10nTranslate>{{'TEXT_CLICK_EDIT'}}</span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="showErrorMessage" class="ecb-scheduleWidgetError">
+        <div class="alert alert-danger ecb-errorMessage">
+            <span>{{errorstatusText}}</span>
+        </div>
+    </div>
+    <div class="ebTable_autoScroll ebPadding_bothNone" [ngclass]="{'ecb-loaderMinHeight' : schedulesLoading}">
+        <ecb-loader *ngIf="loading" mode="dot" fill="widget" type="widget"></ecb-loader>
+        <form form #f="ngForm" class="ngForm" name="schedulesForm" novalidate>
+            <ecb-loader *ngIf="schedulesLoading" mode="skeleton" fill="grid" type="grid"></ecb-loader>
+            <p-dataTable *ngIf="loadGridData" [value]="rateSchedulesExisting" [scrollable]="true" selectionMode="single" [rowStyleClass]="getRowClass">
+                <p-column styleClass="col-button ecb-primeNgColumn ecb-schduleSelectCol">
+                    <ng-template let-idx="rowIndex" let-data="rowData" pTemplate="body">
+                        <span>
+                            <input type="radio" class="ebRadioBtn_noText" name="scheduleRowIndex" [value]="2" (change)="getRatesTable(idx)" [checked]="idx === rowIndex">
+                        </span>
+                    </ng-template>
+                    <ng-template pTemplate="header" let-col let-rowData="rowData">
+                        <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="col.style" styleClass="col-button ecb-primeNgColumn" *ngFor="let col of scheduleCols" [field]="col.field"
+                    [header]='col.key | translate:lang'>
+                    <ng-template pTemplate="header" let-col let-rowData="rowData">
+                        <span title="{{col.header | translate:lang}}" l10nTranslate>{{col.header}}</span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field === 'actions'" let-idx="rowIndex" let-data="rowData" pTemplate="body">
+                        <span [class.disableActions]="disableEdit">
+                            <span *ngIf="editSchedulesCapability">
+                                <a [title]="addTooltip" (click)="addNewSchedule(schedules, idx, true, false)">
+                                    <em class="fa fa-plus" aria-hidden="true"></em>
+                                </a>
+                                <a *ngIf="rateSchedulesExisting[idx]['schedId'] !== defaultRowId" [title]="copyTooltip" (click)="addNewSchedule(schedules, idx, true, true)">
+                                    <em class="fa fa-clone" aria-hidden="true"></em>
+                                </a>
+                            </span>
+                            <a *ngIf="(rateSchedulesExisting[idx]['schedId'] !== defaultRowId && deleteSchedulesCapability)" [class.disable]="disableExistingDeleteIcon()"
+                                [title]="deleteTooltip" (click)="deleteSchedule(data, idx, false)">
+                                <em class="fa fa-times-circle" aria-hidden="true"></em>
+                            </a>
+                            <span [ngClass]="{'ecb-errorTooltipContainer':(i === (rateSchedulesExisting.length-1))}" *ngIf="errorTooltip && idx === tooltipIndex">
+                                <ecb-errortooltip class="ecb-errorTooltipPosition" [text]=deleteScheduleError (onClose)="onToolTipClose($event)"></ecb-errortooltip>
+                            </span>
+                        </span>
+                    </ng-template>
+                    <ng-template *ngIf="col.field === 'rulesCount'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <p [innerHTML]="rateSchedulesExisting[i][col.field]" class="ScheduleNumericals"></p>
+                    </ng-template>
+                    <ng-template *ngIf="col.field === 'startDateType'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <div *ngIf="rateSchedulesExisting[i][col.field] === 'EXPLICIT_DATE'">
+                            <p l10nTranslate> {{'TEXT_SPECIFIC_STARTDATE'}}</p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i][col.field] === 'NOT_SET'">
+                            <p l10nTranslate> {{'TEXT_NO_STARTDATE'}}</p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i][col.field] === 'SUBSCRIPTION_RELATIVE'">
+                            <p l10nTranslate> {{'TEXT_DAYS_AFTER_SUB'}}</p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i][col.field] === 'NEXT_BILL_PERIOD'">
+                            <p l10nTranslate> {{'TEXT_NEXT_BILLING_CYCLE'}}</p>
+                        </div>
+                    </ng-template>
+                    <ng-template *ngIf="col.field === 'startDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <div *ngIf="rateSchedulesExisting[i]['startDateType'] === 'EXPLICIT_DATE' || rateSchedulesExisting[i]['startDateType'] === 'NEXT_BILL_PERIOD'">
+                            <p [innerHTML]="rateSchedulesExisting[i][col.field] | amParse:'MM/DD/YYYY' | amDateFormat: amLocaleDateFormat"> </p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i]['startDateType'] === 'SUBSCRIPTION_RELATIVE'">
+                            <p [innerHTML]="rateSchedulesExisting[i]['startDateOffset']" class="ScheduleNumericals"> </p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i]['startDateType'] === 'NOT_SET'">
+                            <p l10nTranslate> {{'TEXT_NO_START'}} </p>
+                        </div>
+                    </ng-template>
+                    <ng-template *ngIf="col.field === 'endDateType'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <div *ngIf="rateSchedulesExisting[i][col.field] === 'EXPLICIT_DATE'">
+                            <p l10nTranslate> {{'TEXT_SPECIFIC_ENDDATE'}}</p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i][col.field] === 'NOT_SET'">
+                            <p l10nTranslate> {{'TEXT_NO_ENDDATE'}}</p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i][col.field] === 'SUBSCRIPTION_RELATIVE'">
+                            <p l10nTranslate> {{'TEXT_DAYS_AFTER_SUB'}}</p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i][col.field] === 'NEXT_BILL_PERIOD'">
+                            <p l10nTranslate> {{'TEXT_NEXT_BILLING_CYCLE'}}</p>
+                        </div>
+                    </ng-template>
+                    <ng-template *ngIf="col.field === 'endDate'" let-col let-data="rowData" let-i="rowIndex" pTemplate="body">
+                        <div *ngIf="rateSchedulesExisting[i]['endDateType'] === 'EXPLICIT_DATE' || rateSchedulesExisting[i]['endDateType'] === 'NEXT_BILL_PERIOD'">
+                            <p [innerHTML]="rateSchedulesExisting[i][col.field] | amParse:'MM/DD/YYYY' | amDateFormat: amLocaleDateFormat"> </p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i]['endDateType'] === 'SUBSCRIPTION_RELATIVE'">
+                            <p [innerHTML]="rateSchedulesExisting[i]['endDateOffset']" class="ScheduleNumericals"> </p>
+                        </div>
+                        <div *ngIf="rateSchedulesExisting[i]['endDateType'] === 'NOT_SET'">
+                            <p l10nTranslate> {{'TEXT_NO_END'}} </p>
+                        </div>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </form>
+    </div>
+</div>
+
+
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog === 1" (onClose)="onModalDialogCloseCancel($event)">
+    <dialog-header l10nTranslate>{{'TEXT_CANCELING_DISCARD_UNSAVED_EDITS'}}</dialog-header>
+    <dialog-body l10nTranslate>{{'TEXT_CANCELING_WITHOUT_SAVING_DISCARDS_EDITS'}}</dialog-body>
+</ecb-modal-dialog>
+
+<ecb-modal-dialog [closeOnEscape]="false" [open]="confirmDialog === 2" (onClose)="onModalDialogCloseDelete($event)" [defaultFooterButtons]="false">
+    <dialog-header l10nTranslate>{{'TEXT_DELETE_SCHEDULE_POPUP'}}</dialog-header>
+    <dialog-body l10nTranslate>
+        <div class="" l10nTranslate>
+            <p>
+                <span l10nTranslate>{{'TEXT_DELETE'}} </span> &#32;
+                <span>{{delteScheduleObj?.description}} </span>
+                <span *ngIf="delteScheduleObj?.startDateType === 'NOT_SET'" l10nTranslate> {{'TEXT_NO_START'}} </span>
+                <span *ngIf="delteScheduleObj?.startDateType === 'SUBSCRIPTION_RELATIVE'" [innerHTML]="delteScheduleObj?.startDateOffset"></span>
+                <span *ngIf="delteScheduleObj?.startDateType === 'EXPLICIT_DATE' || delteScheduleObj?.startDateType === 'NEXT_BILL_PERIOD'"
+                    l10nTranslate [innerHTML]="delteScheduleObj?.startDate | amParse:'MM/DD/YYYY' | amDateFormat: amLocaleDateFormat"></span>
+                <span l10nTranslate> {{'TEXT_TO'}} </span>
+                <span *ngIf="delteScheduleObj?.endDateType === 'NOT_SET'" l10nTranslate> {{'TEXT_NO_END'}} </span>
+                <span *ngIf="delteScheduleObj?.endDateType === 'SUBSCRIPTION_RELATIVE'" [innerHTML]="delteScheduleObj?.endDateOffset"></span>
+                <span *ngIf="delteScheduleObj?.endDateType === 'EXPLICIT_DATE' || delteScheduleObj?.endDateType === 'NEXT_BILL_PERIOD'" l10nTranslate
+                    [innerHTML]="delteScheduleObj?.endDate | amParse:'MM/DD/YYYY' | amDateFormat: amLocaleDateFormat"></span>
+                <span>({{delteScheduleObj?.rulesCount}} Rates) </span> &#32; &#63;
+            </p>
+        </div>
+    </dialog-body>
+    <dialog-button-1 l10nTranslate>{{'TEXT_DELETE'}}</dialog-button-1>
+    <dialog-button-2 l10nTranslate>{{'TEXT_RETURN'}}</dialog-button-2>
+</ecb-modal-dialog>
+<div class="ecb-modelBG" [ngClass]="{'ecb-showModelBG':showCover}"></div>

@@ -1,0 +1,131 @@
+
+        <div class="row ecb-rowContainer">
+                <div *ngIf="PIServerError" class="col-xs-12 col-sm-6  col-md-6 col-lg-offset-4 col-lg-4 col-lg-offset-4  alert alert-danger" l10nTranslate>
+                        <span l10nTranslate>{{ PIErrorMessage }}</span>
+                    </div>
+            <div *ngIf="!PIServerError">
+                <ecb-localization *ngIf="showLocalizationPanel" (closeLocalisationAsidePanel)="hidelocalizationWidget($event)">
+                </ecb-localization>
+                <div *ngIf="priceableItemsData?.kind == 'NON_RECURRING'">
+                    <div *ngIf="isCapableOf('Props_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-piproperties [PIType]="PIType" [oneTimeCharges]="priceableItemsData">
+                        </ecb-piproperties>
+                    </div>
+                    <div *ngIf="isCapableOf('ExtProps_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showExtPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-extended-properties [errorOccured]="PIServerError" [PIType]="PIType" [extendedProperties]="priceableItemsData"></ecb-extended-properties>
+                    </div>
+                    <div *ngIf="showAdjustments && isCapableOf('Adjustments_View')"
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
+                        <ecb-priceableItem-adjustments [isPItemplate]="false" [piAdjustments]="priceableItemsData" (isFormDirty)="displayNavoutDialog($event)">
+                        </ecb-priceableItem-adjustments>
+                    </div>
+                </div>
+                <div *ngIf="priceableItemsData?.kind == 'RECURRING'">
+                    <div *ngIf="isCapableOf('Props_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-piproperties [PIType]="PIType" [oneTimeCharges]="priceableItemsData">
+                        </ecb-piproperties>
+                    </div>
+                    <div *ngIf="isCapableOf('ExtProps_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showBillingSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-pi-billing [PIServerError]="PIServerError" [isPItemplate]="false"  [billingInformation]="priceableItemsData"></ecb-pi-billing>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 e">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showExtPropertiesSkeleton" mode="skeleton" fill="widget" type="widget"></ecb-loader>
+                        <ecb-extended-properties [errorOccured]="PIServerError" [PIType]="PIType" [extendedProperties]="priceableItemsData"></ecb-extended-properties>
+                    </div>
+                    <div *ngIf="showAdjustments && isCapableOf('Adjustments_View')"
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-3 e">
+                        <ecb-priceableItem-adjustments [isPItemplate]="false" [piAdjustments]="priceableItemsData" (isFormDirty)="displayNavoutDialog($event)">
+                        </ecb-priceableItem-adjustments>
+                    </div>
+                </div>
+                <div *ngIf="priceableItemsData?.kind == 'UNIT_DEPENDENT_RECURRING'">
+                    <div *ngIf="isCapableOf('Props_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-piproperties [PIType]="PIType" [oneTimeCharges]="priceableItemsData">
+                        </ecb-piproperties>
+                    </div>
+                    <div *ngIf="isCapableOf('Billing_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showBillingSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-pi-billing [PIServerError]="PIServerError" [isPItemplate]="false" [billingInformation]="priceableItemsData"></ecb-pi-billing>
+                    </div>
+                    <div *ngIf="isCapableOf('UnitDetails_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showUnitDetailsSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-unit-details [PIType]="PIType" [isPItemplate]="false"  [PIdata]="priceableItemsData"></ecb-unit-details>
+                    </div>
+                    <div *ngIf="isCapableOf('ExtProps_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showExtPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-extended-properties [PIType]="PIType" [extendedProperties]="priceableItemsData">
+                        </ecb-extended-properties>
+                    </div>
+                    <div *ngIf="showAdjustments && isCapableOf('Adjustments_View')"  class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
+                        <ecb-priceableItem-adjustments [isPItemplate]="false" [piAdjustments]="priceableItemsData" (isFormDirty)="displayNavoutDialog($event)">
+                        </ecb-priceableItem-adjustments>
+                    </div>
+                </div>
+                <div *ngIf="priceableItemsData?.kind == 'USAGE'">
+                    <div *ngIf="isCapableOf('Props_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-piproperties [PIType]="PIType" [oneTimeCharges]="priceableItemsData">
+                        </ecb-piproperties>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 " *ngIf="priceableItemsData?.extendedProps && isCapableOf('ExtProps_View')">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showExtPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-extended-properties [errorOccured]="PIServerError" [PIType]="PIType" [extendedProperties]="priceableItemsData"></ecb-extended-properties>
+                    </div>
+                    <div *ngIf="childPriceableItemsData?.pricelistMappingVO?.USAGE" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-card-controller [PIType]="PIType" [productOfferId]="productOfferId" [childPIInstance]="childPriceableItemsData">
+                        </ecb-card-controller>
+                    </div>
+                    <div *ngIf="showAdjustments && isCapableOf('Adjustments_View')"  class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-priceableItem-adjustments [isPItemplate]="false" [piAdjustments]="priceableItemsData" (isFormDirty)="displayNavoutDialog($event)">
+                        </ecb-priceableItem-adjustments>
+                    </div>
+                </div>
+                <div *ngIf="priceableItemsData?.kind == 'DISCOUNT'">
+                    <div *ngIf="isCapableOf('Props_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-piproperties [PIType]="PIType" [oneTimeCharges]="priceableItemsData">
+                        </ecb-piproperties>
+                    </div>
+                    <div *ngIf="isCapableOf('ExtProps_View')" class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                        <ecb-loader *ngIf="showLoader" mode="dot" fill="widget"></ecb-loader>
+                        <ecb-loader *ngIf="showExtPropertiesSkeleton" mode="skeleton" fill="widget" type="widget">
+                        </ecb-loader>
+                        <ecb-extended-properties [errorOccured]="PIServerError" [PIType]="PIType" [extendedProperties]="priceableItemsData">
+                        </ecb-extended-properties>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="isCapableOf('RateTables_View') && !PIServerError">
+            <ecb-rates></ecb-rates>
+        </div>
+

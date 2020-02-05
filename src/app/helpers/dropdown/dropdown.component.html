@@ -1,0 +1,13 @@
+<select #dropdownSelected class="ecb-select ecb-selectOption" (change)="changeDropdown()" [(ngModel)]="modelValue" 
+[ngStyle]="{'color': primaryOption != null ? '#4e4e4e' :  '#333333',
+            'border': primaryOption != null ? '1px solid #adadad' : 'none',
+            'font-size':  primaryOption != null ? '10px' : '12px'}">
+    <option l10nTranslate *ngFor="let option of options" [value]="option?.value" 
+    [ngStyle]="{'display': option.value === primaryOption  ?  'none' :  'block',
+                'visibility': option.value === primaryOption ? 'hidden' :  null,
+                'color':  option.value === primaryOption ? '#4e4e4e' :  '#333333'}" 
+    [selected]="option.value == selectedItem ? 'selected' : null" [disabled]="
+    isPlaceholderOption(option.value)">
+        {{option.label}}
+    </option>
+</select>

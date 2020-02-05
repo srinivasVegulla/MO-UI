@@ -1,0 +1,22 @@
+{
+
+     
+    "name": "Name",
+    "actions": "Actions",
+    "type": "Type",
+    "disname": "Display Name",
+    "currency": "Currency",
+    "partition": "Partition Name",
+    "effstartdt": "Effective Start Date",
+    "effenddt": "Effective End Date",
+    "avaistartdt": "Available Start Date",
+    "avaienddt": "Available End Date",
+    "descriptn": "Description",
+    "img": "https://10.200.165.99:8074/assets/images/ericssonIcons/Icon_ProductOffer.svg",
+    "hovername": "Product Offer",
+    "partitionid": "root",
+    "currencyname": "USD",
+    "itemsheading": "Offerings",
+    "numofoffersheading": "Offerings List (23)"
+   
+}

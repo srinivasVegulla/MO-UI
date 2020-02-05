@@ -1,0 +1,81 @@
+<div class="ecb-filterContainer" (click)="onDatePickerClick($event)">
+    <form [formGroup]="filterDirectiveForm">
+      <select class="ecb-filterInput" name="filterType" formControlName="filterType">
+          <option [ngValue]="defaultCategory" disabled>{{defaultCategory}}</option>
+          <option class="ecb-filterOptions" *ngFor="let filter of FilterTypes" [ngValue]="filter.key">
+          {{filter.key | translate:lang}}
+          </option>
+      </select>
+          <!-- Number Filter -->
+          <div [ngClass]="changeColumnPlacement()" class="ecb-showFilter" *ngIf="showRange && filterKind === 'number' && selectedFilter !== 'No Filter'">
+              <div *ngIf="selectedFilter === 'Between'">
+                  <div class="ecbFormNested-addMargin">
+                      <label for="simple-input" class="ecb-filterLabel ebLabel" l10nTranslate>{{'TEXT_FROM_NUMBER'}}</label>
+                      <input type="number" (keydown)="disableInvalidNumbers($event)" class="ebInput" name="fromNumber" formControlName="fromNumber"/>
+                      <div [hidden]="!filterDirectiveForm.controls.fromNumber.hasError('isFromNumberValue') || validFromToValues" class="ebInputError">
+                            <span class="statusError"></span>
+                            <span class="errorText" l10nTranslate>{{'TEXT_FROM_NUMBER_LESS_THAN_TO'}}</span>
+                        </div>
+                  </div>
+                  <div class="ecbFormNested-addMargin">
+                      <label for="simple-input" class="ecb-filterLabel ebLabel" l10nTranslate>{{'TEXT_TO_NUMBER'}}</label>
+                      <input type="number" (keydown)="disableInvalidNumbers($event)" class="ebInput" name="toNumber" formControlName="toNumber"/>
+                      <div [hidden]="!filterDirectiveForm.controls.toNumber.hasError('isToNumberValue') || validFromToValues" class="ebInputError">
+                            <span class="statusError"></span>
+                            <span class="errorText" l10nTranslate>{{'TEXT_TO_NUMBER_GREATER_THAN_FROM'}}</span>
+                          </div>
+                  </div>
+              </div>
+              <div *ngIf="selectedFilter !== 'Between' && selectedFilter !== 'No Filter'">
+                  <div class="form-group ecbFormNested-addMargin">
+                    <label for="simple-input" class="ecb-filterLabel ebLabel" l10nTranslate>{{'TEXT_ONLY_NUMBER'}}</label>
+                    <input type="number" (keydown)="disableInvalidNumbers($event)" class="ebInput" name="onlyNumber" formControlName="onlyNumber"/>
+                  </div>
+              </div>
+              <div  class="ecbFilter-commandBtns">
+                  <button class="ecb-filterButton ebBtn ebBtn-primary" l10nTranslate (click)="selectedInputRange()" [disabled]="enableFilter()">{{'TEXT_OK'}}</button>
+                  <button class="ecb-filterButton ebBtn ebBtn-default" l10nTranslate (click)="closeRange()">{{'TEXT_CANCEL'}}</button>
+              </div>
+          </div>
+          <!-- Date Filter -->
+          <div [ngClass]="changeColumnPlacement()" class="ecb-showFilter ecb-subscriptionproperties" *ngIf="showRange && filterKind === 'date' && selectedFilter !== 'No Filter'">
+            <div *ngIf="selectedFilter === 'Between'">
+                <div class="ecbFilter-dropdown ecbFormNested-addMargin">
+                  <label for="simple-input" class="ecb-filterLabel ebLabel" l10nTranslate>{{'TEXT_FROM_DATE'}}</label>
+                <div class="input-group col-md-10 col-xs-10">
+                  <p-calendar class="ecb-calendarFilter" name="fromDate" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput" formControlName="fromDate" [placeholder]="calenderLocale.placeHolder" [locale]="calenderLocale" [showIcon]="true">           
+                  </p-calendar>
+                  <div [hidden]="!filterDirectiveForm.controls.fromDate.hasError('isFromDateValue') || validFromToValues" class="ebInputError">
+                      <span class="statusError"></span>
+                      <span class="errorText" l10nTranslate>{{'TEXT_FROM_DATE_LESS_THAN_TO'}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group ecbFilter-dropdown ecbFormNested-addMargin">
+                      <label for="simple-input" class="ecb-filterLabel ebLabel" l10nTranslate>{{'TEXT_TO_DATE'}}</label>
+                  <div class="input-group col-md-10 col-xs-10">
+                      <p-calendar class="ecb-calendarFilter" name="toDate" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput" formControlName="toDate" [placeholder]="calenderLocale.placeHolder" [locale]="calenderLocale" [showIcon]="true">           
+                      </p-calendar>
+                      <div [hidden]="!filterDirectiveForm.controls.toDate.hasError('isToDateValue') || validFromToValues" class="ebInputError">
+                          <span class="statusError"></span>
+                          <span class="errorText" l10nTranslate>{{'TEXT_TO_DATE_GREATER_THAN_FROM'}}</span>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div *ngIf="selectedFilter !== 'Between' && selectedFilter !== 'No Filter'">
+                <div class="form-group ecbFilter-dropdown ecbFormNested-addMargin">
+                    <label for="simple-input" class="ecb-filterLabel ebLabel" l10nTranslate>{{'TEXT_ONLY_DATE'}}</label>
+                    <div class="input-group col-md-10 col-xs-10">
+                      <p-calendar class="ecb-calendarFilter" name="onlyDate" [dateFormat]="calenderLocale.dateFormat" inputStyleClass="ebInput" formControlName="onlyDate" [placeholder]="calenderLocale.placeHolder" [locale]="calenderLocale" [showIcon]="true">
+                      </p-calendar>
+                    </div>
+                </div>
+            </div>
+            <div class="ecbFilter-commandBtns">
+                <button class="ecb-filterButton ebBtn ebBtn-primary" l10nTranslate (click)="selectedInputRange()" [disabled]="enableFilter()">{{'TEXT_OK'}}</button>
+                <button class="ecb-filterButton ebBtn ebBtn-default" (click)="closeRange()" l10nTranslate>{{'TEXT_CANCEL'}}</button>
+            </div>
+        </div>
+          </form>
+</div>
