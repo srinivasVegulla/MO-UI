@@ -50,7 +50,7 @@
     "@types/node": "~6.0.60",
     "angular2-template-loader": "0.6.2",
     "codelyzer": "~2.0.0",
-    "electron": "1.6.11",
+    "electron": "8.0.0",
     "image-to-ascii": "3.0.7",
     "imgpx": "1.0.9",
     "jasmine-core": "~2.5.2",
